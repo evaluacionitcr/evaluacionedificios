@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function setRole(formData: FormData): Promise<void> {
   const client = await clerkClient();
   // Check that the user trying to set the role is an admin
-  if (!checkRole("admin")) {
+  if (await !checkRole("admin")) {
     // Instead of returning, throw an error
     throw new Error("Not Authorized");
   }
@@ -30,7 +30,7 @@ export async function setRole(formData: FormData): Promise<void> {
 export async function removeRole(formData: FormData): Promise<void> {
   const client = await clerkClient();
 
-  if (!checkRole("admin")) {
+  if (await !checkRole("admin")) {
     throw new Error("Not Authorized");
   }
 
