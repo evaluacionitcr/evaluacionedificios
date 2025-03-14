@@ -16,7 +16,9 @@ import {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `evaluacionedificios_${name}`);
+export const createTable = pgTableCreator(
+  (name) => `evaluacionedificios_${name}`,
+);
 
 export const posts = createTable(
   "post",
@@ -27,10 +29,19 @@ export const posts = createTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
+      () => new Date(),
     ),
   },
   (example) => ({
     nameIndex: index("name_idx").on(example.name),
-  })
+  }),
 );
+
+export const clerkUsers = createTable("clerk_users", {
+  id: varchar("id").primaryKey(),
+  first_name: varchar("first_name"),
+  last_name: varchar("last_name"),
+  email: varchar("email").unique(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});

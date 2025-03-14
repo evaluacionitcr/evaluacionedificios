@@ -28,7 +28,6 @@ export default async function AdminDashboard() {
           .
         </p>
 
-
         {users.data.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full border border-gray-200 bg-white">
