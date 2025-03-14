@@ -22,6 +22,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.24.2",
     "@clerk/clerk-sdk-node": "^5.1.6",
+    "@clerk/localizations": "^3.12.0",
     "@clerk/nextjs": "^6.12.5",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@tanstack/react-query": "^5.50.0",
