@@ -11,7 +11,7 @@ export default function UsersView() {
         <h1 className="text-2xl font-bold">Usuarios</h1>
         <div className="flex gap-4">
           <Button>Agregar Usuario</Button>
-          <Link href="/admin/roles">
+          <Link href="/admin">
             <Button>Manejar Roles</Button>
           </Link>
         </div>
