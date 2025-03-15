@@ -45,3 +45,5 @@ export const clerkUsers = createTable("clerk_users", {
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
 });
+
+

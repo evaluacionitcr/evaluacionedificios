@@ -93,16 +93,54 @@ export default async function AdminDashboard() {
                           </form>
                           <form action={setRole} className="inline-block">
                             <input type="hidden" value={user.id} name="id" />
-                            <input
-                              type="hidden"
-                              value="moderator"
-                              name="role"
-                            />
+                            <input type="hidden" value="auxiliar" name="role" />
                             <button
                               type="submit"
                               className="rounded bg-blue-600 px-3 py-1 text-sm text-white transition hover:bg-blue-700"
                             >
-                              Moderador
+                              Auxiliar de Administrador
+                            </button>
+                          </form>
+                          <form action={setRole} className="inline-block">
+                            <input type="hidden" value={user.id} name="id" />
+                            <input
+                              type="hidden"
+                              value="evaluadorProyecto"
+                              name="role"
+                            />
+                            <button
+                              type="submit"
+                              className="rounded bg-green-600 px-3 py-1 text-sm text-white transition hover:bg-green-700"
+                            >
+                              Evaluador de Proyectos
+                            </button>
+                          </form>
+                          <form action={setRole} className="inline-block">
+                            <input type="hidden" value={user.id} name="id" />
+                            <input
+                              type="hidden"
+                              value="evaluadorCondiciones"
+                              name="role"
+                            />
+                            <button
+                              type="submit"
+                              className="rounded bg-yellow-600 px-3 py-1 text-sm text-white transition hover:bg-yellow-700"
+                            >
+                              Evaluador de Condiciones
+                            </button>
+                          </form>
+                          <form action={setRole} className="inline-block">
+                            <input type="hidden" value={user.id} name="id" />
+                            <input
+                              type="hidden"
+                              value="evaluadorGeneral"
+                              name="role"
+                            />
+                            <button
+                              type="submit"
+                              className="rounded bg-orange-600 px-3 py-1 text-sm text-white transition hover:bg-orange-700"
+                            >
+                              Evaluador General
                             </button>
                           </form>
                           <form action={removeRole} className="inline-block">

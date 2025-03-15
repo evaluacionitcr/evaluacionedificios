@@ -1,44 +1,27 @@
-import Link from "next/link";
+"use client"
 
-import { LatestPost } from "~/app/_components/post";
-import { api, HydrateClient } from "~/trpc/server";
-import { ProtectedRoute } from "./_components/ProtectedRoute";
-import { TopNav } from "./_components/TopNav";
+import { useState } from "react"
+import MainLayout from "~/components/main-layout"
+import DashboardView from "~/components/dashboard-view"
+import BuildingsView from "~/components/buildings-view"
+import EvaluationsView from "~/components/evaluations-view"
+import ReportsView from "~/components/reports-view"
+import UsersView from "~/components/users-view"
 
-export default async function Home() {
-  
-  const hello = await api.post.hello({ text: "from tRPC" });
-
-  void api.post.getLatest.prefetch();
-  
+export default function EvaluacionEdificios() {
+  const [activeTab, setActiveTab] = useState("dashboard")
 
   return (
-    <ProtectedRoute>
-      <HydrateClient>
-        <TopNav/>
-        <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-          <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-            <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-              Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-            </h1>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-              <Link
-                className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-                href="/admin"
-              >
-                <h3 className="text-2xl font-bold">Probar lo de admin</h3>
-              </Link>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-2xl text-white">
-                {hello ? hello.greeting : "Loading tRPC query..."}
-              </p>
-            </div>
-
-            <LatestPost />
-          </div>
-        </main>
-      </HydrateClient>
-    </ProtectedRoute>
-  );
+    <div className="bg-gray-50 min-h-screen">
+      <MainLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+        {activeTab === "dashboard" && <DashboardView />}
+        {activeTab === "edificios" && <BuildingsView />}
+        {activeTab === "evaluaciones" && <EvaluationsView />}
+        {activeTab === "reportes" && <ReportsView />}
+        {activeTab === "usuarios" && <UsersView />}
+        {activeTab === "parametros" && <div>Parametros</div>}
+      </MainLayout>
+    </div>
+  )
 }
+
