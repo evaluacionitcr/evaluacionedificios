@@ -1,5 +1,6 @@
 import { Button } from "~/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import Link from "next/link";
 
 interface UserItemProps {
   user: {
@@ -20,9 +21,11 @@ export default function UserItem({ user }: UserItemProps) {
         <div className="font-medium">{user.name}</div>
         <div className="text-sm text-muted-foreground">{user.role}</div>
       </div>
-      <Button variant="ghost" size="sm">
-        Editar
-      </Button>
+      <Link href={`/admin/usuarios/editarUsuario`}>
+        <Button variant="ghost" size="sm">
+          Editar
+        </Button>
+      </Link>
     </div>
   )
 }
