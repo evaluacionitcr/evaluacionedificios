@@ -2,18 +2,28 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { Progress } from "~/components/ui/progress"
-import { GetStaticPropsContext } from "next";
+import { GetServerSideProps, GetStaticPropsContext } from "next";
 import Link from "next/link"
 import { ArrowLeft, Calendar, Building, MapPin, Clock, User } from "lucide-react";
 
 interface EdificioDetallePageProps {
-  params: { id: string };
+  id: string;
 }
 
-export default function EdificioDetallePage({
-  params,
-}: EdificioDetallePageProps) {
-  const { id } = params;
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params!;
+
+  // Aquí puedes cargar datos desde tu API si es necesario
+  // const edificio = await fetch(`https://api.example.com/edificios/${id}`).then(res => res.json());
+
+  return {
+    props: {
+      id,
+    },
+  };
+};
+
+export default function EdificioDetallePage({ id }: EdificioDetallePageProps) {
   // En una aplicación real, aquí cargarías los datos del edificio según el ID
   const edificio = {
     id: id,
