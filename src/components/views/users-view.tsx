@@ -9,7 +9,9 @@ export default function UsersView() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-primary">Usuarios</h1>
         <div className="flex gap-2">
-          <Button>Agregar Usuario</Button>
+          <Link href = "/admin/usuarios/agregar">
+            <Button>Agregar Usuario</Button>
+          </Link>
           <Link href="/admin/usuarios/roles">
             <Button variant="outline">Administrar Roles</Button>
           </Link>
