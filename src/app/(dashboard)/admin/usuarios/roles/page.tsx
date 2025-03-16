@@ -18,7 +18,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Link href="/usuarios">
+      <Link href="/admin/usuarios">
         <Button variant="ghost" size="icon" className="mr-2">
           <ArrowLeft className="h-4 w-4" />
         </Button>

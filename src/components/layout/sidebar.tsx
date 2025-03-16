@@ -71,7 +71,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
             </Link>
           </li>
           <li>
-            <Link href="/usuarios">
+            <Link href="/admin/usuarios">
               <Button
                 variant={activeTab === "usuarios" ? "secondary" : "ghost"}
                 className="w-full justify-start text-white hover:bg-white/10 hover:text-white"

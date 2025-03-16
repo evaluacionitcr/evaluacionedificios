@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <ClerkProvider>
+      <ClerkProvider afterSignOutUrl={"/sign-in"}>
         <body className={`${inter.className} bg-gray-50 min-h-screen`}>{children}</body>
       </ClerkProvider>
     </html>
