@@ -1,14 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "~/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import GeneralInfoSection from "./general-info-section"
-import EvaluationDetailsSection from "./evaluation-details-section"
-import RecommendationsSection from "./recommendations-section"
-import Link from "next/link"
-
-
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import GeneralInfoSection from "./general-info-section";
+import EvaluationDetailsSection from "./evaluation-details-section";
+import RecommendationsSection from "./recommendations-section";
+import Link from "next/link";
 
 export default function FormularioEvaluacion() {
   const [formData, setFormData] = useState({
@@ -20,14 +18,14 @@ export default function FormularioEvaluacion() {
     observaciones: "",
     recomendaciones: "",
     conclusiones: "",
-  })
+  });
 
-  const handleChange = (field :string, value :string) => {
+  const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData({
       ...formData,
       [field]: value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +35,7 @@ export default function FormularioEvaluacion() {
 
   return (
     <div className="container mx-auto py-6">
-      <div className="flex items-center mb-6">
+      <div className="mb-6 flex items-center">
         <Link href="/">
           <Button variant="ghost" size="icon" className="mr-2">
             <ArrowLeft className="h-4 w-4" />
@@ -49,11 +47,17 @@ export default function FormularioEvaluacion() {
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6">
           <GeneralInfoSection formData={formData} handleChange={handleChange} />
-          <EvaluationDetailsSection formData={formData} handleChange={handleChange} />
-          <RecommendationsSection formData={formData} handleChange={handleChange} onSubmit={handleSubmit} />
+          <EvaluationDetailsSection
+            formData={formData}
+            handleChange={handleChange}
+          />
+          <RecommendationsSection
+            formData={formData}
+            handleChange={handleChange}
+            onSubmit={handleSubmit}
+          />
         </div>
       </form>
     </div>
-  )
+  );
 }
-

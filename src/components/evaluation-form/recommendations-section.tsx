@@ -8,12 +8,14 @@ import { Textarea } from "~/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
 import { Save, SendHorizonal } from "lucide-react"
 
+type FormDataKey = "recomendaciones" | "conclusiones" 
+
 interface RecommendationsSectionProps {
   formData: {
     recomendaciones: string
     conclusiones: string
   }
-  handleChange: (field: string, value: string) => void
+  handleChange: (field: FormDataKey, value: string) => void
   onSubmit: (e: React.FormEvent) => void
 }
 

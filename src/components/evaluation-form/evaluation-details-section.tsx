@@ -7,12 +7,14 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 
+type FormDataKey = "condicionGeneral" | "observaciones"
+
 interface EvaluationDetailsSectionProps {
   formData: {
     condicionGeneral: string
     observaciones: string
   }
-  handleChange: (field: string, value: string) => void
+  handleChange: (field: FormDataKey, value: string) => void
 }
 
 export default function EvaluationDetailsSection({ formData, handleChange }: EvaluationDetailsSectionProps) {
