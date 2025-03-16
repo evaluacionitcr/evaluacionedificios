@@ -12,14 +12,11 @@ import { Progress } from "~/components/ui/progress";
 import { Button } from "~/components/ui/button";
 import Link from "next/link";
 
-interface EdificioDetallePageProps {
-  params: { id: string };
-}
+type Params = Promise<{ id: string }>;
 
-export default async function EdificioDetallePage({
-  params,
-}: EdificioDetallePageProps) {
-  const { id } = params;
+export default async function EdificioDetallePage(props: { params: Params }) {
+  const params = await props.params;
+  const id = params.id;
 
   // Simulación de datos de un edificio (aquí deberías hacer una llamada API o una consulta a base de datos)
   const edificio = {
