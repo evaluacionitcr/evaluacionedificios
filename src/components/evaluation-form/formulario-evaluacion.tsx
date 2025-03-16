@@ -8,20 +8,10 @@ import EvaluationDetailsSection from "./evaluation-details-section"
 import RecommendationsSection from "./recommendations-section"
 import Link from "next/link"
 
-interface FormData {
-  edificio: string;
-  fecha: string;
-  evaluador: string;
-  tipoEvaluacion: string;
-  condicionGeneral: string;
-  observaciones: string;
-  recomendaciones: string;
-  conclusiones: string;
-}
 
 
 export default function FormularioEvaluacion() {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     edificio: "",
     fecha: "",
     evaluador: "",
@@ -30,23 +20,20 @@ export default function FormularioEvaluacion() {
     observaciones: "",
     recomendaciones: "",
     conclusiones: "",
-  });
+  })
 
-
-  const handleChange = (field: keyof FormData, value: string) => {
+  const handleChange = (field :string, value :string) => {
     setFormData({
       ...formData,
       [field]: value,
-    });
-  };
+    })
+  }
 
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Datos enviados:", formData);
     // Aquí iría la lógica para enviar los datos
   };
-
 
   return (
     <div className="container mx-auto py-6">
