@@ -1,30 +1,27 @@
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { Progress } from "~/components/ui/progress"
-import { GetServerSideProps, GetStaticPropsContext } from "next";
-import Link from "next/link"
-import { ArrowLeft, Calendar, Building, MapPin, Clock, User } from "lucide-react";
+// src/app/(dashboard)/edificios/[id]/page.tsx
+
+import { Building, MapPin, Calendar, User, Clock, ArrowLeft } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "~/components/ui/card";
+import { Progress } from "~/components/ui/progress";
+import { Button } from "~/components/ui/button";
+import Link from "next/link";
 
 interface EdificioDetallePageProps {
-  id: string;
+  params: { id: string };
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params!;
+export default async function EdificioDetallePage({
+  params,
+}: EdificioDetallePageProps) {
+  const { id } = params;
 
-  // Aquí puedes cargar datos desde tu API si es necesario
-  // const edificio = await fetch(`https://api.example.com/edificios/${id}`).then(res => res.json());
-
-  return {
-    props: {
-      id,
-    },
-  };
-};
-
-export default function EdificioDetallePage({ id }: EdificioDetallePageProps) {
-  // En una aplicación real, aquí cargarías los datos del edificio según el ID
+  // Simulación de datos de un edificio (aquí deberías hacer una llamada API o una consulta a base de datos)
   const edificio = {
     id: id,
     nombre: "Facultad de Ingeniería",
@@ -120,124 +117,6 @@ export default function EdificioDetallePage({ id }: EdificioDetallePageProps) {
               </div>
             </CardContent>
           </Card>
-
-          <Tabs defaultValue="evaluaciones">
-            <TabsList className="mb-4 grid grid-cols-3">
-              <TabsTrigger value="evaluaciones">Evaluaciones</TabsTrigger>
-              <TabsTrigger value="mantenimientos">Mantenimientos</TabsTrigger>
-              <TabsTrigger value="documentos">Documentos</TabsTrigger>
-            </TabsList>
-            <TabsContent value="evaluaciones">
-              <Card className="bg-white shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-primary">
-                    Historial de Evaluaciones
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="rounded-lg border p-4">
-                      <div className="mb-2 flex items-start justify-between">
-                        <div>
-                          <h3 className="font-medium">Evaluación Completa</h3>
-                          <p className="text-sm text-muted-foreground">
-                            15/01/2025
-                          </p>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          Ver Detalles
-                        </Button>
-                      </div>
-                      <p className="mb-2 text-sm">
-                        Evaluador: Ing. Roberto Gómez
-                      </p>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>Condición General:</span>
-                          <span className="font-medium text-green-600">
-                            Excelente (85%)
-                          </span>
-                        </div>
-                        <Progress value={85} className="h-2" />
-                      </div>
-                    </div>
-                    <div className="rounded-lg border p-4">
-                      <div className="mb-2 flex items-start justify-between">
-                        <div>
-                          <h3 className="font-medium">
-                            Evaluación Estructural
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            10/07/2024
-                          </p>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          Ver Detalles
-                        </Button>
-                      </div>
-                      <p className="mb-2 text-sm">
-                        Evaluador: Ing. Carlos Mendoza
-                      </p>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>Condición Estructural:</span>
-                          <span className="font-medium text-green-600">
-                            Excelente (90%)
-                          </span>
-                        </div>
-                        <Progress value={90} className="h-2" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="mantenimientos">
-              <Card className="bg-white shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-primary">
-                    Mantenimientos Programados
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    No hay mantenimientos programados actualmente.
-                  </p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="documentos">
-              <Card className="bg-white shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-primary">
-                    Documentos Relacionados
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    <li className="flex items-center justify-between border-b p-2">
-                      <span>Planos Arquitectónicos.pdf</span>
-                      <Button variant="ghost" size="sm">
-                        Descargar
-                      </Button>
-                    </li>
-                    <li className="flex items-center justify-between border-b p-2">
-                      <span>Certificado Estructural 2023.pdf</span>
-                      <Button variant="ghost" size="sm">
-                        Descargar
-                      </Button>
-                    </li>
-                    <li className="flex items-center justify-between border-b p-2">
-                      <span>Manual de Mantenimiento.pdf</span>
-                      <Button variant="ghost" size="sm">
-                        Descargar
-                      </Button>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
         </div>
 
         <div className="space-y-6">
@@ -273,46 +152,8 @@ export default function EdificioDetallePage({ id }: EdificioDetallePageProps) {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-primary">Acciones</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button className="w-full">Programar Evaluación</Button>
-              <Button variant="outline" className="w-full">
-                Registrar Mantenimiento
-              </Button>
-              <Button variant="outline" className="w-full">
-                Subir Documento
-              </Button>
-              <Button variant="outline" className="w-full">
-                Editar Información
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-primary">Próximos Eventos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <div className="mr-2 h-2 w-2 rounded-full bg-blue-500"></div>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">Evaluación Anual</div>
-                    <div className="text-xs text-muted-foreground">
-                      {edificio.proximaEvaluacion}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
   );
 }
-
