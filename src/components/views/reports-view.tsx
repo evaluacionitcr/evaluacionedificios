@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import AvailableReports from "~/components/available-reports"
-import RecentReports from "~/components/recent-reports"
+import AvailableReports from "~/components/reports/available-reports"
+import RecentReports from "~/components/reports/recent-reports"
 
 export default function ReportsView() {
   return (

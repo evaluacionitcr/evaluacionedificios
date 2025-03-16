@@ -1,5 +1,6 @@
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
+import Link from "next/link"
 
 interface BuildingCardProps {
   building: {
@@ -11,10 +12,13 @@ interface BuildingCardProps {
 }
 
 export default function BuildingCard({ building }: BuildingCardProps) {
+  // Extraer el ID del código para la navegación
+  const buildingId = building.codigo.toLowerCase()
+
   return (
-    <Card>
+    <Card className="bg-white shadow-sm hover:shadow-md transition-shadow">
       <CardHeader>
-        <CardTitle>{building.nombre}</CardTitle>
+        <CardTitle className="text-primary">{building.nombre}</CardTitle>
         <CardDescription>Código: {building.codigo}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -23,12 +27,12 @@ export default function BuildingCard({ building }: BuildingCardProps) {
           <div
             className={`font-medium ${
               building.estado === "Excelente"
-                ? "text-green-500"
+                ? "text-green-600"
                 : building.estado === "Bueno"
-                  ? "text-blue-500"
+                  ? "text-blue-600"
                   : building.estado === "Regular"
-                    ? "text-yellow-500"
-                    : "text-red-500"
+                    ? "text-yellow-600"
+                    : "text-red-600"
             }`}
           >
             {building.estado}
@@ -38,9 +42,11 @@ export default function BuildingCard({ building }: BuildingCardProps) {
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">
-          Ver Detalles
-        </Button>
+        <Link href={`/edificios/${buildingId}`} className="w-full">
+          <Button variant="outline" className="w-full">
+            Ver Detalles
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   )

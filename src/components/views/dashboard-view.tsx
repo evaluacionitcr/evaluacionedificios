@@ -1,8 +1,8 @@
 import { Building, ClipboardCheck, FileText, Settings } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import StatsCard from "~/components/stats-card"
-import BuildingStatusList from "~/components/building-status-list"
-import UpcomingEvaluations from "~/components/upcoming-evaluations"
+import StatsCard from "~/components/dashboard/stats-card"
+import BuildingStatusList from "~/components/dashboard/building-status-list"
+import UpcomingEvaluations from "~/components/dashboard/upcoming-evaluations"
 
 export default function DashboardView() {
   return (

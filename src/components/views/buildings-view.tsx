@@ -1,5 +1,5 @@
 import { Button } from "~/components/ui/button"
-import BuildingList from "~/components/building-list"
+import BuildingList from "~/components/buildings/building-list"
 
 export default function BuildingsView() {
   return (

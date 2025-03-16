@@ -1,5 +1,5 @@
 import { Button } from "~/components/ui/button"
-import EvaluationTabs from "~/components/evaluation-tabs"
+import EvaluationTabs from "~/components/evaluations/evaluation-tabs"
 import Link from "next/link"
 
 export default function EvaluationsView() {

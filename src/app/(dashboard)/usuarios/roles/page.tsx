@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 import { checkRole } from "~/utils/roles";
 import { clerkClient } from "@clerk/nextjs/server";
 import { removeRole, setRole } from "./_actions";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default async function AdminDashboard() {
   if (!(await checkRole("admin"))) {
@@ -15,6 +18,11 @@ export default async function AdminDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Link href="/usuarios">
+        <Button variant="ghost" size="icon" className="mr-2">
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+      </Link>
       <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
         <h1 className="mb-4 text-2xl font-bold text-gray-800">
           Panel de Administración

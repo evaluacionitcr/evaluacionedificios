@@ -20,14 +20,14 @@ export default function FormularioEvaluacion() {
     conclusiones: "",
   })
 
-  const handleChange = (field, value) => {
+  const handleChange = (field :any, value :any) => {
     setFormData({
       ...formData,
       [field]: value,
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e : any) => {
     e.preventDefault()
     console.log("Datos enviados:", formData)
     // Aquí iría la lógica para enviar los datos
