@@ -20,6 +20,9 @@ export default function FormularioEvaluacion() {
     conclusiones: "",
   });
 
+
+
+  
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData({
       ...formData,
