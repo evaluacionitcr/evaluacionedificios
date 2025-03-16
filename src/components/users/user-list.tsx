@@ -28,7 +28,7 @@ export default function UserList() {
       }
     }
 
-    fetchUsers();
+    void fetchUsers(); // Usar void para ignorar la promesa
   }, []);
 
   if (loading) return <div>Loading users...</div>;
