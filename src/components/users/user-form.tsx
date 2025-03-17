@@ -33,7 +33,8 @@ export default function UserForm({ id }: { id: string }) {
     }
 
     if (id) {
-      fetchUserData();
+      // Fix the floating promise by using void operator
+      void fetchUserData();
     }
   }, [id]);
 
@@ -41,7 +42,6 @@ export default function UserForm({ id }: { id: string }) {
     try {
       // Crear un objeto con solo los campos que tienen valor
       const updatedFields = new FormData();
-
       // Copiar solo los campos que no están vacíos
       for (const [key, value] of formData.entries()) {
         if (value !== "" && (key !== "password" || value !== "")) {
@@ -50,10 +50,8 @@ export default function UserForm({ id }: { id: string }) {
       }
 
       const result = await updateUser(id, updatedFields);
-
       if (result.success) {
         setMessage("Usuario actualizado correctamente");
-
         // Refrescar los datos del usuario
         const updatedUserData = await getUserData(id);
         setUser(updatedUserData);
@@ -98,7 +96,6 @@ export default function UserForm({ id }: { id: string }) {
             className="w-full rounded-md border-2 border-blue-500 p-2 focus:ring-2 focus:ring-blue-300"
           />
         </div>
-
         <div className="space-y-1">
           <label className="block font-medium text-gray-700">Apellido:</label>
           <Input
@@ -109,7 +106,6 @@ export default function UserForm({ id }: { id: string }) {
             className="w-full rounded-md border-2 border-blue-500 p-2 focus:ring-2 focus:ring-blue-300"
           />
         </div>
-
         <SubmitButton />
       </form>
     </div>
@@ -118,7 +114,6 @@ export default function UserForm({ id }: { id: string }) {
 
 function SubmitButton() {
   const { pending } = useFormStatus();
-
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? "Guardando..." : "Guardar"}
