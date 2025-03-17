@@ -25,9 +25,9 @@ export default function DashboardLayout({
       setActiveTab("evaluaciones")
     } else if (pathname.startsWith("/reportes")) {
       setActiveTab("reportes")
-    } else if (pathname.startsWith("/usuarios")) {
+    } else if (pathname.startsWith("/admin/usuarios")) {
       setActiveTab("usuarios")
-    } else if (pathname.startsWith("/parametros")) {
+    } else if (pathname.startsWith("/admin/parametros")) {
       setActiveTab("parametros")
     }
   }, [pathname])

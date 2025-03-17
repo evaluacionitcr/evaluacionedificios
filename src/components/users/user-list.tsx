@@ -39,6 +39,7 @@ export default function UserList() {
         <UserItem
           key={user.id || index}
           user={{
+            id: user.id,
             name: user.name,
             role: user.role,
             initials: user.initials,

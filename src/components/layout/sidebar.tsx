@@ -1,10 +1,18 @@
-import { Building, ClipboardCheck, FileText, LayoutDashboard, LogOut, Settings, Users } from "lucide-react"
-import { Button } from "~/components/ui/button"
-import Image from "next/image"
-import Link from "next/link"
+import {
+  Building,
+  ClipboardCheck,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Users,
+} from "lucide-react";
+import { Button } from "~/components/ui/button";
+import Image from "next/image";
+import Link from "next/link";
 
 interface SidebarProps {
-  activeTab: string
+  activeTab: string;
 }
 
 export default function Sidebar({ activeTab }: SidebarProps) {
@@ -29,8 +37,12 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           <li>
             <Link href="/">
               <Button
-                variant={activeTab === "dashboard" ? "secondary" : "ghost"}
-                className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                variant="ghost"
+                className={`w-full justify-start ${
+                  activeTab === "dashboard"
+                    ? "bg-white/10 font-medium text-primary-foreground"
+                    : "text-white hover:bg-white/10 hover:text-white"
+                }`}
               >
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 Dashboard
@@ -40,8 +52,12 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           <li>
             <Link href="/edificios">
               <Button
-                variant={activeTab === "edificios" ? "secondary" : "ghost"}
-                className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                variant="ghost"
+                className={`w-full justify-start ${
+                  activeTab === "edificios"
+                    ? "bg-white/10 font-medium text-primary-foreground"
+                    : "text-white hover:bg-white/10 hover:text-white"
+                }`}
               >
                 <Building className="mr-2 h-4 w-4" />
                 Edificios
@@ -51,8 +67,12 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           <li>
             <Link href="/evaluaciones">
               <Button
-                variant={activeTab === "evaluaciones" ? "secondary" : "ghost"}
-                className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                variant="ghost"
+                className={`w-full justify-start ${
+                  activeTab === "evaluaciones"
+                    ? "bg-white/10 font-medium text-primary-foreground"
+                    : "text-white hover:bg-white/10 hover:text-white"
+                }`}
               >
                 <ClipboardCheck className="mr-2 h-4 w-4" />
                 Evaluaciones
@@ -62,8 +82,12 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           <li>
             <Link href="/reportes">
               <Button
-                variant={activeTab === "reportes" ? "secondary" : "ghost"}
-                className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                variant="ghost"
+                className={`w-full justify-start ${
+                  activeTab === "reportes"
+                    ? "bg-white/10 font-medium text-primary-foreground"
+                    : "text-white hover:bg-white/10 hover:text-white"
+                }`}
               >
                 <FileText className="mr-2 h-4 w-4" />
                 Priorización
@@ -73,8 +97,12 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           <li>
             <Link href="/admin/usuarios">
               <Button
-                variant={activeTab === "usuarios" ? "secondary" : "ghost"}
-                className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                variant="ghost"
+                className={`w-full justify-start ${
+                  activeTab === "usuarios"
+                    ? "bg-white/10 font-medium text-primary-foreground"
+                    : "text-white hover:bg-white/10 hover:text-white"
+                }`}
               >
                 <Users className="mr-2 h-4 w-4" />
                 Usuarios
@@ -84,10 +112,14 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           <li>
             <Link href="/parametros">
               <Button
-                variant={activeTab === "parametros" ? "secondary" : "ghost"}
-                className="w-full justify-start text-white hover:bg-white/10 hover:text-white"
+                variant="ghost"
+                className={`w-full justify-start ${
+                  activeTab === "parametros"
+                    ? "bg-white/10 font-medium text-primary-foreground"
+                    : "text-white hover:bg-white/10 hover:text-white"
+                }`}
               >
-                <Users className="mr-2 h-4 w-4" />
+                <Settings className="mr-2 h-4 w-4" />
                 Parametros
               </Button>
             </Link>
@@ -97,4 +129,3 @@ export default function Sidebar({ activeTab }: SidebarProps) {
     </div>
   );
 }
-

@@ -14,7 +14,7 @@ export default function MainLayout({
   setActiveTab,
 }: MainLayoutProps) {
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 text-bg-primary">
       <Sidebar activeTab={activeTab}/>
       <div className="flex-1">
         <Header />

@@ -1,6 +1,7 @@
 // server/actions/users.ts
 "use server";
 import { clerkClient } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
 export async function getFormattedUsers() {
   const client = await clerkClient();
@@ -46,4 +47,83 @@ function getRoleName(role: string): string {
   }
 }
 
+// Server action para obtener datos de usuario
+// En tu Server Action
+
+
+export async function getUserData(userId: string) {
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    
+    // Serializa solo lo que necesitas
+    return {
+      id: user.id,
+      firstName: user.firstName || "",
+      lastName: user.lastName || ""
+    };
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw new Error("No se pudo obtener la información del usuario");
+  }
+}
+
+// Server action para actualizar usuario
+export async function updateUser(userId: string, formData: FormData) {
+  try {
+    // Extraer los campos que se enviaron en el formulario
+    const updates: any = {};
+
+    // Nombre
+    const firstName = formData.get("firstName");
+    if (firstName) {
+      updates.firstName = firstName;
+    }
+
+    // Apellido
+    const lastName = formData.get("lastName");
+    if (lastName) {
+      updates.lastName = lastName;
+    }
+
+
+    const client = await clerkClient();
+
+    // Solo actualizar si hay campos para actualizar
+    if (Object.keys(updates).length > 0) {
+      await client.users.updateUser(userId, updates);
+
+      // Revalidar la ruta para actualizar la información en la UI
+      revalidatePath(`/admin/usuarios/editar/${userId}`);
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating user:", error);
+    return {
+      success: false,
+      error: error.message || "Error al actualizar el usuario",
+    };
+  }
+}
+
+export async function deleteUser(userId: string) {
+  try {
+    const client = await clerkClient();
+    
+    // Eliminar el usuario
+    await client.users.deleteUser(userId);
+    
+    // Revalidar la ruta para actualizar la lista de usuarios
+    revalidatePath('/admin/usuarios');
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting user:", error);
+    return {
+      success: false,
+      error: error.message || "Error al eliminar el usuario"
+    };
+  }
+}
 
