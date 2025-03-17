@@ -14,6 +14,12 @@ import {
 } from "~/components/ui/alert-dialog";
 import { deleteUser } from "~/server/actions/users"; // Importar la acción del servidor que crearemos
 
+// Define a more specific return type for the deleteUser function
+type DeleteUserResult = {
+  success: boolean;
+  error?: string;
+};
+
 export default function UserDeleteButton({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -28,8 +34,12 @@ export default function UserDeleteButton({ id }: { id: string }) {
         // Redirigir o mostrar éxito como prefieras
         window.location.href = "/admin/usuarios"; // O usar router.push si estás usando Next.js App Router
       } else {
-        // Fixed nullish coalescing
-        setError(result.error ?? "Error al eliminar el usuario");
+        // Fixed unsafe argument by ensuring result.error is string
+        const errorMessage: string =
+          typeof result.error === "string"
+            ? result.error
+            : "Error al eliminar el usuario";
+        setError(errorMessage);
         setIsOpen(false);
       }
     } catch (err) {
@@ -65,7 +75,6 @@ export default function UserDeleteButton({ id }: { id: string }) {
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
-                // Fix floating promise
                 void handleDelete();
               }}
               disabled={isDeleting}
