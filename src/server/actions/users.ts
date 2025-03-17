@@ -1,4 +1,3 @@
-// server/actions/users.ts
 "use server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
@@ -6,7 +5,7 @@ import { revalidatePath } from "next/cache";
 export async function getFormattedUsers() {
   const client = await clerkClient();
   const response = await client.users.getUserList({ limit: 100 });
-  const users = response.data || [];
+  const users = response.data ?? [];
 
   return users.map((user) => ({
     id: user.id,
@@ -47,20 +46,16 @@ function getRoleName(role: string): string {
   }
 }
 
-// Server action para obtener datos de usuario
-// En tu Server Action
-
-
 export async function getUserData(userId: string) {
   try {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
-    
+
     // Serializa solo lo que necesitas
     return {
       id: user.id,
-      firstName: user.firstName || "",
-      lastName: user.lastName || ""
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
     };
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -68,24 +63,22 @@ export async function getUserData(userId: string) {
   }
 }
 
-// Server action para actualizar usuario
 export async function updateUser(userId: string, formData: FormData) {
   try {
     // Extraer los campos que se enviaron en el formulario
-    const updates: any = {};
+    const updates: { firstName?: string; lastName?: string } = {};
 
     // Nombre
-    const firstName = formData.get("firstName");
+    const firstName = formData.get("firstName") as string | null;
     if (firstName) {
       updates.firstName = firstName;
     }
 
     // Apellido
-    const lastName = formData.get("lastName");
+    const lastName = formData.get("lastName") as string | null;
     if (lastName) {
       updates.lastName = lastName;
     }
-
 
     const client = await clerkClient();
 
@@ -98,11 +91,14 @@ export async function updateUser(userId: string, formData: FormData) {
     }
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating user:", error);
     return {
       success: false,
-      error: error.message || "Error al actualizar el usuario",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Error al actualizar el usuario",
     };
   }
 }
@@ -110,20 +106,20 @@ export async function updateUser(userId: string, formData: FormData) {
 export async function deleteUser(userId: string) {
   try {
     const client = await clerkClient();
-    
+
     // Eliminar el usuario
     await client.users.deleteUser(userId);
-    
+
     // Revalidar la ruta para actualizar la lista de usuarios
-    revalidatePath('/admin/usuarios');
-    
+    revalidatePath("/admin/usuarios");
+
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting user:", error);
     return {
       success: false,
-      error: error.message || "Error al eliminar el usuario"
+      error:
+        error instanceof Error ? error.message : "Error al eliminar el usuario",
     };
   }
 }
-
