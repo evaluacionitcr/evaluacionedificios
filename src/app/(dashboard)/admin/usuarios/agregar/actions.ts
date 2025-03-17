@@ -1,6 +1,5 @@
 // app/admin/create-user/actions.ts
 "use server";
-
 import { clerkClient } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
@@ -20,9 +19,10 @@ export async function createUser(
 ): Promise<CreateUserResult> {
   try {
     // Verificar si el usuario actual es un administrador
-    const { userId } = await auth();
+    // If you're not using userId, you can remove it or comment out the line
+    // const { userId } = await auth();
+    await auth(); // Just verify auth without capturing userId
     const client = await clerkClient();
-
 
     // Obtener datos del formulario
     const email = formData.get("email") as string;
@@ -45,7 +45,6 @@ export async function createUser(
       skipPasswordChecks: true, // Para permitir contraseñas temporales sencillas
     });
 
-
     // Revalidar la página para actualizar listas de usuarios si existen
     revalidatePath("/admin/users");
 
@@ -55,10 +54,16 @@ export async function createUser(
       email,
       password: temporaryPassword,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // Use unknown instead of any
     console.error("Error al crear usuario:", error);
+
+    // Type guard to safely access error properties
+    const errorMessage =
+      error instanceof Error ? error.message : "Error desconocido";
+
     return {
-      error: `Error al crear el usuario: ${error.message || "Error desconocido"}`,
+      error: `Error al crear el usuario: ${errorMessage}`,
     };
   }
 }
