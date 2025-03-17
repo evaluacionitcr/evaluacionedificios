@@ -23,14 +23,13 @@ export default function UserDeleteButton({ id }: { id: string }) {
     try {
       setIsDeleting(true);
       setError(null);
-
       const result = await deleteUser(id);
-
       if (result.success) {
         // Redirigir o mostrar éxito como prefieras
         window.location.href = "/admin/usuarios"; // O usar router.push si estás usando Next.js App Router
       } else {
-        setError(result.error || "Error al eliminar el usuario");
+        // Fixed nullish coalescing
+        setError(result.error ?? "Error al eliminar el usuario");
         setIsOpen(false);
       }
     } catch (err) {
@@ -50,7 +49,6 @@ export default function UserDeleteButton({ id }: { id: string }) {
       >
         Eliminar Usuario
       </Button>
-
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -67,7 +65,8 @@ export default function UserDeleteButton({ id }: { id: string }) {
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
-                handleDelete();
+                // Fix floating promise
+                void handleDelete();
               }}
               disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700"
@@ -77,7 +76,6 @@ export default function UserDeleteButton({ id }: { id: string }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {error && (
         <div className="mt-2 rounded bg-red-100 p-2 text-red-700">{error}</div>
       )}
