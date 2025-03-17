@@ -1,6 +1,5 @@
 // app/admin/create-user/page.tsx
 "use client";
-
 import { useState } from "react";
 import { createUser } from "./actions";
 import { Button } from "~/components/ui/button";
@@ -23,22 +22,23 @@ export default function CreateUserPage() {
     setLoading(true);
     setError(null);
     setResult(null);
-
     try {
       const result = await createUser(formData);
-
       if ("error" in result) {
         throw new Error(result.error);
       }
-
       setResult(result as UserResult);
-
       // Limpiar el formulario
       setEmail("");
       setFirstName("");
       setLastName("");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      // Type-safe error handling
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocurrió un error desconocido");
+      }
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,6 @@ export default function CreateUserPage() {
   return (
     <div className="mx-auto mt-10 max-w-md rounded-lg bg-white p-6 shadow-md">
       <h1 className="mb-6 text-2xl font-bold">Crear Nuevo Usuario</h1>
-
       <form action={handleSubmit}>
         <div className="mb-4">
           <label className="mb-2 block text-gray-700" htmlFor="email">
@@ -63,7 +62,6 @@ export default function CreateUserPage() {
             required
           />
         </div>
-
         <div className="mb-4">
           <label className="mb-2 block text-gray-700" htmlFor="firstName">
             Nombre
@@ -78,7 +76,6 @@ export default function CreateUserPage() {
             required
           />
         </div>
-
         <div className="mb-4">
           <label className="mb-2 block text-gray-700" htmlFor="lastName">
             Apellido
@@ -93,22 +90,19 @@ export default function CreateUserPage() {
             required
           />
         </div>
-
         <Button
           type="submit"
-          className="w-full rounded-md  text-white hover:bg-blue-800 disabled:bg-blue-300"
+          className="w-full rounded-md text-white hover:bg-blue-800 disabled:bg-blue-300"
           disabled={loading}
         >
           {loading ? "Creando..." : "Crear Usuario"}
         </Button>
       </form>
-
       {error && (
         <div className="mt-4 rounded-md bg-red-100 p-3 text-red-700">
           {error}
         </div>
       )}
-
       {result && (
         <div className="mt-4 rounded-md bg-green-100 p-3 text-green-700">
           <h3 className="font-bold">Usuario creado exitosamente</h3>
