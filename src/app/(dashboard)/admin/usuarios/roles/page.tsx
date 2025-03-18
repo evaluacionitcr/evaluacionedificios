@@ -78,7 +78,15 @@ export default async function AdminDashboard() {
                             className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${
                               currentRole === "admin"
                                 ? "bg-purple-100 text-purple-800"
-                                : "bg-blue-100 text-blue-800"
+                                : currentRole === "auxiliar"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : currentRole === "evaluadorProyecto"
+                                    ? "bg-green-100 text-green-800"
+                                    : currentRole === "evaluadorCondiciones"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : currentRole === "evaluadorGeneral"
+                                        ? "bg-orange-100 text-orange-800"
+                                        : "bg-gray-100 text-gray-800"
                             }`}
                           >
                             {currentRole}
