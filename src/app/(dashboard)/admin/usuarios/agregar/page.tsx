@@ -1,6 +1,5 @@
-// app/admin/create-user/page.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createUser } from "./actions";
 import { Button } from "~/components/ui/button";
 
@@ -17,6 +16,26 @@ export default function CreateUserPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<UserResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Efecto para abrir el mailto cuando se crea un usuario
+  useEffect(() => {
+    if (result?.email) {
+      const subject = "Tus credenciales de acceso";
+      const body = `Hola ${firstName || "Usuario"},
+
+Aquí están tus credenciales de acceso:
+Email: ${result.email}
+Contraseña temporal: ${result.password}
+
+Por favor, cambia tu contraseña después de iniciar sesión por primera vez.
+
+Saludos,
+El equipo de soporte`;
+
+      // Cambiamos window.open por window.location.href
+      window.location.href = `mailto:${result.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+  }, [result, firstName]);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -109,7 +128,8 @@ export default function CreateUserPage() {
           <p>Email: {result.email}</p>
           <p>Contraseña temporal: {result.password}</p>
           <p className="mt-2 text-sm">
-            Comparta estas credenciales con el usuario.
+            Se ha abierto tu cliente de correo para enviar estas credenciales al
+            usuario.
           </p>
         </div>
       )}

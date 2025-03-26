@@ -16,6 +16,7 @@ export async function getFormattedUsers() {
         ? getRoleName(user.publicMetadata.role)
         : "Rol no asignado",
     initials: getInitials(user.fullName),
+    email: user.primaryEmailAddress?.emailAddress ?? "Unknown",
   }));
 }
 

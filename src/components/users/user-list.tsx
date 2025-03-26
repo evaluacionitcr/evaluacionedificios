@@ -9,6 +9,7 @@ interface User {
   name: string;
   role: string;
   initials: string;
+  email: string;
 }
 
 export default function UserList() {
@@ -43,6 +44,7 @@ export default function UserList() {
             name: user.name,
             role: user.role,
             initials: user.initials,
+            email: user.email,
           }}
         />
       ))}

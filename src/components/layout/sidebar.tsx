@@ -21,11 +21,11 @@ export default function Sidebar({ activeTab }: SidebarProps) {
       <div className="border-b border-white/10 p-4">
         <div className="flex items-center gap-2">
           <Image
-            src="https://plazareal.co.cr/logo-tec-color/"
+            src="/tec.png"
             alt="TEC Logo"
-            width={40}
-            height={40}
-            className="h-8 w-auto"
+            width={80}
+            height={80}
+            className="h-auto w-auto"
           />
           <div>
             <h1 className="text-xl font-bold">Oficina de Ingeniería</h1>
