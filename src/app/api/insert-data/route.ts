@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { insertarDatos } from "~/server/db/insertsCartago";
+import { insertarDatos } from "~/server/db/insertsSanCarlos";
 
 export async function POST() {
   try {
