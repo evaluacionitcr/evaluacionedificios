@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 //import { createEdificio } from "./actions"; //Agregar actions
 import { Button } from "~/components/ui/button";
+import { getSedes } from "~/server/actions/sedes"; // Asegúrate de que esta función esté definida en tu archivo de acciones
 
 
-export default function CreateEdificioPage() {
+export default async function CreateEdificioPage() {
     const [metrosCuadrados, setMetrosCuadrados] = useState("");
     const [valorDolarM2, setValorDolarM2] = useState("");
     const [vidaUtilHacienda, setVidaUtilHacienda] = useState("");
@@ -16,6 +17,7 @@ export default function CreateEdificioPage() {
     const [depreciacionAnual, setDepreciacionAnual] = useState(0);
     const [edad, setEdad] = useState(0);
     const [valorRevaluado, setValorRevaluado] = useState(0);
+    const [sedes, setSedes] = useState<Array<{ id: number; nombre: string }>>([]);
 
     const anioActual = new Date().getFullYear(); // Obtener el año actual
 
@@ -61,6 +63,14 @@ export default function CreateEdificioPage() {
         setValorRevaluado(0);
       }
     }, [valorEdificioIR, vidaUtilHacienda, vidaUtilExperto]);    
+
+     // Cargar las sedes al montar el componente
+    useEffect(() => {
+        const fetchSedes = async () => {
+        const data = await getSedes(); // Llama a la función que obtiene las sedes
+      };
+      fetchSedes();
+    }, []);
 
     return (   
         <div className="mx-auto max-w-4xl rounded-lg bg-white p-8 shadow-md">
