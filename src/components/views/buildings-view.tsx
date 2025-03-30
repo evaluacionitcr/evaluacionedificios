@@ -1,4 +1,5 @@
 import { Button } from "~/components/ui/button"
+import Link from "next/link";
 import BuildingList from "~/components/buildings/building-list"
 import { getEdificacionesPorSede } from "~/server/actions/edificios";
 import BuildingListContainer from "~/components/buildings/building-list";
@@ -9,7 +10,9 @@ export default async function BuildingsView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Edificios</h1>
-        <Button>Agregar Edificio</Button>
+        <Link href="/edificios/agregar">
+          <Button>Agregar Edificio</Button>
+        </Link>
       </div>
 
       <div className="container mx-auto py-6">
