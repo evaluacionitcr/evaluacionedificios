@@ -40,12 +40,12 @@ export async function getEdificacionesPorSede() {
       .orderBy(Sedes.nombre, Edificaciones.codigoEdificio);
 
     // Usamos un mapa para agrupar por sede
-    const edificiosPorSede = new Map();
+    const edificiosPorSede = new Map<number, Sede>();
 
     for (const edificio of edificiosConSede) {
       // Creamos la entrada para la sede si no existe
-      const sedeId = edificio.sedeId || 0; // 0 para edificios sin sede asignada
-      const sedeNombre = edificio.sedeNombre || "Sin sede asignada";
+      const sedeId = edificio.sedeId ?? 0; // 0 para edificios sin sede asignada
+      const sedeNombre = edificio.sedeNombre ?? "Sin sede asignada";
 
       if (!edificiosPorSede.has(sedeId)) {
         edificiosPorSede.set(sedeId, {
@@ -55,12 +55,14 @@ export async function getEdificacionesPorSede() {
         });
       }
 
-      // Añadimos el edificio a su sede correspondiente
-      edificiosPorSede.get(sedeId).edificios.push({
-        id: edificio.id,
-        nombre: edificio.nombre,
-        codigo: edificio.codigoEdificio,
-      });
+      const sede = edificiosPorSede.get(sedeId);
+      if (sede) {
+        sede.edificios.push({
+          id: edificio.id,
+          nombre: edificio.nombre,
+          codigo: edificio.codigoEdificio,
+        });
+      }
     }
 
     // Convertimos el mapa a array, ordenamos las sedes por nombre y los edificios por código
