@@ -37,13 +37,19 @@ export default async function EdificioDetallePage(props: { params: Params }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/edificios">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5 text-primary" />
-          </Button>
-        </Link>
-        <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-4">
+          <Link href="/edificios">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5 text-primary" />
+            </Button>
+          </Link>
+          <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button>Agregar remodelación</Button>
+          <Button>Editar edificio</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
