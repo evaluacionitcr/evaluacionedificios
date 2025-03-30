@@ -1,13 +1,14 @@
 "use server";
 
-import { getSedes } from "~/server/actions/sedes";
 import { db } from "~/server/db";
-// Importar el schema necesario (suponiendo que existe)
+// Importa el schema de Sedes directamente aquí
+import { Sedes } from "~/server/db/schema"; 
 // import { Edificios } from "~/server/db/schema";
 
 export async function fetchSedes() {
   try {
-    const sedes = await getSedes();
+    // Accedemos directamente a la tabla de Sedes desde este archivo
+    const sedes = await db.select().from(Sedes);
     return { success: true, data: sedes };
   } catch (error) {
     console.error("Error al obtener las sedes:", error);
