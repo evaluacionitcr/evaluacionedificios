@@ -1,19 +1,38 @@
 "use server";
 
 import { db } from "~/server/db";
-// Importa el schema de Sedes directamente aquí
-import { Sedes } from "~/server/db/schema"; 
-// import { Edificios } from "~/server/db/schema";
+
+import { Sedes, NumeroFincas, UsosActuales } from "~/server/db/schema"; 
+
 
 export async function fetchSedes() {
   try {
-    // Accedemos directamente a la tabla de Sedes desde este archivo
     const sedes = await db.select().from(Sedes);
     return { success: true, data: sedes };
   } catch (error) {
     console.error("Error al obtener las sedes:", error);
     return { success: false, error: "No se pudieron cargar las sedes" };
   }
+}
+
+export async function fetchFincas() {
+    try {
+        const fincas = await db.select().from(NumeroFincas);
+        return { success: true, data: fincas };
+    } catch (error) {
+        console.error("Error al obtener las fincas:", error);
+        return { success: false, error: "No se pudieron cargar las fincas" };
+    }
+}
+
+export async function fetchUsosActuales() {
+    try {
+        const usos = await db.select().from(UsosActuales); // Cambia esto al nombre correcto de la tabla de Usos
+        return { success: true, data: usos };
+    } catch (error) {
+        console.error("Error al obtener los usos:", error);
+        return { success: false, error: "No se pudieron cargar los usos" };
+    }
 }
 
 export async function createEdificio(data: {

@@ -3,12 +3,23 @@ import { useState, useEffect } from "react";
 //import { createEdificio } from "./actions"; //Agregar actions
 import { Button } from "~/components/ui/button";
 
-import { fetchSedes } from "./actions"; // Importar la función para obtener sedes
+import { fetchSedes, fetchFincas, fetchUsosActuales } from "./actions"; // Importar la función para obtener sedes
+import Link from "next/link";
 
 
 interface Sede {
   id: number;
   nombre: string;
+}
+
+interface Finca {
+  id: number;
+  numero: string;
+}
+
+interface UsoActual {
+  id: number;
+  descripcion: string;
 }
 
 export default function CreateEdificioPage() {
@@ -24,6 +35,8 @@ export default function CreateEdificioPage() {
     const [edad, setEdad] = useState(0);
     const [valorRevaluado, setValorRevaluado] = useState(0);
     const [sedes, setSedes] = useState<Sede[]>([]); // Estado para almacenar las sedes
+    const [fincas, setFincas] = useState<Finca[]>([]); // Estado para almacenar las sedes y fincas
+    const [usosActuales, setUsosActuales] = useState<UsoActual[]>([]); // Estado para almacenar los usos actuales
 
     const anioActual = new Date().getFullYear(); // Obtener el año actual
 
@@ -84,6 +97,38 @@ export default function CreateEdificioPage() {
       loadSedes();
     }, []);
 
+    // Cargar fincas al iniciar el componente
+    useEffect(() => {
+      const loadFincas = async () => {
+        try {
+          const response = await fetchFincas();
+          const mappedFincas = (response.data ?? []).map(finca => ({
+            id: finca.id,
+            numero: finca.numero
+          }));
+          setFincas(mappedFincas);
+        } catch (error) {
+          console.error("Error al cargar fincas:", error);
+        }
+      };
+
+      loadFincas();
+    }, []);
+
+    // Cargar usos actuales al iniciar el componente
+    useEffect(() => {
+      const loadUsosActuales = async () => {
+        try {
+          const response = await fetchUsosActuales();
+          setUsosActuales(response.data ?? []);
+        } catch (error) {
+          console.error("Error al cargar usos actuales:", error);
+        }
+      };
+
+      loadUsosActuales();
+    }, []);
+
     return (   
         <div className="mx-auto max-w-4xl rounded-lg bg-white p-8 shadow-md">
           <h1 className="mb-6 text-3xl font-bold">Creación de Edificios</h1>
@@ -142,17 +187,11 @@ export default function CreateEdificioPage() {
                 value={fincaSeleccionada}
                 onChange={(e) => setFincaSeleccionada(e.target.value)}
               >
-                <option value="" disabled>Seleccione una finca</option>
-                <option value="3-255499-000/C-1895719-2016">3-255499-000/C-1895719-2016</option>
-                <option value="FR-1-073967A-000">FR-1-073967A-000</option>
-                <option value="FR-1333791-000">FR-1333791-000</option>
-                <option value="FR-1-70536-00">FR-1-70536-00</option>
-                <option value="1-112539-000 1-119085-0000">1-112539-000 1-119085-0000</option>
-                <option value="7-1796391-2015">7-1796391-2015</option>
-                <option value="SJ-287792-77">SJ-287792-77</option>
-                <option value="2-526954-000">2-526954-000</option>
-                <option value="A-1737794-2014 A-1795299-2015 A1737795-2014">A-1737794-2014 A-1795299-2015 A1737795-2014</option>
-                <option value="A-303776-1978">A-303776-1978</option>
+                {fincas.map((finca) => (
+                  <option key={finca.id} value={finca.numero}>
+                    {finca.numero}
+                  </option>
+                ))}
                 <option value="nueva">Nueva Finca</option>
               </select>
             </div>
@@ -281,18 +320,24 @@ export default function CreateEdificioPage() {
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">Uso Actual</label>
               <select className="mt-1 w-full rounded-md border border-gray-300 p-2">
-                <option>Seleccione el uso actual</option>
+                {usosActuales.map((uso) => (
+                  <option key={uso.id} value={uso.descripcion}>
+                    {uso.descripcion}
+                  </option>
+                ))}
               </select>
             </div>
 
           </div>
           <div className="mt-8 flex justify-end space-x-4">
-            <button 
-              type="button" 
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
-            >
-              Cancelar
-            </button>
+            <Link href="/edificios">
+              <button 
+                type="button" 
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+              >
+                Cancelar
+              </button>
+            </Link>
             <button 
               type="submit" 
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
@@ -305,5 +350,3 @@ export default function CreateEdificioPage() {
         
     )
 }
-
-  
