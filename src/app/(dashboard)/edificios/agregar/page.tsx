@@ -1,11 +1,17 @@
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 //import { createEdificio } from "./actions"; //Agregar actions
 import { Button } from "~/components/ui/button";
-import { getSedes } from "~/server/actions/sedes"; // Asegúrate de que esta función esté definida en tu archivo de acciones
+
+import { fetchSedes } from "./actions"; // Importar la función para obtener sedes
 
 
-export default async function CreateEdificioPage() {
+interface Sede {
+  id: number;
+  nombre: string;
+}
+
+export default function CreateEdificioPage() {
     const [metrosCuadrados, setMetrosCuadrados] = useState("");
     const [valorDolarM2, setValorDolarM2] = useState("");
     const [vidaUtilHacienda, setVidaUtilHacienda] = useState("");
@@ -17,7 +23,7 @@ export default async function CreateEdificioPage() {
     const [depreciacionAnual, setDepreciacionAnual] = useState(0);
     const [edad, setEdad] = useState(0);
     const [valorRevaluado, setValorRevaluado] = useState(0);
-    const [sedes, setSedes] = useState<Array<{ id: number; nombre: string }>>([]);
+    const [sedes, setSedes] = useState<Sede[]>([]); // Estado para almacenar las sedes
 
     const anioActual = new Date().getFullYear(); // Obtener el año actual
 
@@ -64,12 +70,18 @@ export default async function CreateEdificioPage() {
       }
     }, [valorEdificioIR, vidaUtilHacienda, vidaUtilExperto]);    
 
-     // Cargar las sedes al montar el componente
+    // Cargar sedes al iniciar el componente
     useEffect(() => {
-        const fetchSedes = async () => {
-        const data = await getSedes(); // Llama a la función que obtiene las sedes
+      const loadSedes = async () => {
+        try {
+          const response = await fetchSedes();
+          setSedes(response.data ?? []);
+        } catch (error) {
+          console.error("Error al cargar sedes:", error);
+        }
       };
-      fetchSedes();
+
+      loadSedes();
     }, []);
 
     return (   
@@ -93,11 +105,11 @@ export default async function CreateEdificioPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700">Sede</label>
               <select className="mt-1 w-full rounded-md border border-gray-300 p-2">
-                <option>CAMPUS TECNOLÓGICO CENTRAL CARTAGO</option>
-                <option>CAMPUS TECNOLÓGICO LOCAL SAN JOSÉ</option>
-                <option>CAMPUS TECNOLÓGICO LOCAL LIMÓN</option>
-                <option>SEDE ZAPOTE</option>
-                <option>CAMPUS TECNOLOGICO LOCAL SAN CARLOS</option>
+                {sedes.map((sede) => (
+                  <option key={sede.id} value={sede.id.toString()}>
+                    {sede.nombre}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -274,7 +286,23 @@ export default async function CreateEdificioPage() {
             </div>
 
           </div>
+          <div className="mt-8 flex justify-end space-x-4">
+            <button 
+              type="button" 
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
+            >
+              Guardar edificio
+            </button>
+          </div>
+
         </div>
+        
     )
 }
 
