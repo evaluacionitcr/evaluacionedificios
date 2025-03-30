@@ -1,6 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import AvailableReports from "~/components/reports/available-reports"
-import RecentReports from "~/components/reports/recent-reports"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import AvailableReports from "~/components/reports/available-reports";
+import RecentReports from "~/components/reports/recent-reports";
 
 export default function ReportsView() {
   return (
@@ -8,27 +14,32 @@ export default function ReportsView() {
       <h1 className="text-2xl font-bold">Reportes</h1>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle>Reportes Disponibles</CardTitle>
-            <CardDescription>Seleccione un tipo de reporte para generar</CardDescription>
+            <CardDescription>
+              Seleccione un tipo de reporte para generar
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <AvailableReports />
+            <div className="overflow-x-auto">
+              <AvailableReports />
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle>Reportes Recientes</CardTitle>
             <CardDescription>Últimos reportes generados</CardDescription>
           </CardHeader>
           <CardContent>
-            <RecentReports />
+            <div className="overflow-x-auto">
+              <RecentReports />
+            </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

@@ -1,15 +1,21 @@
 import Link from "next/link";
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import UserList from "~/components/users/user-list"
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import UserList from "~/components/users/user-list";
 
 export default function UsersView() {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-primary">Usuarios</h1>
-        <div className="flex gap-2">
-          <Link href = "/admin/usuarios/agregar">
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/usuarios/agregar">
             <Button>Agregar Usuario</Button>
           </Link>
           <Link href="/admin/usuarios/roles">
@@ -26,10 +32,11 @@ export default function UsersView() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UserList />
+          <div className="overflow-x-auto">
+            <UserList />
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 }
-

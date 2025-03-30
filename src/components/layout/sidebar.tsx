@@ -6,6 +6,7 @@ import {
   LogOut,
   Settings,
   Users,
+  X,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import Image from "next/image";
@@ -17,8 +18,8 @@ interface SidebarProps {
 
 export default function Sidebar({ activeTab }: SidebarProps) {
   return (
-    <div className="hidden w-64 flex-col bg-primary text-white md:flex">
-      <div className="border-b border-white/10 p-4">
+    <div className="flex h-full w-64 flex-col bg-primary text-white">
+      <div className="flex items-center justify-between border-b border-white/10 p-4">
         <div className="flex items-center gap-2">
           <Image
             src="/tec.png"
@@ -31,6 +32,18 @@ export default function Sidebar({ activeTab }: SidebarProps) {
             <h1 className="text-xl font-bold">Oficina de Ingeniería</h1>
           </div>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => {
+            // El estado se maneja en el layout
+            const event = new CustomEvent("toggleSidebar");
+            window.dispatchEvent(event);
+          }}
+        >
+          <X className="h-5 w-5" />
+        </Button>
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-1">

@@ -1,34 +1,45 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Label } from "~/components/ui/label"
-import { Textarea } from "~/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import { useState } from "react";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 
-type FormDataKey = "condicionGeneral" | "observaciones"
+type FormDataKey = "condicionGeneral" | "observaciones";
 
 interface EvaluationDetailsSectionProps {
   formData: {
-    condicionGeneral: string
-    observaciones: string
-  }
-  handleChange: (field: FormDataKey, value: string) => void
+    condicionGeneral: string;
+    observaciones: string;
+  };
+  handleChange: (field: FormDataKey, value: string) => void;
 }
 
-export default function EvaluationDetailsSection({ formData, handleChange }: EvaluationDetailsSectionProps) {
-  const [activeTab, setActiveTab] = useState("general")
+export default function EvaluationDetailsSection({
+  formData,
+  handleChange,
+}: EvaluationDetailsSectionProps) {
+  const [activeTab, setActiveTab] = useState("general");
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Detalles de la Evaluación</CardTitle>
-        <CardDescription>Complete los criterios de evaluación para el edificio</CardDescription>
+        <CardDescription>
+          Complete los criterios de evaluación para el edificio
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 mb-4">
+          <TabsList className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="estructura">Estructura</TabsTrigger>
             <TabsTrigger value="instalaciones">Instalaciones</TabsTrigger>
@@ -40,7 +51,9 @@ export default function EvaluationDetailsSection({ formData, handleChange }: Eva
               <Label>Condición General del Edificio</Label>
               <RadioGroup
                 value={formData.condicionGeneral}
-                onValueChange={(value) => handleChange("condicionGeneral", value)}
+                onValueChange={(value) =>
+                  handleChange("condicionGeneral", value)
+                }
                 className="flex flex-col space-y-1"
               >
                 <div className="flex items-center space-x-2">
@@ -96,7 +109,7 @@ export default function EvaluationDetailsSection({ formData, handleChange }: Eva
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function StructureEvaluationTab() {
@@ -163,7 +176,9 @@ function StructureEvaluationTab() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="estructura-observaciones">Observaciones de Estructura</Label>
+        <Label htmlFor="estructura-observaciones">
+          Observaciones de Estructura
+        </Label>
         <Textarea
           id="estructura-observaciones"
           placeholder="Ingrese sus observaciones sobre la estructura del edificio..."
@@ -171,7 +186,7 @@ function StructureEvaluationTab() {
         />
       </div>
     </div>
-  )
+  );
 }
 
 function InstallationsEvaluationTab() {
@@ -238,7 +253,9 @@ function InstallationsEvaluationTab() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="instalaciones-observaciones">Observaciones de Instalaciones</Label>
+        <Label htmlFor="instalaciones-observaciones">
+          Observaciones de Instalaciones
+        </Label>
         <Textarea
           id="instalaciones-observaciones"
           placeholder="Ingrese sus observaciones sobre las instalaciones del edificio..."
@@ -246,7 +263,7 @@ function InstallationsEvaluationTab() {
         />
       </div>
     </div>
-  )
+  );
 }
 
 function SecurityEvaluationTab() {
@@ -313,7 +330,9 @@ function SecurityEvaluationTab() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="seguridad-observaciones">Observaciones de Seguridad</Label>
+        <Label htmlFor="seguridad-observaciones">
+          Observaciones de Seguridad
+        </Label>
         <Textarea
           id="seguridad-observaciones"
           placeholder="Ingrese sus observaciones sobre la seguridad del edificio..."
@@ -321,6 +340,5 @@ function SecurityEvaluationTab() {
         />
       </div>
     </div>
-  )
+  );
 }
-

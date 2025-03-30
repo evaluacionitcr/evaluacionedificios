@@ -1,43 +1,63 @@
 // src/app/(dashboard)/edificios/[id]/page.tsx
 
-import { Building, MapPin, Calendar, User, Clock, ArrowLeft } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
-import { Button } from "~/components/ui/button";
+import {
+  ArrowLeft,
+  Building,
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+} from "lucide-react";
 import Link from "next/link";
+import { getDetallesEdificio } from "~/server/actions/edificios";
+import { notFound } from "next/navigation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
-type Params = Promise<{ id: string }>;
+interface Params {
+  id: string;
+}
 
-export default async function EdificioDetallePage(props: { params: Params }) {
-  const params = await props.params;
-  const id = params.id;
+export default async function EdificioDetallePage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { id } = await params;
 
-  // Simulación de datos de un edificio (aquí deberías hacer una llamada API o una consulta a base de datos)
-  const edificio = {
-    id: id,
-    nombre: "Facultad de Ingeniería",
-    codigo: "FI-01",
-    ubicacion: "Campus Central",
-    fechaConstruccion: "1985",
-    ultimaRenovacion: "2018",
-    estado: "Excelente",
-    condicion: 85,
-    area: "4,500 m²",
-    pisos: 4,
-    responsable: "Ing. Roberto Méndez",
-    ultimaEvaluacion: "15/01/2025",
-    proximaEvaluacion: "15/01/2026",
-  };
+  if (!id) {
+    notFound();
+  }
+
+  const edificios = await getDetallesEdificio(id);
+
+  if (!edificios || edificios.length === 0) {
+    notFound();
+  }
+
+  const edificio = edificios[0];
+  if (!edificio) {
+    notFound();
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between w-full">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Link href="/edificios">
             <Button variant="ghost" size="icon">
@@ -46,116 +66,75 @@ export default async function EdificioDetallePage(props: { params: Params }) {
           </Link>
           <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
         </div>
-        <div className="flex items-center gap-4">
-          <Button>Agregar remodelación</Button>
-          <Button>Editar edificio</Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm">
+            <Calendar className="mr-2 h-4 w-4" />
+            Agregar Remodelación
+          </Button>
+          <Button variant="outline" size="sm">
+            <Building className="mr-2 h-4 w-4" />
+            Editar Edificio
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="space-y-6 md:col-span-2">
-          <Card className="bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-primary">
-                Información General
-              </CardTitle>
-              <CardDescription>Datos básicos del edificio</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="flex items-start gap-2">
-                  <Building className="mt-0.5 h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Código
-                    </p>
-                    <p>{edificio.codigo}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Ubicación
-                    </p>
-                    <p>{edificio.ubicacion}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Calendar className="mt-0.5 h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Fecha de Construcción
-                    </p>
-                    <p>{edificio.fechaConstruccion}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Calendar className="mt-0.5 h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Última Renovación
-                    </p>
-                    <p>{edificio.ultimaRenovacion}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <User className="mt-0.5 h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Responsable
-                    </p>
-                    <p>{edificio.responsable}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Clock className="mt-0.5 h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Última Evaluación
-                    </p>
-                    <p>{edificio.ultimaEvaluacion}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card className="bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-primary">Estado Actual</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">
-                      Condición General
-                    </span>
-                    <span className="text-sm font-medium text-green-600">
-                      {edificio.condicion}%
-                    </span>
-                  </div>
-                  <Progress value={edificio.condicion} className="h-2" />
-                </div>
-                <div className="border-t pt-2">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="text-muted-foreground">Estado:</div>
-                    <div className="font-medium text-green-600">
-                      {edificio.estado}
-                    </div>
-                    <div className="text-muted-foreground">Área:</div>
-                    <div>{edificio.area}</div>
-                    <div className="text-muted-foreground">Pisos:</div>
-                    <div>{edificio.pisos}</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="grid grid-cols-1 gap-6">
+        <Card className="bg-white shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-primary">
+              Historial de Registros
+            </CardTitle>
+            <CardDescription>Registros históricos del edificio</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Fecha Const.</TableHead>
+                    <TableHead>No. Finca</TableHead>
+                    <TableHead>Área (m²)</TableHead>
+                    <TableHead>Uso</TableHead>
+                    <TableHead>Valor USD/m²</TableHead>
+                    <TableHead>Valor CRC/m²</TableHead>
+                    <TableHead>Valor IR</TableHead>
+                    <TableHead>Valor Actual</TableHead>
+                    <TableHead>Depreciación</TableHead>
+                    <TableHead>Año Reval.</TableHead>
+                    <TableHead>Edad 2021</TableHead>
+                    <TableHead>Vida Útil Hacienda</TableHead>
+                    <TableHead>Vida Útil Experto</TableHead>
+                    <TableHead>Es Renovación</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {edificios.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell>{e.nombre}</TableCell>
+                      <TableCell>{e.fechaConstruccion ?? "N/A"}</TableCell>
+                      <TableCell>{e.numeroFinca ?? "N/A"}</TableCell>
+                      <TableCell>{e.m2Construccion ?? "N/A"}</TableCell>
+                      <TableCell>{e.usoActual ?? "N/A"}</TableCell>
+                      <TableCell>${e.valorDolarPorM2 ?? "0.00"}</TableCell>
+                      <TableCell>₡{e.valorColonPorM2 ?? "0.00"}</TableCell>
+                      <TableCell>₡{e.valorEdificioIR ?? "0.00"}</TableCell>
+                      <TableCell>₡{e.valorActualRevaluado ?? "0.00"}</TableCell>
+                      <TableCell>
+                        ₡{e.depreciacionLinealAnual ?? "0.00"}
+                      </TableCell>
+                      <TableCell>{e.anoDeRevaluacion ?? "N/A"}</TableCell>
+                      <TableCell>{e.edadAl2021 ?? 0} años</TableCell>
+                      <TableCell>{e.vidaUtilHacienda ?? 0} años</TableCell>
+                      <TableCell>{e.vidaUtilExperto ?? 0} años</TableCell>
+                      <TableCell>{e.esRenovacion ? "Sí" : "No"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

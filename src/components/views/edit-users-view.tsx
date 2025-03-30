@@ -12,9 +12,9 @@ import UserForm from "~/components/users/user-form";
 export default function EditUsersView({ id }: { id: string }) {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-primary">Editar usuario</h1>
-        <div className="flex gap-2"></div>
+        <div className="flex flex-wrap gap-2"></div>
       </div>
       <Card className="bg-white shadow-sm">
         <CardHeader>
@@ -22,7 +22,9 @@ export default function EditUsersView({ id }: { id: string }) {
           <CardDescription>Edite los datos del usuario</CardDescription>
         </CardHeader>
         <CardContent>
-          <UserForm id={id} />
+          <div className="overflow-x-auto">
+            <UserForm id={id} />
+          </div>
         </CardContent>
       </Card>
     </div>

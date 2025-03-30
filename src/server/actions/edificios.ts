@@ -1,6 +1,6 @@
-import { eq, sql, min } from "drizzle-orm";
-import { db } from "~/server/db"; // Ajusta esta ruta a tu configuración
-import { Edificaciones, Sedes } from "../db/schema"; // Ajusta esta ruta a tu esquema
+import { eq, sql, min, ilike } from "drizzle-orm";
+import { db } from "~/server/db";
+import { Edificaciones, Sedes, NumeroFincas, UsosActuales } from "../db/schema";
 
 interface Edificio {
   id: number;
@@ -12,6 +12,27 @@ interface Sede {
   id: number;
   nombre: string;
   edificios: Edificio[];
+}
+
+interface DetallesEdificio {
+  id: number;
+  codigoEdificio: string;
+  sede: string | null;
+  esRenovacion: boolean | null;
+  nombre: string;
+  fechaConstruccion: number | null;
+  numeroFinca: string | null;
+  m2Construccion: number | null;
+  valorDolarPorM2: string | null;
+  valorColonPorM2: string | null;
+  edadAl2021: number | null;
+  vidaUtilHacienda: number | null;
+  vidaUtilExperto: number | null;
+  valorEdificioIR: string | null;
+  depreciacionLinealAnual: string | null;
+  valorActualRevaluado: string | null;
+  anoDeRevaluacion: number | null;
+  usoActual: string | null;
 }
 
 export async function getEdificacionesPorSede() {
@@ -77,5 +98,52 @@ export async function getEdificacionesPorSede() {
   } catch (error) {
     console.error("Error obteniendo edificaciones por sede:", error);
     return []; // Devuelve un array vacío en caso de error
+  }
+}
+
+export async function getDetallesEdificio(
+  codigoEdificio: string,
+): Promise<DetallesEdificio[]> {
+  try {
+    if (!codigoEdificio) {
+      console.log("codigoEdificio es nulo o vacío");
+      return [];
+    }
+
+    console.log("Buscando edificio con código:", codigoEdificio);
+
+    const edificios = await db
+      .select({
+        id: Edificaciones.id,
+        codigoEdificio: Edificaciones.codigoEdificio,
+        sede: Sedes.nombre,
+        esRenovacion: Edificaciones.esRenovacion,
+        nombre: Edificaciones.nombre,
+        fechaConstruccion: Edificaciones.fechaConstruccion,
+        numeroFinca: NumeroFincas.numero,
+        m2Construccion: Edificaciones.m2Construccion,
+        valorDolarPorM2: Edificaciones.valorDolarPorM2,
+        valorColonPorM2: Edificaciones.valorColonPorM2,
+        edadAl2021: Edificaciones.edadAl2021,
+        vidaUtilHacienda: Edificaciones.vidaUtilHacienda,
+        vidaUtilExperto: Edificaciones.vidaUtilExperto,
+        valorEdificioIR: Edificaciones.valorEdificioIR,
+        depreciacionLinealAnual: Edificaciones.depreciacionLinealAnual,
+        valorActualRevaluado: Edificaciones.valorActualRevaluado,
+        anoDeRevaluacion: Edificaciones.anoDeRevaluacion,
+        usoActual: UsosActuales.descripcion,
+      })
+      .from(Edificaciones)
+      .leftJoin(Sedes, eq(Edificaciones.sede, Sedes.id))
+      .leftJoin(NumeroFincas, eq(Edificaciones.noFinca, NumeroFincas.id))
+      .leftJoin(UsosActuales, eq(Edificaciones.usoActual, UsosActuales.id))
+      .where(ilike(Edificaciones.codigoEdificio, codigoEdificio))
+      .orderBy(Edificaciones.id);
+
+    console.log("Resultados encontrados:", edificios.length);
+    return edificios;
+  } catch (error) {
+    console.error("Error obteniendo detalles del edificio:", error);
+    return [];
   }
 }
