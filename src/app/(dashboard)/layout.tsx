@@ -14,7 +14,7 @@ export default function DashboardLayout({
 }>) {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Actualizar la pestaña activa basada en la ruta actual
   useEffect(() => {
@@ -33,15 +33,13 @@ export default function DashboardLayout({
     }
   }, [pathname]);
 
-  // Asegurar que el sidebar esté abierto en pantallas mayores a md
+  // Manejar el estado del sidebar basado en el tamaño de la pantalla
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsSidebarOpen(true);
-      }
+      setIsSidebarOpen(window.innerWidth >= 768);
     };
 
-    // Establecer al cargar
+    // Establecer estado inicial
     handleResize();
 
     // Añadir listener para cambios de tamaño
