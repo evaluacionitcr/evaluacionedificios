@@ -83,24 +83,31 @@ export default function DashboardLayout({
         className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        style={{ minWidth: "16rem", width: "16rem" }} // Forzar el ancho
+        style={{ minWidth: "16rem", width: "16rem" }}
       >
         <Sidebar activeTab={activeTab} />
       </div>
 
       {/* Contenido principal */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Header>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-        </Header>
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        {/* Header fijo */}
+        <div className="sticky top-0 z-10">
+          <Header>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+          </Header>
+        </div>
+
+        {/* Contenido con scroll */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto p-4 md:p-6">{children}</div>
+        </main>
       </div>
     </div>
   );

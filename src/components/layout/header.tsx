@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ children }: HeaderProps) {
   return (
-    <header className="flex items-center justify-between border-b bg-white p-4 shadow-sm">
+    <header className="flex items-center justify-between border-b bg-white p-4 shadow-sm backdrop-blur-sm">
       <div className="flex items-center gap-4">
         {children}
         <div className="font-bold text-primary">Oficina de Ingeniería</div>
