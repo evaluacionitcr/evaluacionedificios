@@ -1,7 +1,5 @@
 "use client";
-
 import type React from "react";
-
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "~/components/layout/sidebar";
@@ -16,7 +14,7 @@ export default function DashboardLayout({
 }>) {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Actualizar la pestaña activa basada en la ruta actual
   useEffect(() => {
@@ -35,20 +33,43 @@ export default function DashboardLayout({
     }
   }, [pathname]);
 
-  // Escuchar el evento de toggle del sidebar
+  // Asegurar que el sidebar esté abierto en pantallas mayores a md
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    // Establecer al cargar
+    handleResize();
+
+    // Añadir listener para cambios de tamaño
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Modificar el comportamiento del evento toggleSidebar
   useEffect(() => {
     const handleToggleSidebar = () => {
-      setIsSidebarOpen(false);
+      // Solo cerrar en móvil
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      }
     };
 
     window.addEventListener("toggleSidebar", handleToggleSidebar);
+
     return () => {
       window.removeEventListener("toggleSidebar", handleToggleSidebar);
     };
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden">
       {/* Overlay para móvil */}
       {isSidebarOpen && (
         <div
@@ -57,11 +78,12 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar con ancho fijo explícito */}
       <div
-        className={`fixed inset-y-0 left-0 z-30 transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ minWidth: "16rem", width: "16rem" }} // Forzar el ancho
       >
         <Sidebar activeTab={activeTab} />
       </div>
