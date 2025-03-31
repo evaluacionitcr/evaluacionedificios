@@ -34,7 +34,7 @@ interface DetallesEdificio {
   anoDeRevaluacion: number | null;
   usoActual: string | null;
 }
-
+// edificios.ts
 export async function getEdificacionesPorSede() {
   try {
     // Primero obtenemos los IDs mínimos para cada código de edificio
