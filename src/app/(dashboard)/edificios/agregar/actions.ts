@@ -2,7 +2,7 @@
 
 import { db } from "~/server/db";
 
-import { Sedes, NumeroFincas, UsosActuales } from "~/server/db/schema"; 
+import { Sedes, NumeroFincas, UsosActuales, Edificaciones } from "~/server/db/schema"; 
 
 
 export async function fetchSedes() {
@@ -36,37 +36,31 @@ export async function fetchUsosActuales() {
 }
 
 export async function createEdificio(data: {
-  codigo: string;
+  codigoEdificio: string;
+  sede: number;
+  esRenovacion: boolean;
   nombre: string;
-  sedeId: number;
-  anioConstruccion: number;
-  metrosCuadrados: number;
-  valorDolarM2: number;
+  fechaConstruccion: number;
+  noFinca: number;
+  m2Construccion: number;
+  valorDolarPorM2: string  ;
+  valorColonPorM2: string;
+  edadAl2021: number;
   vidaUtilHacienda: number;
   vidaUtilExperto: number;
-  fincaId?: number;
+  valorEdificioIR: string;
+  depreciacionLinealAnual: string;
+  valorActualRevaluado: string;
+  anoDeRevaluacion: number;
+  usoActual: number;
+  createdAt: Date;
+  updatedAt: Date;
 }) {
   try {
-    // Aquí implementarás la lógica para guardar el edificio en la base de datos
-    // Por ejemplo:
-    /* 
-    await db.insert(Edificios).values({
-      codigo: data.codigo,
-      nombre: data.nombre,
-      sedeId: data.sedeId,
-      anioConstruccion: data.anioConstruccion,
-      metrosCuadrados: data.metrosCuadrados,
-      valorDolarM2: data.valorDolarM2,
-      vidaUtilHacienda: data.vidaUtilHacienda,
-      vidaUtilExperto: data.vidaUtilExperto,
-      fincaId: data.fincaId,
-      valorInicial: data.metrosCuadrados * data.valorDolarM2,
-    });
-    */
-    
-    return { success: true, message: "Edificio creado correctamente" };
+    const edificio = await db.insert(Edificaciones).values(data).returning();
+    return { success: true, data: edificio };
   } catch (error) {
-    console.error("Error al crear el edificio:", error);
-    return { success: false, error: "No se pudo crear el edificio" };
+    console.error("Error al crear edificio:", error);
+    return { success: false, error: "No se pudo crear el edificio." };
   }
 }
