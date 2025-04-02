@@ -35,6 +35,7 @@ import {
   obtenerDetallesEdificio,
   eliminarEdificioCompleto,
 } from "./actions";
+
 interface EdificioDetalle {
   id: number;
   codigoEdificio: string;
@@ -55,12 +56,10 @@ interface EdificioDetalle {
   anoDeRevaluacion: number | null;
   usoActual: string | null;
 }
-type Params = Promise<{ id: string }>;
 
-export default async function BuildingPage(props: { params: Params }) {
+export default function BuildingPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const params = await props.params;
-  const id = params.id;
+  const { id } = params;
   const [edificios, setEdificios] = useState<EdificioDetalle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
