@@ -147,3 +147,48 @@ export async function getDetallesEdificio(
     return [];
   }
 }
+
+// Nueva función para eliminar un registro de edificio
+export async function eliminarRegistroEdificio(id: number) {
+  try {
+    const resultado = await db
+      .delete(Edificaciones)
+      .where(eq(Edificaciones.id, id))
+      .returning({ id: Edificaciones.id });
+    
+    return { 
+      success: true, 
+      mensaje: "Registro eliminado exitosamente",
+      eliminado: resultado.length > 0
+    };
+  } catch (error) {
+    console.error("Error al eliminar el registro del edificio:", error);
+    return { 
+      success: false, 
+      error: "No se pudo eliminar el registro del edificio."
+    };
+  }
+}
+
+// Nueva función para eliminar todos los registros de un edificio por su código
+export async function eliminarEdificioCompleto(codigoEdificio: string) {
+  try {
+    const resultado = await db
+      .delete(Edificaciones)
+      .where(ilike(Edificaciones.codigoEdificio, codigoEdificio))
+      .returning({ id: Edificaciones.id });
+    
+    return { 
+      success: true, 
+      mensaje: "Edificio eliminado exitosamente",
+      eliminados: resultado.length,
+      ids: resultado.map(r => r.id)
+    };
+  } catch (error) {
+    console.error("Error al eliminar el edificio:", error);
+    return { 
+      success: false, 
+      error: "No se pudo eliminar el edificio."
+    };
+  }
+}
