@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "~/server/db";
+import { sql } from "drizzle-orm";
 
 import { Sedes, NumeroFincas, UsosActuales, Edificaciones } from "~/server/db/schema"; 
 
@@ -64,3 +65,28 @@ export async function createEdificio(data: {
     return { success: false, error: "No se pudo crear el edificio." };
   }
 }
+
+export async function checkCodigoEdificioExists(codigo: string) {
+  try {
+    const edificios = await db
+      .select({ id: Edificaciones.id })
+      .from(Edificaciones)
+      .where(sql`LOWER(${Edificaciones.codigoEdificio}) = LOWER(${codigo})`)
+      .limit(1);
+    
+    return { 
+      exists: edificios.length > 0,
+      success: true 
+    };
+  } catch (error) {
+    console.error("Error al verificar el código de edificio:", error);
+    return { 
+      exists: false, 
+      success: false, 
+      error: "No se pudo verificar el código de edificio." 
+    };
+  }
+}
+
+
+

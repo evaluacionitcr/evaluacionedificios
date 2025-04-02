@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Button } from "~/components/ui/button";
-import { fetchSedes, fetchFincas, fetchUsosActuales, createEdificio } from "./actions"; // Importar la función para obtener sedes
+import { fetchSedes, fetchFincas, fetchUsosActuales, createEdificio, checkCodigoEdificioExists } from "./actions"; // Importar la función para obtener sedes
 import Link from "next/link";
 import { useRouter } from "next/navigation"; // Importar useRouter
 
@@ -183,33 +183,54 @@ export default function CreateEdificioPage() {
     
     setLoading(true);
 
-    const data = {
-      codigoEdificio: codigoEdificio,
-      sede: Number(sedeId),
-      esRenovacion: false,
-      nombre: nombreEdificio,
-      fechaConstruccion: parseInt(anioConstruccion),
-      noFinca: Number(fincaSeleccionada),
-      m2Construccion: parseFloat(metrosCuadrados),
-      valorDolarPorM2: valorDolarM2,
-      valorColonPorM2: valorColonM2,
-      edadAl2021: edad,
-      vidaUtilHacienda: parseInt(vidaUtilHacienda),
-      vidaUtilExperto: parseInt(vidaUtilExperto),
-      valorEdificioIR: valorEdificioIR.toString(),
-      depreciacionLinealAnual: depreciacionAnual.toString(),
-      valorActualRevaluado: valorRevaluado.toString(),
-      anoDeRevaluacion: parseInt(anioRevaluacion),
-      usoActual: parseInt(usoActual),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-  
     try {
+      // Primero verificamos si el código ya existe
+      const codigoCheck = await checkCodigoEdificioExists(codigoEdificio);
+      
+      // Si el código ya existe, marcarlo como remodelación
+      const esRemodelacion = codigoCheck.exists;
+      
+      if (esRemodelacion) {
+        // Opcionalmente mostrar confirmación al usuario
+        const confirmar = confirm(
+          "El código de edificio ya existe. ¿Desea continuar y agregarlo como una remodelación?"
+        );
+        
+        if (!confirmar) {
+          setLoading(false);
+          return;
+        }
+      }
+
+      const data = {
+        codigoEdificio: codigoEdificio,
+        sede: Number(sedeId),
+        esRenovacion: esRemodelacion, // Aquí marcamos si es remodelación
+        nombre: nombreEdificio,
+        fechaConstruccion: parseInt(anioConstruccion),
+        noFinca: Number(fincaSeleccionada),
+        m2Construccion: parseFloat(metrosCuadrados),
+        valorDolarPorM2: valorDolarM2,
+        valorColonPorM2: valorColonM2,
+        edadAl2021: edad,
+        vidaUtilHacienda: parseInt(vidaUtilHacienda),
+        vidaUtilExperto: parseInt(vidaUtilExperto),
+        valorEdificioIR: valorEdificioIR.toString(),
+        depreciacionLinealAnual: depreciacionAnual.toString(),
+        valorActualRevaluado: valorRevaluado.toString(),
+        anoDeRevaluacion: parseInt(anioRevaluacion),
+        usoActual: parseInt(usoActual),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
       const response = await createEdificio(data);
-  
+
       if (response?.success) {
-        alert("✅ Edificio creado exitosamente");
+        alert(esRemodelacion 
+          ? "✅ Remodelación de edificio registrada exitosamente" 
+          : "✅ Edificio creado exitosamente"
+        );
         router.push("/edificios"); // Redireccionar a la página de edificios
       } else {
         alert("❌ Error al guardar: " + response?.error);

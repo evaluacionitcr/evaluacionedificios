@@ -67,14 +67,6 @@ export default async function EdificioDetallePage({
           <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm">
-            <Calendar className="mr-2 h-4 w-4" />
-            Agregar Remodelación
-          </Button>
-          <Button variant="outline" size="sm">
-            <Building className="mr-2 h-4 w-4" />
-            Editar Edificio
-          </Button>
         </div>
       </div>
 
