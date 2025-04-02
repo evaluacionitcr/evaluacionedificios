@@ -6,6 +6,7 @@ import Sidebar from "~/components/layout/sidebar";
 import Header from "~/components/layout/header";
 import { Menu } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 
 export default function DashboardLayout({
   children,
@@ -38,13 +39,10 @@ export default function DashboardLayout({
     const handleResize = () => {
       setIsSidebarOpen(window.innerWidth >= 768);
     };
-
     // Establecer estado inicial
     handleResize();
-
     // Añadir listener para cambios de tamaño
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -58,55 +56,61 @@ export default function DashboardLayout({
         setIsSidebarOpen(false);
       }
     };
-
     window.addEventListener("toggleSidebar", handleToggleSidebar);
-
     return () => {
       window.removeEventListener("toggleSidebar", handleToggleSidebar);
     };
   }, []);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      {/* Overlay para móvil */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-black/50 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+    <>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
 
-      {/* Sidebar con ancho fijo explícito */}
-      <div
-        className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-        style={{ minWidth: "16rem", width: "16rem" }}
-      >
-        <Sidebar activeTab={activeTab} />
-      </div>
+      <SignedIn>
+        <div className="flex h-screen w-full overflow-hidden">
+          {/* Overlay para móvil */}
+          {isSidebarOpen && (
+            <div
+              className="fixed inset-0 z-20 bg-black/50 md:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
 
-      {/* Contenido principal */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header fijo */}
-        <div className="sticky top-0 z-10">
-          <Header>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-          </Header>
+          {/* Sidebar con ancho fijo explícito */}
+          <div
+            className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${
+              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+            style={{ minWidth: "16rem", width: "16rem" }}
+          >
+            <Sidebar activeTab={activeTab} />
+          </div>
+
+          {/* Contenido principal */}
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {/* Header fijo */}
+            <div className="sticky top-0 z-10">
+              <Header>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                >
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </Header>
+            </div>
+
+            {/* Contenido con scroll */}
+            <main className="flex-1 overflow-y-auto">
+              <div className="container mx-auto p-4 md:p-6">{children}</div>
+            </main>
+          </div>
         </div>
-
-        {/* Contenido con scroll */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto p-4 md:p-6">{children}</div>
-        </main>
-      </div>
-    </div>
+      </SignedIn>
+    </>
   );
 }

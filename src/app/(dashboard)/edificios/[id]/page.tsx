@@ -9,18 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Progress } from "~/components/ui/progress";
 import {
-  ArrowLeft,
-  Building,
-  Calendar,
-  Clock,
-  MapPin,
-  User,
-  Trash2,
-} from "lucide-react";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
+import { ArrowLeft, Building, Calendar, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -56,20 +57,23 @@ interface EdificioDetalle {
   usoActual: string | null;
 }
 
-// Definimos la interfaz correcta para las props de la página
-interface PageProps {
-  params: {
-    id: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
-
-export default function BuildingPage({ params }: PageProps) {
+export default function BuildingPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { id } = params;
   const [edificios, setEdificios] = useState<EdificioDetalle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Estado para AlertDialog de eliminación de registro
+  const [registroToDelete, setRegistroToDelete] = useState<number | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Estado para AlertDialog de eliminación de edificio completo
+  const [isDeleteEdificioDialogOpen, setIsDeleteEdificioDialogOpen] =
+    useState(false);
+  const [isDeletingEdificio, setIsDeletingEdificio] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Cargar los datos del edificio al iniciar
   useEffect(() => {
@@ -102,68 +106,84 @@ export default function BuildingPage({ params }: PageProps) {
     void cargarDatos();
   }, [id]);
 
-  // Función para manejar la eliminación de un registro
-  const handleEliminar = async (edificioId: number) => {
-    // Mostrar confirmación antes de eliminar
-    const confirmar = confirm(
-      "¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.",
-    );
+  // Función para abrir el diálogo de confirmación de eliminación de registro
+  const openDeleteDialog = (edificioId: number) => {
+    setRegistroToDelete(edificioId);
+    setIsDeleteDialogOpen(true);
+    setDeleteError(null);
+  };
 
-    if (!confirmar) return;
+  // Función para manejar la eliminación de un registro
+  const handleEliminar = async () => {
+    if (registroToDelete === null) return;
 
     try {
-      const resultado = await eliminarRegistroEdificio(edificioId);
+      setIsDeleting(true);
+      setDeleteError(null);
+
+      const resultado = await eliminarRegistroEdificio(registroToDelete);
 
       if (resultado.success) {
         // Actualizar la lista de edificios (remover el eliminado)
-        setEdificios(edificios.filter((e) => e.id !== edificioId));
-        alert("Registro eliminado exitosamente");
+        setEdificios(edificios.filter((e) => e.id !== registroToDelete));
+        setIsDeleteDialogOpen(false);
       } else {
-        alert(`Error: ${resultado.error}`);
+        const errorMessage =
+          typeof resultado.error === "string"
+            ? resultado.error
+            : "Error al eliminar el registro";
+        setDeleteError(errorMessage);
       }
     } catch (error) {
       console.error("Error al eliminar:", error);
-      alert("Ocurrió un error al eliminar el registro");
+      setDeleteError("Ocurrió un error al eliminar el registro");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  // Añadir la función para manejar la eliminación completa del edificio
+  // Función para abrir el diálogo de confirmación de eliminación completa
+  const openDeleteEdificioDialog = () => {
+    if (edificios.length === 0) return;
+    setIsDeleteEdificioDialogOpen(true);
+    setDeleteError(null);
+  };
+
+  // Función para manejar la eliminación completa del edificio
   const handleEliminarEdificio = async () => {
-    if (!edificio) return; // Verificar que edificio exista
+    if (edificios.length === 0) return;
 
-    // Mostrar confirmación con advertencia clara
-    const confirmar = confirm(
-      "⚠️ ADVERTENCIA: Está a punto de eliminar TODOS los registros de este edificio. Esta acción es irreversible y eliminará todo el historial. ¿Está seguro que desea continuar?",
-    );
-
-    if (!confirmar) return;
-
-    // Segunda confirmación para prevenir eliminaciones accidentales
-    const confirmarSegundo = confirm(
-      "⚠️ ÚLTIMA ADVERTENCIA: Confirme que realmente desea eliminar TODOS los registros del edificio " +
-        edificio.nombre,
-    );
-
-    if (!confirmarSegundo) return;
+    // Verificación explícita de que edificio exista antes de usarlo
+    const edificio = edificios[0];
+    if (!edificio) {
+      setDeleteError("No se pudo encontrar información del edificio");
+      setIsDeleteEdificioDialogOpen(false);
+      return;
+    }
 
     try {
-      setIsLoading(true);
+      setIsDeletingEdificio(true);
+      setDeleteError(null);
+
       const resultado = await eliminarEdificioCompleto(edificio.codigoEdificio);
 
       if (resultado.success) {
-        alert(
-          `Edificio eliminado exitosamente. Se eliminaron ${resultado.eliminados} registros.`,
-        );
         // Redirigir a la página de edificios
         router.push("/edificios");
       } else {
-        alert(`Error: ${resultado.error}`);
-        setIsLoading(false);
+        const errorMessage =
+          typeof resultado.error === "string"
+            ? resultado.error
+            : "Error al eliminar el edificio";
+        setDeleteError(errorMessage);
+        setIsDeleteEdificioDialogOpen(false);
       }
     } catch (error) {
       console.error("Error al eliminar el edificio:", error);
-      alert("Ocurrió un error al eliminar el edificio");
-      setIsLoading(false);
+      setDeleteError("Ocurrió un error al eliminar el edificio");
+      setIsDeleteEdificioDialogOpen(false);
+    } finally {
+      setIsDeletingEdificio(false);
     }
   };
 
@@ -216,29 +236,24 @@ export default function BuildingPage({ params }: PageProps) {
           <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/edificios/agregar?codigoEdificio=${edificio.codigoEdificio}`}
-          >
-            <Button variant="outline" size="sm">
-              <Calendar className="mr-2 h-4 w-4" />
-              Agregar Remodelación
-            </Button>
-          </Link>
-          <Button variant="outline" size="sm">
-            <Building className="mr-2 h-4 w-4" />
-            Editar Edificio
-          </Button>
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleEliminarEdificio}
-            disabled={isLoading}
+            onClick={openDeleteEdificioDialog}
+            disabled={isDeletingEdificio}
+            className="bg-[#EF3340] hover:bg-red-700"
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Eliminar Edificio
           </Button>
         </div>
       </div>
+
+      {deleteError && (
+        <div className="mt-2 rounded bg-red-100 p-2 text-red-700">
+          {deleteError}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6">
         <Card className="bg-white shadow-sm">
@@ -293,10 +308,11 @@ export default function BuildingPage({ params }: PageProps) {
                       <TableCell>{e.esRenovacion ? "Sí" : "No"}</TableCell>
                       <TableCell>
                         <Button
-                          onClick={() => handleEliminar(e.id)}
+                          onClick={() => openDeleteDialog(e.id)}
                           variant="destructive"
                           size="sm"
                           title="Eliminar registro"
+                          className="bg-[#EF3340] hover:bg-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -309,6 +325,72 @@ export default function BuildingPage({ params }: PageProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* AlertDialog para eliminar un registro */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará permanentemente este registro y no se puede
+              deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                void handleEliminar();
+              }}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeleting ? "Eliminando..." : "Eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AlertDialog para eliminar un edificio completo */}
+      <AlertDialog
+        open={isDeleteEdificioDialogOpen}
+        onOpenChange={setIsDeleteEdificioDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>⚠️ ADVERTENCIA</AlertDialogTitle>
+            <AlertDialogDescription>
+              Está a punto de eliminar TODOS los registros del edificio{" "}
+              {edificio.nombre}. Esta acción es irreversible y eliminará todo el
+              historial.
+              <br />
+              <br />
+              <strong>¿Está completamente seguro que desea continuar?</strong>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingEdificio}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                void handleEliminarEdificio();
+              }}
+              disabled={isDeletingEdificio}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isDeletingEdificio ? "Eliminando..." : "Eliminar Edificio"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
