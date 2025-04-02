@@ -61,9 +61,10 @@ interface PageProps {
   params: {
     id: string;
   };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function BuildingPage({ params }: PageProps) {
+export default function BuildingPage({ params }: PageProps) {
   const router = useRouter();
   const { id } = params;
   const [edificios, setEdificios] = useState<EdificioDetalle[]>([]);
