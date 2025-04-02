@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -57,9 +57,14 @@ interface EdificioDetalle {
   usoActual: string | null;
 }
 
-export default function BuildingPage({ params }: { params: { id: string } }) {
+interface BuildingPageProps {
+  params: Promise<{ id: string }>;
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default function BuildingPage({ params }: BuildingPageProps) {
   const router = useRouter();
-  const { id } = params;
+  const { id } = use(params);
   const [edificios, setEdificios] = useState<EdificioDetalle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
