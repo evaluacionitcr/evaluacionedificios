@@ -97,7 +97,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
             setEdificios(response.data);
           }
         } else {
-          setError(response.error || "Error al cargar los datos");
+          setError(response.error ?? "Error al cargar los datos");
         }
       } catch (err) {
         setError("Error al cargar los datos del edificio");
@@ -199,7 +199,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     return (
       <div>
         <p className="text-red-500">
-          {error || "No se encontraron datos para este edificio"}
+          {error ?? "No se encontraron datos para este edificio"}
         </p>
         <Link href="/edificios">
           <Button variant="outline" className="mt-4">
