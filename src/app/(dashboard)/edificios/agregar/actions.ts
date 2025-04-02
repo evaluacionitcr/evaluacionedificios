@@ -36,6 +36,8 @@ export async function fetchUsosActuales() {
     }
 }
 
+import { revalidatePath } from "next/cache";
+
 export async function createEdificio(data: {
   codigoEdificio: string;
   sede: number;
@@ -44,7 +46,7 @@ export async function createEdificio(data: {
   fechaConstruccion: number;
   noFinca: number;
   m2Construccion: number;
-  valorDolarPorM2: string  ;
+  valorDolarPorM2: string;
   valorColonPorM2: string;
   edadAl2021: number;
   vidaUtilHacienda: number;
@@ -59,6 +61,10 @@ export async function createEdificio(data: {
 }) {
   try {
     const edificio = await db.insert(Edificaciones).values(data).returning();
+
+    // Añadir esta línea para revalidar la página de edificios
+    revalidatePath("/edificios");
+
     return { success: true, data: edificio };
   } catch (error) {
     console.error("Error al crear edificio:", error);
