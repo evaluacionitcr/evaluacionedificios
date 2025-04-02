@@ -29,11 +29,11 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { eliminarRegistroEdificio, obtenerDetallesEdificio, eliminarEdificioCompleto } from "./actions";
-
-interface Params {
-  id: string;
-}
+import {
+  eliminarRegistroEdificio,
+  obtenerDetallesEdificio,
+  eliminarEdificioCompleto,
+} from "./actions";
 
 interface EdificioDetalle {
   id: number;
@@ -56,11 +56,14 @@ interface EdificioDetalle {
   usoActual: string | null;
 }
 
-export default function EdificioDetallePage({
-  params,
-}: {
-  params: Params;
-}) {
+// Definimos la interfaz correcta para las props de la página
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function BuildingPage({ params }: PageProps) {
   const router = useRouter();
   const { id } = params;
   const [edificios, setEdificios] = useState<EdificioDetalle[]>([]);
@@ -102,17 +105,17 @@ export default function EdificioDetallePage({
   const handleEliminar = async (edificioId: number) => {
     // Mostrar confirmación antes de eliminar
     const confirmar = confirm(
-      "¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer."
+      "¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.",
     );
 
     if (!confirmar) return;
 
     try {
       const resultado = await eliminarRegistroEdificio(edificioId);
-      
+
       if (resultado.success) {
         // Actualizar la lista de edificios (remover el eliminado)
-        setEdificios(edificios.filter(e => e.id !== edificioId));
+        setEdificios(edificios.filter((e) => e.id !== edificioId));
         alert("Registro eliminado exitosamente");
       } else {
         alert(`Error: ${resultado.error}`);
@@ -126,17 +129,18 @@ export default function EdificioDetallePage({
   // Añadir la función para manejar la eliminación completa del edificio
   const handleEliminarEdificio = async () => {
     if (!edificio) return; // Verificar que edificio exista
-    
+
     // Mostrar confirmación con advertencia clara
     const confirmar = confirm(
-      "⚠️ ADVERTENCIA: Está a punto de eliminar TODOS los registros de este edificio. Esta acción es irreversible y eliminará todo el historial. ¿Está seguro que desea continuar?"
+      "⚠️ ADVERTENCIA: Está a punto de eliminar TODOS los registros de este edificio. Esta acción es irreversible y eliminará todo el historial. ¿Está seguro que desea continuar?",
     );
 
     if (!confirmar) return;
 
     // Segunda confirmación para prevenir eliminaciones accidentales
     const confirmarSegundo = confirm(
-      "⚠️ ÚLTIMA ADVERTENCIA: Confirme que realmente desea eliminar TODOS los registros del edificio " + edificio.nombre
+      "⚠️ ÚLTIMA ADVERTENCIA: Confirme que realmente desea eliminar TODOS los registros del edificio " +
+        edificio.nombre,
     );
 
     if (!confirmarSegundo) return;
@@ -144,9 +148,11 @@ export default function EdificioDetallePage({
     try {
       setIsLoading(true);
       const resultado = await eliminarEdificioCompleto(edificio.codigoEdificio);
-      
+
       if (resultado.success) {
-        alert(`Edificio eliminado exitosamente. Se eliminaron ${resultado.eliminados} registros.`);
+        alert(
+          `Edificio eliminado exitosamente. Se eliminaron ${resultado.eliminados} registros.`,
+        );
         // Redirigir a la página de edificios
         router.push("/edificios");
       } else {
@@ -167,7 +173,9 @@ export default function EdificioDetallePage({
   if (error || edificios.length === 0) {
     return (
       <div>
-        <p className="text-red-500">{error || "No se encontraron datos para este edificio"}</p>
+        <p className="text-red-500">
+          {error || "No se encontraron datos para este edificio"}
+        </p>
         <Link href="/edificios">
           <Button variant="outline" className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -179,7 +187,7 @@ export default function EdificioDetallePage({
   }
 
   const edificio = edificios[0];
-  
+
   // Asegurarse de que el edificio exista
   if (!edificio) {
     return (
@@ -207,7 +215,9 @@ export default function EdificioDetallePage({
           <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href={`/edificios/agregar?codigoEdificio=${edificio.codigoEdificio}`}>
+          <Link
+            href={`/edificios/agregar?codigoEdificio=${edificio.codigoEdificio}`}
+          >
             <Button variant="outline" size="sm">
               <Calendar className="mr-2 h-4 w-4" />
               Agregar Remodelación
@@ -217,8 +227,8 @@ export default function EdificioDetallePage({
             <Building className="mr-2 h-4 w-4" />
             Editar Edificio
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             size="sm"
             onClick={handleEliminarEdificio}
             disabled={isLoading}
