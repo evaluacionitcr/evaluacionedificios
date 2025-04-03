@@ -1,6 +1,7 @@
 import { eq, sql, min, ilike } from "drizzle-orm";
 import { db } from "~/server/db";
 import { Edificaciones, Sedes, NumeroFincas, UsosActuales } from "../db/schema";
+import { revalidatePath } from "next/cache";
 
 interface Edificio {
   id: number;
@@ -155,11 +156,13 @@ export async function eliminarRegistroEdificio(id: number) {
       .delete(Edificaciones)
       .where(eq(Edificaciones.id, id))
       .returning({ id: Edificaciones.id });
-    
-    return { 
-      success: true, 
+    // Añadir esta línea para revalidar la página de edificios
+      revalidatePath("/edificios");
+
+    return {
+      success: true,
       mensaje: "Registro eliminado exitosamente",
-      eliminado: resultado.length > 0
+      eliminado: resultado.length > 0,
     };
   } catch (error) {
     console.error("Error al eliminar el registro del edificio:", error);
@@ -177,12 +180,14 @@ export async function eliminarEdificioCompleto(codigoEdificio: string) {
       .delete(Edificaciones)
       .where(ilike(Edificaciones.codigoEdificio, codigoEdificio))
       .returning({ id: Edificaciones.id });
-    
-    return { 
-      success: true, 
+    // Añadir esta línea para revalidar la página de edificios
+      revalidatePath("/edificios");
+
+    return {
+      success: true,
       mensaje: "Edificio eliminado exitosamente",
       eliminados: resultado.length,
-      ids: resultado.map(r => r.id)
+      ids: resultado.map((r) => r.id),
     };
   } catch (error) {
     console.error("Error al eliminar el edificio:", error);
