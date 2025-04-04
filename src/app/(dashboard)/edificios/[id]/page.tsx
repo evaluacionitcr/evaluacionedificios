@@ -241,6 +241,15 @@ export default function BuildingPage({ params }: BuildingPageProps) {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push(`/edificios/${id}/agregar-remodelacion`)}
+            className="bg-primary text-white hover:bg-primary/90"
+          >
+            <Building className="mr-2 h-4 w-4" />
+            Agregar Remodelación
+          </Button>
+          <Button
             variant="destructive"
             size="sm"
             onClick={openDeleteEdificioDialog}

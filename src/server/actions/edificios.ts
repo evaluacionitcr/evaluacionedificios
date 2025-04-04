@@ -18,7 +18,8 @@ interface Sede {
 interface DetallesEdificio {
   id: number;
   codigoEdificio: string;
-  sede: string | null;
+  sede: number | null;
+  sedeNombre: string | null;
   esRenovacion: boolean | null;
   nombre: string;
   fechaConstruccion: number | null;
@@ -117,7 +118,8 @@ export async function getDetallesEdificio(
       .select({
         id: Edificaciones.id,
         codigoEdificio: Edificaciones.codigoEdificio,
-        sede: Sedes.nombre,
+        sede: Edificaciones.sede,
+        sedeNombre: Sedes.nombre,
         esRenovacion: Edificaciones.esRenovacion,
         nombre: Edificaciones.nombre,
         fechaConstruccion: Edificaciones.fechaConstruccion,
