@@ -39,7 +39,8 @@ import {
 interface EdificioDetalle {
   id: number;
   codigoEdificio: string;
-  sede: string | null;
+  sede: number | null;
+  sedeNombre: string | null;
   esRenovacion: boolean | null;
   nombre: string;
   fechaConstruccion: number | null;
