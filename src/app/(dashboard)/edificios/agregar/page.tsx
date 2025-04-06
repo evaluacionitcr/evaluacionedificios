@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { Button } from "~/components/ui/button";
 import { fetchSedes, fetchFincas, fetchUsosActuales, createEdificio, checkCodigoEdificioExists } from "./actions"; // Importar la función para obtener sedes
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // Importar useRouter
+import { useRouter } from "next/navigation";
+import { NumericFormat } from "react-number-format" // Importar useRouter
 
 interface Sede {
   id: number;
@@ -33,6 +34,7 @@ interface ValidationErrors {
   fincaSeleccionada?: string;
   usoActual?: string;
   anioRevaluacion?: string;
+  tipoCambio?: string;
 }
 
 export default function CreateEdificioPage() {
@@ -58,15 +60,21 @@ export default function CreateEdificioPage() {
   const [sedes, setSedes] = useState<Sede[]>([]); // Estado para almacenar las sedes
   const [fincas, setFincas] = useState<Finca[]>([]); // Estado para almacenar las sedes y fincas
   const [usosActuales, setUsosActuales] = useState<UsoActual[]>([]); // Estado para almacenar los usos actuales
+  const [tipoCambio, setTipoCambio] = useState(""); // Estado para almacenar el tipo de cambio
+  const [anioCalculoEdad, setAnioCalculoEdad] = useState("");
+  const [nuevaSede, setNuevaSede] = useState("");
+  const [mostrarNuevaSede, setMostrarNuevaSede] = useState(false);
+  const [nuevaFinca, setNuevaFinca] = useState("");
+  const [mostrarNuevaFinca, setMostrarNuevaFinca] = useState(false);
 
   const [loading, setLoading] = useState(false); // Estado para manejar el estado de carga
   const [errors, setErrors] = useState<ValidationErrors>({});
 
   // Calcula automáticamente el valor IR
   useEffect(() => {
-    const m2 = parseFloat(metrosCuadrados);
-    const dolar = parseFloat(valorDolarM2);
-
+    const m2 = parseFloat(metrosCuadrados.replace(/\./g, "").replace(",", "."));
+    const dolar = parseFloat(valorDolarM2.replace(/\./g, "").replace(",", "."));
+  
     if (!isNaN(m2) && !isNaN(dolar)) {
       setValorEdificioIR(m2 * dolar);
     } else {
@@ -76,8 +84,8 @@ export default function CreateEdificioPage() {
 
   // Calcular Depreciación Anual
   useEffect(() => {
-    const vidaUtil = parseFloat(vidaUtilHacienda);
-
+    const vidaUtil = parseFloat(vidaUtilHacienda.replace(/\./g, "").replace(",", "."));
+  
     if (valorEdificioIR > 0 && !isNaN(vidaUtil) && vidaUtil > 0) {
       setDepreciacionAnual(valorEdificioIR / vidaUtil);
     } else {
@@ -88,13 +96,15 @@ export default function CreateEdificioPage() {
   // Cálculo: Edad
   useEffect(() => {
     const anio = parseInt(anioConstruccion);
-    setEdad(!isNaN(anio) ? 2021 - anio : 0);
-  }, [anioConstruccion]);
+    const anioBase = parseInt(anioCalculoEdad);
+    setEdad(!isNaN(anio) && !isNaN(anioBase) ? anioBase - anio : 0);
+  }, [anioConstruccion, anioCalculoEdad]);
 
   // Cálculo: Valor Actual Revaluado
   useEffect(() => {
-    const vidaHacienda = parseFloat(vidaUtilHacienda);
-    const vidaExperto = parseFloat(vidaUtilExperto);
+    const vidaHacienda = parseFloat(vidaUtilHacienda.replace(/\./g, "").replace(",", "."));
+    const vidaExperto = parseFloat(vidaUtilExperto.replace(/\./g, "").replace(",", "."));
+  
     if (!isNaN(vidaHacienda) && vidaHacienda > 0 && !isNaN(vidaExperto)) {
       const valor = (valorEdificioIR / vidaHacienda) * vidaExperto;
       setValorRevaluado(valor);
@@ -102,6 +112,20 @@ export default function CreateEdificioPage() {
       setValorRevaluado(0);
     }
   }, [valorEdificioIR, vidaUtilHacienda, vidaUtilExperto]);
+
+  // Calcular Valor en Colones por m²
+  useEffect(() => {
+    // Convertir "10,00" => 10.00 y "615,50" => 615.50
+    const dolar = parseFloat(valorDolarM2.replace(/\./g, "").replace(",", "."));
+    const cambio = parseFloat(tipoCambio.replace(/\./g, "").replace(",", "."));
+  
+    if (!isNaN(dolar) && !isNaN(cambio)) {
+      const resultado = dolar * cambio;
+      setValorColonM2(resultado.toFixed(2));
+    } else {
+      setValorColonM2("");
+    }
+  }, [valorDolarM2, tipoCambio]);
 
   // Cargar sedes al iniciar el componente
   useEffect(() => {
@@ -162,6 +186,7 @@ export default function CreateEdificioPage() {
     // Validación de campos numéricos
     if (!metrosCuadrados) newErrors.metrosCuadrados = "Los metros cuadrados son obligatorios";
     if (!valorDolarM2) newErrors.valorDolarM2 = "El valor en dólar por m² es obligatorio";
+    if (!tipoCambio) newErrors.tipoCambio = "Debe ingresar el tipo de cambio";
     if (!valorColonM2) newErrors.valorColonM2 = "El valor en colón por m² es obligatorio";
     if (!vidaUtilHacienda) newErrors.vidaUtilHacienda = "La vida útil según Hacienda es obligatoria";
     if (!vidaUtilExperto) newErrors.vidaUtilExperto = "La vida útil según experto es obligatoria";
@@ -172,7 +197,9 @@ export default function CreateEdificioPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  //Nota: Checkear si un edificio existe y agregar primero sede y finca en caso de que se agregue una nueva
+  const handleSubmit = async (e: React.FormEvent) => { 
     e.preventDefault();
     
     // Validar formulario antes de enviar
@@ -266,26 +293,43 @@ export default function CreateEdificioPage() {
           {/* Sede */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Sede*</label>
-            <select 
+            <select
               value={sedeId}
-              onChange={(e) => setSedeId(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "nueva") {
+                  setMostrarNuevaSede(true);
+                  setSedeId("");
+                } else {
+                  setMostrarNuevaSede(false);
+                  setSedeId(value);
+                }
+              }}
               className={`mt-1 w-full rounded-md border ${errors.sedeId ? 'border-red-500' : 'border-gray-300'} p-2`}
             >
-              <option value="" disabled>
-                Seleccione una sede
-              </option>
+              <option value="" disabled>Seleccione una sede</option>
               {sedes.map((sede) => (
                 <option key={sede.id} value={sede.id.toString()}>
                   {sede.nombre}
                 </option>
               ))}
+              <option value="nueva">+ Nueva Sede...</option>
             </select>
             {errors.sedeId && <p className="mt-1 text-sm text-red-500">{errors.sedeId}</p>}
+            {mostrarNuevaSede && (
+              <input
+                type="text"
+                placeholder="Nombre de la nueva sede"
+                value={nuevaSede}
+                onChange={(e) => setNuevaSede(e.target.value)}
+                className="mt-2 w-full rounded-md border border-gray-300 p-2"
+              />
+            )}
           </div>
 
           {/* Nombre */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Nombre*</label>
+            <label className="block text-sm font-medium text-gray-700">Nombre del Edificio e Infraestructura*</label>
             <input
               type="text"
               value={nombreEdificio}
@@ -298,7 +342,7 @@ export default function CreateEdificioPage() {
 
           {/* Año de Construcción */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Año de Construcción*</label>
+            <label className="block text-sm font-medium text-gray-700">Fecha de Construcción*</label>
             <input
               type="number"
               value={anioConstruccion}
@@ -310,31 +354,55 @@ export default function CreateEdificioPage() {
 
           {/* No. Finca */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">No. Finca*</label>
+            <label className="block text-sm font-medium text-gray-700">No./Finca*</label>
             <select
-              className={`mt-1 w-full rounded-md border ${errors.fincaSeleccionada ? 'border-red-500' : 'border-gray-300'} p-2`}
               value={fincaSeleccionada}
-              onChange={(e) => setFincaSeleccionada(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "nueva") {
+                  setMostrarNuevaFinca(true);
+                  setFincaSeleccionada("");
+                } else {
+                  setMostrarNuevaFinca(false);
+                  setFincaSeleccionada(value);
+                }
+              }}
+              className={`mt-1 w-full rounded-md border ${errors.fincaSeleccionada ? 'border-red-500' : 'border-gray-300'} p-2`}
             >
-              <option value="" disabled>
-                Seleccione una finca
-              </option>
+              <option value="" disabled>Seleccione una finca</option>
               {fincas.map((finca) => (
-                <option key={finca.id} value={finca.id}>
+                <option key={finca.id} value={finca.id.toString()}>
                   {finca.numero}
                 </option>
               ))}
+              <option value="nueva">+ Nueva Finca...</option>
             </select>
             {errors.fincaSeleccionada && <p className="mt-1 text-sm text-red-500">{errors.fincaSeleccionada}</p>}
+            {mostrarNuevaFinca && (
+              <input
+                type="text"
+                placeholder="Número de la nueva finca"
+                value={nuevaFinca}
+                onChange={(e) => setNuevaFinca(e.target.value)}
+                className="mt-2 w-full rounded-md border border-gray-300 p-2"
+              />
+            )}
           </div>
 
           {/* m² Construcción */}
           <div>
             <label className="block text-sm font-medium text-gray-700">m² Construcción*</label>
-            <input
-              type="number"
+            <NumericFormat
               value={metrosCuadrados}
-              onChange={(e) => setMetrosCuadrados(e.target.value)}
+              onValueChange={(values) => {
+                setMetrosCuadrados(values.formattedValue);
+              }}
+              thousandSeparator="."
+              decimalSeparator=","
+              decimalScale={2}
+              fixedDecimalScale
+              allowNegative={false}
+              placeholder="Ej: 1.200,50"
               className={`mt-1 w-full rounded-md border ${errors.metrosCuadrados ? 'border-red-500' : 'border-gray-300'} p-2`}
             />
             {errors.metrosCuadrados && <p className="mt-1 text-sm text-red-500">{errors.metrosCuadrados}</p>}
@@ -342,32 +410,71 @@ export default function CreateEdificioPage() {
 
           {/* Valor Dólar por m² */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor Dólar por m²*</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700">Valor $ por m²*</label>
+            <NumericFormat
               value={valorDolarM2}
-              onChange={(e) => setValorDolarM2(e.target.value)}
+              onValueChange={(values) => {
+                setValorDolarM2(values.formattedValue); // .value es el número sin formato
+              }}
+              thousandSeparator="."
+              decimalSeparator=","
+              decimalScale={2}
+              fixedDecimalScale
+              allowNegative={false}
+              placeholder="Ej: 10.000,00"
               className={`mt-1 w-full rounded-md border ${errors.valorDolarM2 ? 'border-red-500' : 'border-gray-300'} p-2`}
             />
             {errors.valorDolarM2 && <p className="mt-1 text-sm text-red-500">{errors.valorDolarM2}</p>}
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Tipo de Cambio (₡/USD)</label>
+            <NumericFormat
+              value={tipoCambio}
+              onValueChange={(values) => {
+                setTipoCambio(values.formattedValue);
+              }}
+              thousandSeparator="."
+              decimalSeparator=","
+              decimalScale={2}
+              fixedDecimalScale
+              allowNegative={false}
+              placeholder="Ej: 615,50"
+              className={`mt-1 w-full rounded-md border ${errors.tipoCambio ? 'border-red-500' : 'border-gray-300'} p-2`}
+            />
+            {errors.tipoCambio && <p className="mt-1 text-sm text-red-500">{errors.tipoCambio}</p>}
+          </div>
+
           {/* Valor Colón por m² */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor Colón por m²*</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700">Valor ₡ por m²*</label>
+            <NumericFormat
               value={valorColonM2}
-              onChange={(e) => setValorColonM2(e.target.value)}
-              placeholder="Ej: 348619.95"
-              className={`mt-1 w-full rounded-md border ${errors.valorColonM2 ? 'border-red-500' : 'border-gray-300'} p-2`}
+              displayType="input"
+              thousandSeparator="."
+              decimalSeparator=","
+              decimalScale={2}
+              fixedDecimalScale
+              readOnly
+              className={`mt-1 w-full rounded-md border ${errors.valorColonM2 ? 'border-red-500' : 'border-gray-300'} p-2 bg-gray-100`}
             />
             {errors.valorColonM2 && <p className="mt-1 text-sm text-red-500">{errors.valorColonM2}</p>}
           </div>
 
-          {/* Edad al 2021 */}
+          {/* Año base para cálculo de edad */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Edad al 2021</label>
+            <label className="block text-sm font-medium text-gray-700">Año base para cálculo de edad</label>
+            <input
+              type="number"
+              value={anioCalculoEdad}
+              onChange={(e) => setAnioCalculoEdad(e.target.value)}
+              className="mt-1 w-full rounded-md border border-gray-300 p-2"
+            />
+          </div>
+
+          {/* Edad calculada */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Edad calculada</label>
             <input
               type="text"
               value={edad}
@@ -390,7 +497,7 @@ export default function CreateEdificioPage() {
 
           {/* Vida Útil Experto */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Vida Útil Experto (años)*</label>
+            <label className="block text-sm font-medium text-gray-700">Vida Útil Experto esperada (años)*</label>
             <input
               type="number"
               value={vidaUtilExperto}
@@ -402,10 +509,14 @@ export default function CreateEdificioPage() {
 
           {/* Valor Edificio IR (calculado) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor Edificio IR</label>
-            <input
-              type="number"
-              value={valorEdificioIR.toFixed(2)}
+            <label className="block text-sm font-medium text-gray-700">Valor de Edificio e Infraestructura reposición ($)</label>
+            <NumericFormat
+              value={valorEdificioIR}
+              displayType="input"
+              thousandSeparator="."
+              decimalSeparator=","
+              decimalScale={2}
+              fixedDecimalScale
               readOnly
               className="mt-1 w-full rounded-md border border-gray-300 p-2 bg-gray-100"
             />
@@ -413,10 +524,14 @@ export default function CreateEdificioPage() {
 
           {/* Depreciación Acumulada */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Depreciación Lineal Anual</label>
-            <input
-              type="text"
-              value={depreciacionAnual.toFixed(2)}
+            <label className="block text-sm font-medium text-gray-700">Depreciación Lineal Anual restante ($)</label>
+            <NumericFormat
+              value={depreciacionAnual}
+              displayType="input"
+              thousandSeparator="."
+              decimalSeparator=","
+              decimalScale={2}
+              fixedDecimalScale
               readOnly
               className="mt-1 w-full rounded-md border border-gray-300 p-2 bg-gray-100"
             />
@@ -424,10 +539,14 @@ export default function CreateEdificioPage() {
 
           {/* Valor Actual Revaluado */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor Actual Revaluado</label>
-            <input
-              type="text"
-              value={valorRevaluado.toFixed(2)}
+            <label className="block text-sm font-medium text-gray-700">Valor de Edificio ó Infraestructura Actual Revaluado ($)</label>
+            <NumericFormat
+              value={valorRevaluado}
+              displayType="input"
+              thousandSeparator="."
+              decimalSeparator=","
+              decimalScale={2}
+              fixedDecimalScale
               readOnly
               className="mt-1 w-full rounded-md border border-gray-300 p-2 bg-gray-100"
             />
