@@ -11,6 +11,7 @@ import {
   boolean,
   decimal,
   real,
+  text,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -23,22 +24,6 @@ export const createTable = pgTableCreator(
   (name) => `evaluacionedificios_${name}`,
 );
 
-export const posts = createTable(
-  "post",
-  {
-    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    name: varchar("name", { length: 256 }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-  },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  }),
-);
 
 export const clerkUsers = createTable("clerk_users", {
   id: varchar("id").primaryKey(),
@@ -48,8 +33,6 @@ export const clerkUsers = createTable("clerk_users", {
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
 });
-
-
 
 // Tabla Sedes
 export const Sedes = createTable("sedes", {
@@ -87,8 +70,14 @@ export const Edificaciones = createTable(
     vidaUtilHacienda: integer("vida_util_hacienda"),
     vidaUtilExperto: integer("vida_util_experto"),
     valorEdificioIR: decimal("valor_edificio_ir", { precision: 14, scale: 2 }),
-    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", { precision: 14, scale: 2 }),
-    valorActualRevaluado: decimal("valor_actual_revaluado", { precision: 14, scale: 2 }),
+    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorActualRevaluado: decimal("valor_actual_revaluado", {
+      precision: 14,
+      scale: 2,
+    }),
     anoDeRevaluacion: integer("ano_de_revaluacion"), // Año como entero
     usoActual: integer("uso_actual").references(() => UsosActuales.id),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -99,6 +88,43 @@ export const Edificaciones = createTable(
     ),
   },
   (edificaciones) => ({
-    codigoEdificioIndex: index("codigo_edificio_idx").on(edificaciones.codigoEdificio),
+    codigoEdificioIndex: index("codigo_edificio_idx").on(
+      edificaciones.codigoEdificio,
+    ),
   }),
 );
+
+export const Evaluaciones = createTable("evaluations", {
+  id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
+  buildingId: integer("building_id").references(() => Edificaciones.id),
+  evaluatorId: varchar("evaluator_id").references(() => clerkUsers.id),
+  score: integer("score").notNull(),
+  comments: text("comments"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const images = createTable(
+  "image",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar("name", { length: 256 }).notNull(),
+    description: varchar("description", { length: 256 }).notNull(),
+    url: varchar("url", { length: 1024 }).notNull(),
+    buildingId: integer("building_id").references(() => Edificaciones.id),
+    evaluationId: integer("evaluation_id").references(() => Evaluaciones.id),
+    userId: varchar("user_id", { length: 256 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (example) => ({
+    nameIndex: index("name_idx").on(example.name),
+  }),
+);
+
+export type Evaluation = typeof Evaluaciones.$inferSelect;
+export type NewEvaluation = typeof Evaluaciones.$inferInsert;
