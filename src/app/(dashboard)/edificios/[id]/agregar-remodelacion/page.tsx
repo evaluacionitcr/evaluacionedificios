@@ -1,10 +1,12 @@
+import { use } from "react";
 import { RemodelacionForm } from "./RemodelacionForm";
 
 interface BuildingPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // Server component that passes the id to the client component
 export default function AddRemodelacionPage({ params }: BuildingPageProps) {
-  return <RemodelacionForm buildingId={params.id} />;
+  const { id } = use(params);
+  return <RemodelacionForm buildingId={id} />;
 } 
