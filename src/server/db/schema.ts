@@ -91,7 +91,7 @@ export const Construcciones = createTable(
 export const Aceras = createTable(
   "aceras",
   {
-    id: integer("id").primaryKey(),
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     idConstruccion: integer("id_construccion").references(() => Construcciones.id),
     codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
@@ -135,7 +135,7 @@ export const Aceras = createTable(
 export const ZonasVerdes = createTable(
   "zonas_verdes",
   {
-    id: integer("id").primaryKey(),
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     idConstruccion: integer("id_construccion").references(
       () => Construcciones.id,
     ),
@@ -178,10 +178,10 @@ export const ZonasVerdes = createTable(
   }),
 );
 
-export const Terreno = createTable(
+export const Terrenos = createTable(
   "terreno",
   {
-    id: integer("id").primaryKey(),
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     idConstruccion: integer("id_construccion").references(
       () => Construcciones.id,
     ),
