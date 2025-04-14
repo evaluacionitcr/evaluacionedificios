@@ -3,7 +3,7 @@
 import { db } from "~/server/db";
 import { sql } from "drizzle-orm";
 
-import { Sedes, NumeroFincas, UsosActuales, Edificaciones } from "~/server/db/schema"; 
+import { Sedes, NumeroFincas, UsosActuales, Construcciones } from "~/server/db/schema"; 
 
 
 export async function fetchSedes() {
@@ -60,7 +60,7 @@ export async function createEdificio(data: {
   updatedAt: Date;
 }) {
   try {
-    const edificio = await db.insert(Edificaciones).values(data).returning();
+    const edificio = await db.insert(Construcciones).values(data).returning();
 
     // Añadir esta línea para revalidar la página de edificios
     revalidatePath("/edificios");
@@ -75,9 +75,9 @@ export async function createEdificio(data: {
 export async function checkCodigoEdificioExists(codigo: string) {
   try {
     const edificios = await db
-      .select({ id: Edificaciones.id })
-      .from(Edificaciones)
-      .where(sql`LOWER(${Edificaciones.codigoEdificio}) = LOWER(${codigo})`)
+      .select({ id: Construcciones.id })
+      .from(Construcciones)
+      .where(sql`LOWER(${Construcciones.codigoEdificio}) = LOWER(${codigo})`)
       .limit(1);
     
     return { 

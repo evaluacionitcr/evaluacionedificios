@@ -48,10 +48,10 @@ interface EdificioDetalle {
   m2Construccion: number | null;
   valorDolarPorM2: string | null;
   valorColonPorM2: string | null;
-  edadAl2021: number | null;
+  edad: number | null;
   vidaUtilHacienda: number | null;
   vidaUtilExperto: number | null;
-  valorEdificioIR: string | null;
+  valorReposicion: string | null;
   depreciacionLinealAnual: string | null;
   valorActualRevaluado: string | null;
   anoDeRevaluacion: number | null;
@@ -310,13 +310,13 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                       <TableCell>{e.usoActual ?? "N/A"}</TableCell>
                       <TableCell>${e.valorDolarPorM2 ?? "0.00"}</TableCell>
                       <TableCell>₡{e.valorColonPorM2 ?? "0.00"}</TableCell>
-                      <TableCell>₡{e.valorEdificioIR ?? "0.00"}</TableCell>
+                      <TableCell>₡{e.valorReposicion ?? "0.00"}</TableCell>
                       <TableCell>₡{e.valorActualRevaluado ?? "0.00"}</TableCell>
                       <TableCell>
                         ₡{e.depreciacionLinealAnual ?? "0.00"}
                       </TableCell>
                       <TableCell>{e.anoDeRevaluacion ?? "N/A"}</TableCell>
-                      <TableCell>{e.edadAl2021 ?? 0} años</TableCell>
+                      <TableCell>{e.edad ?? 0} años</TableCell>
                       <TableCell>{e.vidaUtilHacienda ?? 0} años</TableCell>
                       <TableCell>{e.vidaUtilExperto ?? 0} años</TableCell>
                       <TableCell>{e.esRenovacion ? "Sí" : "No"}</TableCell>

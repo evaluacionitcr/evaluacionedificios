@@ -1,6 +1,6 @@
 import { eq, sql, min, ilike } from "drizzle-orm";
 import { db } from "~/server/db";
-import { Edificaciones, Sedes, NumeroFincas, UsosActuales } from "../db/schema";
+import { Construcciones, Sedes, NumeroFincas, UsosActuales } from "../db/schema";
 import { revalidatePath } from "next/cache";
 
 interface Edificio {
@@ -27,40 +27,40 @@ interface DetallesEdificio {
   m2Construccion: number | null;
   valorDolarPorM2: string | null;
   valorColonPorM2: string | null;
-  edadAl2021: number | null;
+  edad: number | null;
   vidaUtilHacienda: number | null;
   vidaUtilExperto: number | null;
-  valorEdificioIR: string | null;
+  valorReposicion: string | null;
   depreciacionLinealAnual: string | null;
   valorActualRevaluado: string | null;
   anoDeRevaluacion: number | null;
   usoActual: string | null;
 }
 // edificios.ts
-export async function getEdificacionesPorSede() {
+export async function getConstruccionesPorSede() {
   try {
     // Primero obtenemos los IDs mínimos para cada código de edificio
     const idsMinimos = await db
       .select({
-        codigoEdificio: Edificaciones.codigoEdificio,
-        id: min(Edificaciones.id),
+        codigoEdificio: Construcciones.codigoEdificio,
+        id: min(Construcciones.id),
       })
-      .from(Edificaciones)
-      .groupBy(Edificaciones.codigoEdificio);
+      .from(Construcciones)
+      .groupBy(Construcciones.codigoEdificio);
 
     // Luego obtenemos los edificios con información de sede solo para esos IDs
     const edificiosConSede = await db
       .select({
-        id: Edificaciones.id,
-        codigoEdificio: Edificaciones.codigoEdificio,
-        nombre: Edificaciones.nombre,
+        id: Construcciones.id,
+        codigoEdificio: Construcciones.codigoEdificio,
+        nombre: Construcciones.nombre,
         sedeId: Sedes.id,
         sedeNombre: Sedes.nombre,
       })
-      .from(Edificaciones)
-      .leftJoin(Sedes, eq(Edificaciones.sede, Sedes.id))
-      .where(sql`${Edificaciones.id} IN ${idsMinimos.map((e) => e.id)}`)
-      .orderBy(Sedes.nombre, Edificaciones.codigoEdificio);
+      .from(Construcciones)
+      .leftJoin(Sedes, eq(Construcciones.sede, Sedes.id))
+      .where(sql`${Construcciones.id} IN ${idsMinimos.map((e) => e.id)}`)
+      .orderBy(Sedes.nombre, Construcciones.codigoEdificio);
 
     // Usamos un mapa para agrupar por sede
     const edificiosPorSede = new Map<number, Sede>();
@@ -98,7 +98,7 @@ export async function getEdificacionesPorSede() {
       }))
       .sort((a: Sede, b: Sede) => a.nombre.localeCompare(b.nombre));
   } catch (error) {
-    console.error("Error obteniendo edificaciones por sede:", error);
+    console.error("Error obteniendo Construcciones por sede:", error);
     return []; // Devuelve un array vacío en caso de error
   }
 }
@@ -116,32 +116,32 @@ export async function getDetallesEdificio(
 
     const edificios = await db
       .select({
-        id: Edificaciones.id,
-        codigoEdificio: Edificaciones.codigoEdificio,
-        sede: Edificaciones.sede,
+        id: Construcciones.id,
+        codigoEdificio: Construcciones.codigoEdificio,
+        sede: Construcciones.sede,
         sedeNombre: Sedes.nombre,
-        esRenovacion: Edificaciones.esRenovacion,
-        nombre: Edificaciones.nombre,
-        fechaConstruccion: Edificaciones.fechaConstruccion,
+        esRenovacion: Construcciones.esRenovacion,
+        nombre: Construcciones.nombre,
+        fechaConstruccion: Construcciones.fechaConstruccion,
         numeroFinca: NumeroFincas.numero,
-        m2Construccion: Edificaciones.m2Construccion,
-        valorDolarPorM2: Edificaciones.valorDolarPorM2,
-        valorColonPorM2: Edificaciones.valorColonPorM2,
-        edadAl2021: Edificaciones.edadAl2021,
-        vidaUtilHacienda: Edificaciones.vidaUtilHacienda,
-        vidaUtilExperto: Edificaciones.vidaUtilExperto,
-        valorEdificioIR: Edificaciones.valorEdificioIR,
-        depreciacionLinealAnual: Edificaciones.depreciacionLinealAnual,
-        valorActualRevaluado: Edificaciones.valorActualRevaluado,
-        anoDeRevaluacion: Edificaciones.anoDeRevaluacion,
+        m2Construccion: Construcciones.m2Construccion,
+        valorDolarPorM2: Construcciones.valorDolarPorM2,
+        valorColonPorM2: Construcciones.valorColonPorM2,
+        edad: Construcciones.edad,
+        vidaUtilHacienda: Construcciones.vidaUtilHacienda,
+        vidaUtilExperto: Construcciones.vidaUtilExperto,
+        valorReposicion: Construcciones.valorReposicion,
+        depreciacionLinealAnual: Construcciones.depreciacionLinealAnual,
+        valorActualRevaluado: Construcciones.valorActualRevaluado,
+        anoDeRevaluacion: Construcciones.anoDeRevaluacion,
         usoActual: UsosActuales.descripcion,
       })
-      .from(Edificaciones)
-      .leftJoin(Sedes, eq(Edificaciones.sede, Sedes.id))
-      .leftJoin(NumeroFincas, eq(Edificaciones.noFinca, NumeroFincas.id))
-      .leftJoin(UsosActuales, eq(Edificaciones.usoActual, UsosActuales.id))
-      .where(ilike(Edificaciones.codigoEdificio, codigoEdificio))
-      .orderBy(Edificaciones.id);
+      .from(Construcciones)
+      .leftJoin(Sedes, eq(Construcciones.sede, Sedes.id))
+      .leftJoin(NumeroFincas, eq(Construcciones.noFinca, NumeroFincas.id))
+      .leftJoin(UsosActuales, eq(Construcciones.usoActual, UsosActuales.id))
+      .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
+      .orderBy(Construcciones.id);
 
     console.log("Resultados encontrados:", edificios.length);
     return edificios;
@@ -155,9 +155,9 @@ export async function getDetallesEdificio(
 export async function eliminarRegistroEdificio(id: number) {
   try {
     const resultado = await db
-      .delete(Edificaciones)
-      .where(eq(Edificaciones.id, id))
-      .returning({ id: Edificaciones.id });
+      .delete(Construcciones)
+      .where(eq(Construcciones.id, id))
+      .returning({ id: Construcciones.id });
     // Añadir esta línea para revalidar la página de edificios
       revalidatePath("/edificios");
 
@@ -179,9 +179,9 @@ export async function eliminarRegistroEdificio(id: number) {
 export async function eliminarEdificioCompleto(codigoEdificio: string) {
   try {
     const resultado = await db
-      .delete(Edificaciones)
-      .where(ilike(Edificaciones.codigoEdificio, codigoEdificio))
-      .returning({ id: Edificaciones.id });
+      .delete(Construcciones)
+      .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
+      .returning({ id: Construcciones.id });
     // Añadir esta línea para revalidar la página de edificios
       revalidatePath("/edificios");
 

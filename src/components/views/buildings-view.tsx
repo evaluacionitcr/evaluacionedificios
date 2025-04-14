@@ -1,11 +1,11 @@
 import { Button } from "~/components/ui/button"
 import Link from "next/link";
 import BuildingList from "~/components/buildings/building-list"
-import { getEdificacionesPorSede } from "~/server/actions/edificios";
+import { getConstruccionesPorSede } from "~/server/actions/edificios";
 import BuildingListContainer from "~/components/buildings/building-list";
 
 export default async function BuildingsView() {
-  const sedesConEdificios = await getEdificacionesPorSede();
+  const sedesConEdificios = await getConstruccionesPorSede();
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -24,7 +24,6 @@ export const createTable = pgTableCreator(
   (name) => `evaluacionedificios_${name}`,
 );
 
-
 export const clerkUsers = createTable("clerk_users", {
   id: varchar("id").primaryKey(),
   first_name: varchar("first_name"),
@@ -53,8 +52,8 @@ export const UsosActuales = createTable("usos_actuales", {
 });
 
 // Tabla Edificaciones
-export const Edificaciones = createTable(
-  "edificaciones",
+export const Construcciones = createTable(
+  "construcciones",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
@@ -66,15 +65,54 @@ export const Edificaciones = createTable(
     m2Construccion: real("m2_construccion"), // Área en metros cuadrados
     valorDolarPorM2: decimal("valor_dolar_por_m2", { precision: 12, scale: 2 }),
     valorColonPorM2: decimal("valor_colon_por_m2", { precision: 12, scale: 2 }),
+    edad: integer("edad"),
+    vidaUtilHacienda: integer("vida_util_hacienda"),
+    vidaUtilExperto: integer("vida_util_experto"),
+    valorReposicion: decimal("valor_reposicion", { precision: 14, scale: 2 }),
+    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {precision: 14,scale: 2,}),
+    valorActualRevaluado: decimal("valor_actual_revaluado", {precision: 14,scale: 2,}),
+    valorPorcionTerreno: decimal("valor_porcion_terreno", {precision: 14,scale: 2,}),
+    anoDeRevaluacion: integer("ano_de_revaluacion"), // Año como entero
+    usoActual: integer("uso_actual").references(() => UsosActuales.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (construcciones) => ({
+    codigoEdificioIndex: index("codigo_edificio_idx").on(
+      construcciones.codigoEdificio,
+    ),
+  }),
+);
+
+export const Aceras = createTable(
+  "aceras",
+  {
+    id: integer("id").primaryKey(),
+    idConstruccion: integer("id_construccion").references(() => Construcciones.id),
+    codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
+    nombre: varchar("nombre", { length: 256 }).notNull(),
+    fechaConstruccion: integer("fecha_construccion"), // Año como entero
+    noFinca: integer("no_finca").references(() => NumeroFincas.id),
+    m2Construccion: real("m2_construccion"), // Área en metros cuadrados
+    valorDolarPorM2: decimal("valor_dolar_por_m2", { precision: 12, scale: 2 }),
+    valorColonPorM2: decimal("valor_colon_por_m2", { precision: 12, scale: 2 }),
     edadAl2021: integer("edad_al_2021"),
     vidaUtilHacienda: integer("vida_util_hacienda"),
     vidaUtilExperto: integer("vida_util_experto"),
-    valorEdificioIR: decimal("valor_edificio_ir", { precision: 14, scale: 2 }),
+    valorReposicion: decimal("valor_reposicion", { precision: 14, scale: 2 }),
     depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {
       precision: 14,
       scale: 2,
     }),
     valorActualRevaluado: decimal("valor_actual_revaluado", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorPorcionTerreno: decimal("valor_porcion_terreno", {
       precision: 14,
       scale: 2,
     }),
@@ -87,16 +125,109 @@ export const Edificaciones = createTable(
       () => new Date(),
     ),
   },
-  (edificaciones) => ({
-    codigoEdificioIndex: index("codigo_edificio_idx").on(
-      edificaciones.codigoEdificio,
+  (construcciones) => ({
+    codigoEdificioIndex2: index("codigo_edificio_idx2").on(
+      construcciones.codigoEdificio,
     ),
   }),
 );
 
+export const ZonasVerdes = createTable(
+  "zonas_verdes",
+  {
+    id: integer("id").primaryKey(),
+    idConstruccion: integer("id_construccion").references(
+      () => Construcciones.id,
+    ),
+    codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
+    nombre: varchar("nombre", { length: 256 }).notNull(),
+    fechaConstruccion: integer("fecha_construccion"), // Año como entero
+    noFinca: integer("no_finca").references(() => NumeroFincas.id),
+    m2Construccion: real("m2_construccion"), // Área en metros cuadrados
+    valorDolarPorM2: decimal("valor_dolar_por_m2", { precision: 12, scale: 2 }),
+    valorColonPorM2: decimal("valor_colon_por_m2", { precision: 12, scale: 2 }),
+    edadAl2021: integer("edad_al_2021"),
+    vidaUtilHacienda: integer("vida_util_hacienda"),
+    vidaUtilExperto: integer("vida_util_experto"),
+    valorReposicion: decimal("valor_reposicion", { precision: 14, scale: 2 }),
+    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorActualRevaluado: decimal("valor_actual_revaluado", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorPorcionTerreno: decimal("valor_porcion_terreno", {
+      precision: 14,
+      scale: 2,
+    }),
+    anoDeRevaluacion: integer("ano_de_revaluacion"), // Año como entero
+    usoActual: integer("uso_actual").references(() => UsosActuales.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (construcciones) => ({
+    codigoEdificioIndex3: index("codigo_edificio_idx3").on(
+      construcciones.codigoEdificio,
+    ),
+  }),
+);
+
+export const Terreno = createTable(
+  "terreno",
+  {
+    id: integer("id").primaryKey(),
+    idConstruccion: integer("id_construccion").references(
+      () => Construcciones.id,
+    ),
+    codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
+    nombre: varchar("nombre", { length: 256 }).notNull(),
+    fechaConstruccion: integer("fecha_construccion"), // Año como entero
+    noFinca: integer("no_finca").references(() => NumeroFincas.id),
+    m2Construccion: real("m2_construccion"), // Área en metros cuadrados
+    valorDolarPorM2: decimal("valor_dolar_por_m2", { precision: 12, scale: 2 }),
+    valorColonPorM2: decimal("valor_colon_por_m2", { precision: 12, scale: 2 }),
+    edadAl2021: integer("edad_al_2021"),
+    vidaUtilHacienda: integer("vida_util_hacienda"),
+    vidaUtilExperto: integer("vida_util_experto"),
+    valorReposicion: decimal("valor_reposicion", { precision: 14, scale: 2 }),
+    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorActualRevaluado: decimal("valor_actual_revaluado", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorPorcionTerreno: decimal("valor_porcion_terreno", {
+      precision: 14,
+      scale: 2,
+    }),
+    anoDeRevaluacion: integer("ano_de_revaluacion"), // Año como entero
+    usoActual: integer("uso_actual").references(() => UsosActuales.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (construcciones) => ({
+    codigoEdificioIndex4: index("codigo_edificio_idx4").on(
+      construcciones.codigoEdificio,
+    ),
+  }),
+);
+
+
 export const Evaluaciones = createTable("evaluations", {
   id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
-  buildingId: integer("building_id").references(() => Edificaciones.id),
+  buildingId: integer("building_id").references(() => Construcciones.id),
   evaluatorId: varchar("evaluator_id").references(() => clerkUsers.id),
   score: integer("score").notNull(),
   comments: text("comments"),
@@ -111,7 +242,7 @@ export const images = createTable(
     name: varchar("name", { length: 256 }).notNull(),
     description: varchar("description", { length: 256 }).notNull(),
     url: varchar("url", { length: 1024 }).notNull(),
-    buildingId: integer("building_id").references(() => Edificaciones.id),
+    buildingId: integer("building_id").references(() => Construcciones  .id),
     evaluationId: integer("evaluation_id").references(() => Evaluaciones.id),
     userId: varchar("user_id", { length: 256 }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })

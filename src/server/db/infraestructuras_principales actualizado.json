@@ -1,27 +1,10 @@
-import { db } from "~/server/db";
-import {
-  Construcciones,
-  NumeroFincas,
-  Sedes,
-  UsosActuales,
-} from "~/server/db/schema"; // Asegúrate de importar la tabla que creaste
-
-export async function insertarDatos() {
-  const dataSede = {
-    nombre: "Campus Tecnológico Central Cartago",
-  };
-
-  const dataNumeroFinca = {
-    numero: 1,
-  };
-
-  const data = [
+[
     {
-        id: 1,
-        codigoEdificio: "A-1",
+        Id: 1,
+        idEdificio: "A-1",
         nombre: "Administración (2 niveles)",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 2102.48,
         valorDolarPorM2: "1100",
         valorColonPorM2: "676335",
@@ -38,11 +21,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 2,
-        codigoEdificio: "A-2",
+        Id: 2,
+        idEdificio: "A-2",
         nombre: "Centro de Cómputo (2,50 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1109.36,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -59,11 +42,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 3,
-        codigoEdificio: "A-3",
+        Id: 3,
+        idEdificio: "A-3",
         nombre: "Servicios Estudiantiles - VIESA (2 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1015.26,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -80,11 +63,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 4,
-        codigoEdificio: "A-3",
+        Id: 4,
+        idEdificio: "A-3",
         nombre: "Ampliación VIESA (2 niveles)",
         fechaConstruccion: 2016,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 395.4,
         valorDolarPorM2: "995",
         valorColonPorM2: "611775.75",
@@ -101,11 +84,11 @@ export async function insertarDatos() {
         esRenovacion: true
     },
     {
-        id: 5,
-        codigoEdificio: "A-4",
+        Id: 5,
+        idEdificio: "A-4",
         nombre: "Aulas y Cubículos Oeste (2 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1865.3,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -122,11 +105,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 6,
-        codigoEdificio: "A-5",
+        Id: 6,
+        idEdificio: "A-5",
         nombre: "Centro de Investigación en Computación (2 niveles)",
         fechaConstruccion: 1992,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 726.9200000000001,
         valorDolarPorM2: "1300",
         valorColonPorM2: "799305",
@@ -143,11 +126,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 7,
-        codigoEdificio: "A-6",
+        Id: 7,
+        idEdificio: "A-6",
         nombre: "Caseta de guarda principal (1 nivel)",
         fechaConstruccion: 2004,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 13.83,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -164,11 +147,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 8,
-        codigoEdificio: "A-7",
+        Id: 8,
+        idEdificio: "A-7",
         nombre: "Terminal de buses principal",
         fechaConstruccion: 1995,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 118.34,
         valorDolarPorM2: "600",
         valorColonPorM2: "368910",
@@ -185,11 +168,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 9,
-        codigoEdificio: "A-8",
+        Id: 9,
+        idEdificio: "A-8",
         nombre: "Caseta de vigilancia (1 nivel)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 6.25,
         valorDolarPorM2: "500",
         valorColonPorM2: "307425",
@@ -206,11 +189,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 10,
-        codigoEdificio: "A-9",
+        Id: 10,
+        idEdificio: "A-9",
         nombre: "Caseta Banco Nacional 1 nivel)",
         fechaConstruccion: 2014,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 20.74,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -227,11 +210,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 11,
-        codigoEdificio: "A-11",
+        Id: 11,
+        idEdificio: "A-11",
         nombre: "Casa Trópica (1 nivel)",
         fechaConstruccion: 2014,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 140.82,
         valorDolarPorM2: "920",
         valorColonPorM2: "565662",
@@ -248,11 +231,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 12,
-        codigoEdificio: "A-12",
+        Id: 12,
+        idEdificio: "A-12",
         nombre: "Placita CIC",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 251.31,
         valorDolarPorM2: "252",
         valorColonPorM2: "154942.2",
@@ -269,11 +252,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 13,
-        codigoEdificio: "A-13",
+        Id: 13,
+        idEdificio: "A-13",
         nombre: "Centro de Fotocopiado",
         fechaConstruccion: 2008,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 90.04,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -290,11 +273,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 14,
-        codigoEdificio: "B-1",
+        Id: 14,
+        idEdificio: "B-1",
         nombre: "Aulas Oeste",
         fechaConstruccion: 1976,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 805.98,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -311,11 +294,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 15,
-        codigoEdificio: "B-2",
+        Id: 15,
+        idEdificio: "B-2",
         nombre: "Aulas Oeste",
         fechaConstruccion: 1976,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 793.9100000000001,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -332,15 +315,15 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 16,
-        codigoEdificio: "B-3",
+        Id: 16,
+        idEdificio: "B-3",
         nombre: "Aulas Oeste",
         fechaConstruccion: 1976,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 805.5799999999999,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
-        edad: 45 ,
+        edad: " ",
         vidaUtilHacienda: 50,
         vidaUtilExperto: 30,
         valorReposicion: "966695.9999999999",
@@ -353,11 +336,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 17,
-        codigoEdificio: "B-4",
+        Id: 17,
+        idEdificio: "B-4",
         nombre: "CE FEITEC - Oficinas Administrativas (Incluye Remodelación)",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 581.68,
         valorDolarPorM2: "925",
         valorColonPorM2: "568736.25",
@@ -374,11 +357,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 18,
-        codigoEdificio: "B-5",
+        Id: 18,
+        idEdificio: "B-5",
         nombre: "Cultura y Deporte,CEDA,Equidad, Educación Técnica",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1272.17,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -395,11 +378,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 19,
-        codigoEdificio: "B-6",
+        Id: 19,
+        idEdificio: "B-6",
         nombre: "Cubículos Diseño Industrial y EditorialTecnólogica,",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 978.27,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -416,11 +399,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 20,
-        codigoEdificio: "B-7",
+        Id: 20,
+        idEdificio: "B-7",
         nombre: "Auditoría",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 503.34,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -437,11 +420,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 21,
-        codigoEdificio: "B-8",
+        Id: 21,
+        idEdificio: "B-8",
         nombre: "Adulto Mayor",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 69.35,
         valorDolarPorM2: "600",
         valorColonPorM2: "368910",
@@ -458,8 +441,8 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 22,
-        codigoEdificio: "B-9",
+        Id: 22,
+        idEdificio: "B-9",
         nombre: "Caseta de guarda (Fue demolida)",
         fechaConstruccion: null,
         noFinca: null,
@@ -479,11 +462,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 23,
-        codigoEdificio: "B-10",
+        Id: 23,
+        idEdificio: "B-10",
         nombre: "Bloque de servicios Sanitarios",
         fechaConstruccion: 1980,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 37.67,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -500,11 +483,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 24,
-        codigoEdificio: "B-11",
+        Id: 24,
+        idEdificio: "B-11",
         nombre: "Laboratorio de Diseño Industrial (Contenedores) (No inlcuye ampliación 2018 realizada por el DAM)",
         fechaConstruccion: 2011,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 357.49,
         valorDolarPorM2: "700",
         valorColonPorM2: "430395",
@@ -521,11 +504,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 25,
-        codigoEdificio: "B-12",
+        Id: 25,
+        idEdificio: "B-12",
         nombre: "Placita Azul Central",
         fechaConstruccion: 2016,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1046.3,
         valorDolarPorM2: "185",
         valorColonPorM2: "113747.25",
@@ -542,11 +525,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 26,
-        codigoEdificio: "C-1",
+        Id: 26,
+        idEdificio: "C-1",
         nombre: "Aulas CEDA, FEITEC",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 807.62,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -563,11 +546,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 27,
-        codigoEdificio: "C-2",
+        Id: 27,
+        idEdificio: "C-2",
         nombre: "Tanque Elevado",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 187.57,
         valorDolarPorM2: "1800",
         valorColonPorM2: "1106730",
@@ -584,11 +567,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 28,
-        codigoEdificio: "C-3",
+        Id: 28,
+        idEdificio: "C-3",
         nombre: "Biblioteca",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 3396.51,
         valorDolarPorM2: "1500",
         valorColonPorM2: "922275",
@@ -605,11 +588,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 29,
-        codigoEdificio: "C-4",
+        Id: 29,
+        idEdificio: "C-4",
         nombre: "Laboratorio de Física y Química",
         fechaConstruccion: 1983,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1560.21,
         valorDolarPorM2: "2000",
         valorColonPorM2: "8",
@@ -626,11 +609,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 30,
-        codigoEdificio: "C-4",
+        Id: 30,
+        idEdificio: "C-4",
         nombre: "Remodelación niveles 1, 2 y 3",
         fechaConstruccion: 2022,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1560.21,
         valorDolarPorM2: "619.2262798114093",
         valorColonPorM2: "380731.278142045",
@@ -647,11 +630,11 @@ export async function insertarDatos() {
         esRenovacion: true
     },
     {
-        id: 31,
-        codigoEdificio: "C-5",
+        Id: 31,
+        idEdificio: "C-5",
         nombre: "Bodega de Reactivos 1 (Asoc de estudiantes, laboratorios y baños Escuela de física)",
         fechaConstruccion: 1983,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 59.6,
         valorDolarPorM2: "1400",
         valorColonPorM2: "860790",
@@ -668,11 +651,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 32,
-        codigoEdificio: "C-6",
+        Id: 32,
+        idEdificio: "C-6",
         nombre: "Caseta Sistema Hidroneomático",
         fechaConstruccion: 1983,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 17.26,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -689,11 +672,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 33,
-        codigoEdificio: "C-7",
+        Id: 33,
+        idEdificio: "C-7",
         nombre: "Cajero Bancrédito ATH",
         fechaConstruccion: 2015,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 10.9,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -710,11 +693,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 34,
-        codigoEdificio: "C-8",
+        Id: 34,
+        idEdificio: "C-8",
         nombre: "Caseta para Basura y Desechos",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 17.85,
         valorDolarPorM2: "600",
         valorColonPorM2: "368910",
@@ -731,11 +714,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 35,
-        codigoEdificio: "C-9",
+        Id: 35,
+        idEdificio: "C-9",
         nombre: "LAIMI I",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 274.33,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -752,11 +735,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 36,
-        codigoEdificio: "C-10",
+        Id: 36,
+        idEdificio: "C-10",
         nombre: "Soda Comedor Central",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1237.84,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -773,11 +756,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 37,
-        codigoEdificio: "C-11",
+        Id: 37,
+        idEdificio: "C-11",
         nombre: "Caseta de guarda Bloque C -Sur (Fue demolida)",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 0,
         valorDolarPorM2: "0",
         valorColonPorM2: "0",
@@ -794,11 +777,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 38,
-        codigoEdificio: "C-12",
+        Id: 38,
+        idEdificio: "C-12",
         nombre: "Bodega de Reactivos 2",
         fechaConstruccion: 1983,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 77.01,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -815,11 +798,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 39,
-        codigoEdificio: "C-13",
+        Id: 39,
+        idEdificio: "C-13",
         nombre: "Caseta BCR",
         fechaConstruccion: 2014,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 10.39,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -836,11 +819,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 40,
-        codigoEdificio: "C-14",
+        Id: 40,
+        idEdificio: "C-14",
         nombre: "Caseta Banco Popular",
         fechaConstruccion: 2010,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 10.62,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -857,11 +840,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 41,
-        codigoEdificio: "C-15",
+        Id: 41,
+        idEdificio: "C-15",
         nombre: "Tanque de agua potable",
         fechaConstruccion: 2010,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 83.809,
         valorDolarPorM2: "243961.9419207937",
         valorColonPorM2: "149999999.99",
@@ -878,11 +861,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 42,
-        codigoEdificio: "D-1",
+        Id: 42,
+        idEdificio: "D-1",
         nombre: "Aulas y Cubículos - Edif. Adm. Empresas (Incluye Ampliación 3er nivel y Remodelación 1er y 2do nivel)(2012)",
         fechaConstruccion: 1979,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1210.85,
         valorDolarPorM2: "1500",
         valorColonPorM2: "922275",
@@ -899,11 +882,11 @@ export async function insertarDatos() {
         esRenovacion: false
     },
     {
-        id: 43,
-        codigoEdificio: "D-1",
+        Id: 43,
+        idEdificio: "D-1",
         nombre: "Ducto de Ascensor Edificio D-1",
         fechaConstruccion: 2012,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 6.41,
         valorDolarPorM2: "7000",
         valorColonPorM2: "4303950",
@@ -920,11 +903,11 @@ export async function insertarDatos() {
         esRenovacion: true
     },
     {
-        id: 44,
-        codigoEdificio: "D-2",
+        Id: 44,
+        idEdificio: "D-2",
         nombre: "DATIC, Auditorio de Recursos Humanos, TEC Digital, APROTEC (Incluye Remodelación)",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 445.07,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -939,13 +922,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 45,
-        codigoEdificio: "D-2",
+        Id: 45,
+        idEdificio: "D-2",
         nombre: "Ampliación D-2",
         fechaConstruccion: 2013,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 74.41,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -960,13 +943,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: true
-    },
+    }
     {
-        id: 46,
-        codigoEdificio: "D-3",
+        Id: 46,
+        idEdificio: "D-3",
         nombre: "Edificio de Aulas Central y Obras Adicionales",
         fechaConstruccion: 2015,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 2567.37,
         valorDolarPorM2: "1050",
         valorColonPorM2: "645592.5",
@@ -981,13 +964,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 47,
-        codigoEdificio: "D-4",
+        Id: 47,
+        idEdificio: "D-4",
         nombre: "Departamento de Aprovisionamiento",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1461.77,
         valorDolarPorM2: "1300",
         valorColonPorM2: "799305",
@@ -1002,13 +985,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 48,
-        codigoEdificio: "D-5",
+        Id: 48,
+        idEdificio: "D-5",
         nombre: "Librería ASETEC",
         fechaConstruccion: 1982,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 361.76000000000005,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -1023,13 +1006,13 @@ export async function insertarDatos() {
         UsoActual: 8,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 49,
-        codigoEdificio: "D-6",
+        Id: 49,
+        idEdificio: "D-6",
         nombre: "Caseta de Transformadores y Central Telefónica (Incluye Conversión de Voltaje)",
         fechaConstruccion: 1980,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 72.57,
         valorDolarPorM2: "2500",
         valorColonPorM2: "1537125",
@@ -1044,13 +1027,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 50,
-        codigoEdificio: "D-7",
+        Id: 50,
+        idEdificio: "D-7",
         nombre: "ATI y Centro de Monitoreo (Incluye remodelación y Laboratorio de Higiene Analítica en el 2012)",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 589.43,
         valorDolarPorM2: "1500",
         valorColonPorM2: "922275",
@@ -1065,13 +1048,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 51,
-        codigoEdificio: "D-8",
+        Id: 51,
+        idEdificio: "D-8",
         nombre: "Servicios Generales, Archivo Institucional",
         fechaConstruccion: 1975,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 827.77,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -1086,13 +1069,13 @@ export async function insertarDatos() {
         UsoActual: 3,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 52,
-        codigoEdificio: "D-9",
+        Id: 52,
+        idEdificio: "D-9",
         nombre: "Taller de Publicaciones y AIR",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 381.73,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -1107,13 +1090,13 @@ export async function insertarDatos() {
         UsoActual: 3,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 53,
-        codigoEdificio: "D-10",
+        Id: 53,
+        idEdificio: "D-10",
         nombre: "Escuela de Ingeniería Electrómecanica",
         fechaConstruccion: 1980,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1637.4,
         valorDolarPorM2: "1600",
         valorColonPorM2: "983760",
@@ -1128,13 +1111,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 54,
-        codigoEdificio: "D-10",
+        Id: 54,
+        idEdificio: "D-10",
         nombre: "Ampliación D-10 2do nivel y Obras adicionales",
         fechaConstruccion: 2013,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 826,
         valorDolarPorM2: "900",
         valorColonPorM2: "553365",
@@ -1149,13 +1132,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: true
-    },
+    }
     {
-        id: 55,
-        codigoEdificio: "D-11",
+        Id: 55,
+        idEdificio: "D-11",
         nombre: "Taller Básico escuela de Electromecánica",
         fechaConstruccion: 1980,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 598.63,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -1170,13 +1153,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 56,
-        codigoEdificio: "D-12",
+        Id: 56,
+        idEdificio: "D-12",
         nombre: "Placita Librería",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 246.24,
         valorDolarPorM2: "260",
         valorColonPorM2: "159861",
@@ -1191,13 +1174,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 57,
-        codigoEdificio: "D-13",
+        Id: 57,
+        idEdificio: "D-13",
         nombre: "Tanque de Agua sistema de Incendio-Edificio de Aulas",
         fechaConstruccion: 2016,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 2688,
         valorDolarPorM2: "165",
         valorColonPorM2: "101450.25",
@@ -1212,13 +1195,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 58,
-        codigoEdificio: "E-1",
+        Id: 58,
+        idEdificio: "E-1",
         nombre: "Gimnasio Institucional A.V.",
         fechaConstruccion: 1976,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 969.08,
         valorDolarPorM2: "552.9804017239977",
         valorColonPorM2: "340000",
@@ -1233,13 +1216,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 59,
-        codigoEdificio: "E-2",
+        Id: 59,
+        idEdificio: "E-2",
         nombre: "Piscina (Incluye Cubierta)",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1378.78,
         valorDolarPorM2: "500",
         valorColonPorM2: "307425",
@@ -1254,13 +1237,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 60,
-        codigoEdificio: "E-3",
+        Id: 60,
+        idEdificio: "E-3",
         nombre: "Unidad Deportiva",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 230.34,
         valorDolarPorM2: "600",
         valorColonPorM2: "368910",
@@ -1275,13 +1258,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 61,
-        codigoEdificio: "E-4",
+        Id: 61,
+        idEdificio: "E-4",
         nombre: "Cancha de Futbol, pista atletica y Obras para Eventos Deportivos",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 15822.62,
         valorDolarPorM2: "170.77335935594047",
         valorColonPorM2: "105000",
@@ -1296,13 +1279,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 62,
-        codigoEdificio: "E-5",
+        Id: 62,
+        idEdificio: "E-5",
         nombre: "Cancha de Baseball y Softboll",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 19202.89,
         valorDolarPorM2: "5",
         valorColonPorM2: "3074.25",
@@ -1317,13 +1300,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 63,
-        codigoEdificio: "E-6",
+        Id: 63,
+        idEdificio: "E-6",
         nombre: "Soda Área Deportiva",
         fechaConstruccion: 2014,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 439.88,
         valorDolarPorM2: "605",
         valorColonPorM2: "371984.25",
@@ -1338,13 +1321,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 64,
-        codigoEdificio: "E-8",
+        Id: 64,
+        idEdificio: "E-8",
         nombre: "Edificio Centro de las Artes y Obras adicionales",
         fechaConstruccion: 2013,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1002.4300000000001,
         valorDolarPorM2: "1950",
         valorColonPorM2: "1198957.5",
@@ -1359,13 +1342,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 65,
-        codigoEdificio: "E-9",
+        Id: 65,
+        idEdificio: "E-9",
         nombre: "Cancha Multiuso (Polideportivo)",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1557.64,
         valorDolarPorM2: "113.84890623729365",
         valorColonPorM2: "70000",
@@ -1380,13 +1363,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 66,
-        codigoEdificio: "E-10",
+        Id: 66,
+        idEdificio: "E-10",
         nombre: "Canchas sintéticas de Futbol",
         fechaConstruccion: 2014,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 2349,
         valorDolarPorM2: "73.18858258111734",
         valorColonPorM2: "45000",
@@ -1401,13 +1384,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 67,
-        codigoEdificio: "E-11",
+        Id: 67,
+        idEdificio: "E-11",
         nombre: "voleibol de Playa 1 y 2",
         fechaConstruccion: 2012,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 479.43,
         valorDolarPorM2: "65.05651784988208",
         valorColonPorM2: "40000",
@@ -1422,13 +1405,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 68,
-        codigoEdificio: "E-12",
+        Id: 68,
+        idEdificio: "E-12",
         nombre: "Cancha de Tenis",
         fechaConstruccion: 2010,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 457.55,
         valorDolarPorM2: "75",
         valorColonPorM2: "46113.75",
@@ -1443,13 +1426,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 69,
-        codigoEdificio: "E-13",
+        Id: 69,
+        idEdificio: "E-13",
         nombre: "Caseta Bodega y Bomba de riego",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 16.59,
         valorDolarPorM2: "400",
         valorColonPorM2: "245940",
@@ -1464,13 +1447,13 @@ export async function insertarDatos() {
         UsoActual: 10,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 70,
-        codigoEdificio: "E-14",
+        Id: 70,
+        idEdificio: "E-14",
         nombre: "Caseta de Jueces",
         fechaConstruccion: 2005,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 50.1,
         valorDolarPorM2: "145",
         valorColonPorM2: "89153.25",
@@ -1485,13 +1468,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 71,
-        codigoEdificio: "E-15",
+        Id: 71,
+        idEdificio: "E-15",
         nombre: "Batería de baños",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 130.39,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -1506,13 +1489,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 72,
-        codigoEdificio: "E-16",
+        Id: 72,
+        idEdificio: "E-16",
         nombre: "Paso Cubierto a Zona Deportiva",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 606.65,
         valorDolarPorM2: "100",
         valorColonPorM2: "61485",
@@ -1527,13 +1510,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 73,
-        codigoEdificio: "E-17",
+        Id: 73,
+        idEdificio: "E-17",
         nombre: "Puente Entrada Norte",
         fechaConstruccion: 2018,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 2004.03,
         valorDolarPorM2: "438.53",
         valorColonPorM2: "269630.1705",
@@ -1548,13 +1531,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 74,
-        codigoEdificio: "E-18",
+        Id: 74,
+        idEdificio: "E-18",
         nombre: "Parqueo Centro de las Artes",
         fechaConstruccion: 2013,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1500,
         valorDolarPorM2: "460",
         valorColonPorM2: "282831",
@@ -1569,13 +1552,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 75,
-        codigoEdificio: "E-19",
+        Id: 75,
+        idEdificio: "E-19",
         nombre: "Parqueo Area Central (Incluye Parqueo oeste OI, Parqueo norte Escuela de Producción, Parqueo norte Escuela de Materiales)",
         fechaConstruccion: 2014,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 4712,
         valorDolarPorM2: "45.63",
         valorColonPorM2: "28055.6055",
@@ -1590,13 +1573,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 76,
-        codigoEdificio: "E-21",
+        Id: 76,
+        idEdificio: "E-21",
         nombre: "Baños Zona deportiva",
         fechaConstruccion: null,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 28.63,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -1611,13 +1594,13 @@ export async function insertarDatos() {
         UsoActual: 9,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 77,
-        codigoEdificio: "F-1",
+        Id: 77,
+        idEdificio: "F-1",
         nombre: "Aulas y Cubículos Este - CO - PosGrados (2 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1824.34,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -1632,13 +1615,13 @@ export async function insertarDatos() {
         UsoActual: 11,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 78,
-        codigoEdificio: "F-2",
+        Id: 78,
+        idEdificio: "F-2",
         nombre: "Aulas Este (2 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 944.99,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -1653,13 +1636,13 @@ export async function insertarDatos() {
         UsoActual: 11,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 79,
-        codigoEdificio: "F-3",
+        Id: 79,
+        idEdificio: "F-3",
         nombre: "Aulas Este (2 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 956.9300000000001,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -1674,13 +1657,13 @@ export async function insertarDatos() {
         UsoActual: 11,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 80,
-        codigoEdificio: "F-4",
+        Id: 80,
+        idEdificio: "F-4",
         nombre: "Aulas Este (2 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 962.76,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -1695,13 +1678,13 @@ export async function insertarDatos() {
         UsoActual: 11,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 81,
-        codigoEdificio: "F-5",
+        Id: 81,
+        idEdificio: "F-5",
         nombre: "Aulas Este (2 niveles)",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 964.96,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -1716,13 +1699,13 @@ export async function insertarDatos() {
         UsoActual: 11,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 82,
-        codigoEdificio: "F-6",
+        Id: 82,
+        idEdificio: "F-6",
         nombre: "Laboratorios (Antigua soda Periférica)(Incluye ampliación)",
         fechaConstruccion: 1987,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 473.64,
         valorDolarPorM2: "1500",
         valorColonPorM2: "922275",
@@ -1737,13 +1720,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 83,
-        codigoEdificio: "F-7",
+        Id: 83,
+        idEdificio: "F-7",
         nombre: "Clínica de Salud",
         fechaConstruccion: 2007,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 454.37,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -1758,13 +1741,13 @@ export async function insertarDatos() {
         UsoActual: 17,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 84,
-        codigoEdificio: "F-8",
+        Id: 84,
+        idEdificio: "F-8",
         nombre: "Fotocopiadora",
         fechaConstruccion: 2005,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 26.75,
         valorDolarPorM2: "200",
         valorColonPorM2: "122970",
@@ -1779,13 +1762,13 @@ export async function insertarDatos() {
         UsoActual: 17,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 85,
-        codigoEdificio: "F-9",
+        Id: 85,
+        idEdificio: "F-9",
         nombre: "LAIMI II",
         fechaConstruccion: 2007,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 687.44,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -1800,13 +1783,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 86,
-        codigoEdificio: "F-10",
+        Id: 86,
+        idEdificio: "F-10",
         nombre: "Ciencias del Lenguaje (3 niveles)",
         fechaConstruccion: 2005,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1166,
         valorDolarPorM2: "1300",
         valorColonPorM2: "799305",
@@ -1821,13 +1804,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 87,
-        codigoEdificio: "G-1",
+        Id: 87,
+        idEdificio: "G-1",
         nombre: "Cubículos Administración Agropecuaria",
         fechaConstruccion: 1976,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 629.97,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -1842,13 +1825,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 88,
-        codigoEdificio: "G-2",
+        Id: 88,
+        idEdificio: "G-2",
         nombre: "Editorial Tecnológica",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 602.41,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -1863,13 +1846,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 89,
-        codigoEdificio: "G-3",
+        Id: 89,
+        idEdificio: "G-3",
         nombre: "Laboratorio Agroindustria (No incluye remodelación ni Ampliación 2018-2019)",
         fechaConstruccion: 1978,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 720.41,
         valorDolarPorM2: "1150",
         valorColonPorM2: "707077.5",
@@ -1884,13 +1867,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 90,
-        codigoEdificio: "G-4",
+        Id: 90,
+        idEdificio: "G-4",
         nombre: "Aula de Escuela de Ingeniería en Construcción",
         fechaConstruccion: 1980,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 133.01,
         valorDolarPorM2: "1100",
         valorColonPorM2: "676335",
@@ -1905,13 +1888,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 91,
-        codigoEdificio: "G-5",
+        Id: 91,
+        idEdificio: "G-5",
         nombre: "CECO - Laboratorio de Construcción",
         fechaConstruccion: 1981,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 818.18,
         valorDolarPorM2: "1400",
         valorColonPorM2: "860790",
@@ -1926,13 +1909,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 92,
-        codigoEdificio: "G-6",
+        Id: 92,
+        idEdificio: "G-6",
         nombre: "CIVCO - Centro de Investigación en Vivienda y Construcción",
         fechaConstruccion: 1992,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1309.28,
         valorDolarPorM2: "1500",
         valorColonPorM2: "922275",
@@ -1947,13 +1930,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 93,
-        codigoEdificio: "G-7",
+        Id: 93,
+        idEdificio: "G-7",
         nombre: "Centro de Investigación en Biotecnología 1-Escuela de Biología",
         fechaConstruccion: 2007,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 587.63,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -1968,13 +1951,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 94,
-        codigoEdificio: "G-8",
+        Id: 94,
+        idEdificio: "G-8",
         nombre: "Edificio de Laboratorios para Esc. de Electrónica",
         fechaConstruccion: 2010,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 261.08,
         valorDolarPorM2: "1100",
         valorColonPorM2: "676335",
@@ -1989,13 +1972,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 95,
-        codigoEdificio: "G-10",
+        Id: 95,
+        idEdificio: "G-10",
         nombre: "Centro de Investigación - CIPA (Diseño Industrial)",
         fechaConstruccion: 2008,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 195.75,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -2010,13 +1993,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 96,
-        codigoEdificio: "G-11",
+        Id: 96,
+        idEdificio: "G-11",
         nombre: "Vivero de Biología",
         fechaConstruccion: 2007,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 175.36,
         valorDolarPorM2: "300",
         valorColonPorM2: "184455",
@@ -2031,13 +2014,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 97,
-        codigoEdificio: "G-12",
+        Id: 97,
+        idEdificio: "G-12",
         nombre: "Plataforma de Pruebas Ingeniería en Construcción",
         fechaConstruccion: 2018,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 139.87,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -2052,13 +2035,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 98,
-        codigoEdificio: "G-13",
+        Id: 98,
+        idEdificio: "G-13",
         nombre: "Estación Metereológica",
         fechaConstruccion: 1990,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 109.13,
         valorDolarPorM2: "2000",
         valorColonPorM2: "1229700",
@@ -2073,13 +2056,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 99,
-        codigoEdificio: "G-14",
+        Id: 99,
+        idEdificio: "G-14",
         nombre: "Laboratorio GAMACEL",
         fechaConstruccion: 2015,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 60.21,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -2094,13 +2077,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 100,
-        codigoEdificio: "G-17",
+        Id: 100,
+        idEdificio: "G-17",
         nombre: "Escuela de Ingeniería Ambiental (Etapa I y Etapa II)",
         fechaConstruccion: 2004,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 794.66,
         valorDolarPorM2: "1400",
         valorColonPorM2: "860790",
@@ -2115,13 +2098,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 101,
-        codigoEdificio: "G-18",
+        Id: 101,
+        idEdificio: "G-18",
         nombre: "Aulas Este Docencia",
         fechaConstruccion: 2015,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 436.81,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -2136,13 +2119,13 @@ export async function insertarDatos() {
         UsoActual: 11,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 102,
-        codigoEdificio: "G-19",
+        Id: 102,
+        idEdificio: "G-19",
         nombre: "Centro de Investigación en Biotecnología (CIB) 2 - Escuela de Biología",
         fechaConstruccion: 2013,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 1165.68,
         valorDolarPorM2: "2100",
         valorColonPorM2: "1291185",
@@ -2157,13 +2140,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 103,
-        codigoEdificio: "G-20",
+        Id: 103,
+        idEdificio: "G-20",
         nombre: "Caseta de reactivos",
         fechaConstruccion: 2013,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 104.42,
         valorDolarPorM2: "2100",
         valorColonPorM2: "1291185",
@@ -2178,13 +2161,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 104,
-        codigoEdificio: "H-1",
+        Id: 104,
+        idEdificio: "H-1",
         nombre: "Vivero Forestal Escuela de Ingeniería Forestal",
         fechaConstruccion: 1985,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 382.5,
         valorDolarPorM2: "500",
         valorColonPorM2: "307425",
@@ -2199,13 +2182,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 105,
-        codigoEdificio: "H-2",
+        Id: 105,
+        idEdificio: "H-2",
         nombre: "Aulas y Laboratorio de Riego Ingeniería Agrícola",
         fechaConstruccion: 2010,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 296.37,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -2220,13 +2203,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 106,
-        codigoEdificio: "H-3",
+        Id: 106,
+        idEdificio: "H-3",
         nombre: "Taller y Bodega Ingeniería Agrícola",
         fechaConstruccion: 1990,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 147.32,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -2241,13 +2224,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 107,
-        codigoEdificio: "H-4",
+        Id: 107,
+        idEdificio: "H-4",
         nombre: "Aula Escuela Ingeniería Agrícola",
         fechaConstruccion: 1990,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 165.43,
         valorDolarPorM2: "400",
         valorColonPorM2: "245940",
@@ -2262,13 +2245,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 108,
-        codigoEdificio: "H-5",
+        Id: 108,
+        idEdificio: "H-5",
         nombre: "Bodega de Escuela de Ingeniería Agropecuaria (Antiguo)",
         fechaConstruccion: 1975,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 189.51,
         valorDolarPorM2: "225",
         valorColonPorM2: "138341.25",
@@ -2283,13 +2266,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 109,
-        codigoEdificio: "H-6",
+        Id: 109,
+        idEdificio: "H-6",
         nombre: "Taller y Laboratorios Escuela de Ingeniería Agropecuaria",
         fechaConstruccion: 2010,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 247.54,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -2304,13 +2287,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 110,
-        codigoEdificio: "H7",
+        Id: 110,
+        idEdificio: "H7",
         nombre: "Aulas y Cubículos Escuela de Ingeniería Agrícola",
         fechaConstruccion: 2014,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 582.93,
         valorDolarPorM2: "875",
         valorColonPorM2: "537993.75",
@@ -2325,13 +2308,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 111,
-        codigoEdificio: "H8",
+        Id: 111,
+        idEdificio: "H8",
         nombre: "Garage Maquinaria Agrícola y Baños",
         fechaConstruccion: 1990,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 310.93,
         valorDolarPorM2: "400",
         valorColonPorM2: "245940",
@@ -2346,13 +2329,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 112,
-        codigoEdificio: "H9",
+        Id: 112,
+        idEdificio: "H9",
         nombre: "Almácigos Escuela de Ingeniería Forestal",
         fechaConstruccion: 1985,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 126.49,
         valorDolarPorM2: "230",
         valorColonPorM2: "141415.5",
@@ -2367,13 +2350,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 113,
-        codigoEdificio: "H10",
+        Id: 113,
+        idEdificio: "H10",
         nombre: "Viveros e Invernaderos Escuela de Ingeniería Agrícola",
         fechaConstruccion: 1980,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 738.89,
         valorDolarPorM2: "100",
         valorColonPorM2: "61485",
@@ -2388,13 +2371,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 114,
-        codigoEdificio: "H11",
+        Id: 114,
+        idEdificio: "H11",
         nombre: "Viveros e Invernaderos Escuela de Ingeniería Agrícola",
         fechaConstruccion: 1980,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 646.88,
         valorDolarPorM2: "100",
         valorColonPorM2: "61485",
@@ -2409,13 +2392,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 115,
-        codigoEdificio: "H12",
+        Id: 115,
+        idEdificio: "H12",
         nombre: "Viveros e Invernaderos Escuela de Ingeniería Agrícola",
         fechaConstruccion: 1980,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 265.79,
         valorDolarPorM2: "100",
         valorColonPorM2: "61485",
@@ -2430,13 +2413,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 116,
-        codigoEdificio: "H13",
+        Id: 116,
+        idEdificio: "H13",
         nombre: "Viveros e Invernaderos Escuela de Ingeniería Agrícola",
         fechaConstruccion: 1980,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 39.1,
         valorDolarPorM2: "100",
         valorColonPorM2: "61485",
@@ -2451,13 +2434,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 117,
-        codigoEdificio: "H14",
+        Id: 117,
+        idEdificio: "H14",
         nombre: "Estación Metereológica",
         fechaConstruccion: 1990,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 32.6,
         valorDolarPorM2: "2000",
         valorColonPorM2: "1229700",
@@ -2472,13 +2455,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 118,
-        codigoEdificio: "H15",
+        Id: 118,
+        idEdificio: "H15",
         nombre: "Invernaderos Escuela de Ingeniería Agronegocios",
         fechaConstruccion: 1980,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 239.91,
         valorDolarPorM2: "100",
         valorColonPorM2: "61485",
@@ -2493,13 +2476,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 119,
-        codigoEdificio: "H16",
+        Id: 119,
+        idEdificio: "H16",
         nombre: "Compostaje Agronegocios",
         fechaConstruccion: 1980,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 45.36,
         valorDolarPorM2: "100",
         valorColonPorM2: "61485",
@@ -2514,13 +2497,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 120,
-        codigoEdificio: "I -1",
+        Id: 120,
+        idEdificio: "I -1",
         nombre: "Taller Metalurgia Escuela de Ingeniería de los Materiales",
         fechaConstruccion: 1985,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 1368.67,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -2535,13 +2518,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 121,
-        codigoEdificio: "I -2",
+        Id: 121,
+        idEdificio: "I -2",
         nombre: "Laboratorios de la Escuela de Ingeniería de los Materiales",
         fechaConstruccion: 1985,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 398,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -2556,13 +2539,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 122,
-        codigoEdificio: "I -3",
+        Id: 122,
+        idEdificio: "I -3",
         nombre: "Escuela de Ingeniería en Producción",
         fechaConstruccion: 2009,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 1322.09,
         valorDolarPorM2: "1400",
         valorColonPorM2: "860790",
@@ -2577,13 +2560,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 123,
-        codigoEdificio: "I -4",
+        Id: 123,
+        idEdificio: "I -4",
         nombre: "Cubículos y Laboratorios Escuela de Ingeniería de los Materiales (Incluye Ampliación Edificio)",
         fechaConstruccion: 2011,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 348.61,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -2598,13 +2581,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 124,
-        codigoEdificio: "I-6",
+        Id: 124,
+        idEdificio: "I-6",
         nombre: "Aulas Sector Oeste (Producción - Materiales)",
         fechaConstruccion: 2014,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 436.81,
         valorDolarPorM2: "725",
         valorColonPorM2: "445766.25",
@@ -2619,13 +2602,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 125,
-        codigoEdificio: "I-7",
+        Id: 125,
+        idEdificio: "I-7",
         nombre: "FUNDATEC ( 1 Nivel)",
         fechaConstruccion: 2017,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 511.11,
         valorDolarPorM2: "1350",
         valorColonPorM2: "830047.5",
@@ -2640,13 +2623,13 @@ export async function insertarDatos() {
         UsoActual: 13,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 126,
-        codigoEdificio: "I-8",
+        Id: 126,
+        idEdificio: "I-8",
         nombre: "Monitoreo y Producción Energía Solar(No incluye la II Etapa) (Incluye Reajustes al junio 2018)",
         fechaConstruccion: 2018,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 72.29,
         valorDolarPorM2: "1550.53",
         valorColonPorM2: "953343.3705",
@@ -2661,13 +2644,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 127,
-        codigoEdificio: "I-9",
+        Id: 127,
+        idEdificio: "I-9",
         nombre: "Área de Paneles Solares",
         fechaConstruccion: 2018,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 1500,
         valorDolarPorM2: "38.66256",
         valorColonPorM2: "23771.675016",
@@ -2682,13 +2665,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 128,
-        codigoEdificio: "I-10",
+        Id: 128,
+        idEdificio: "I-10",
         nombre: "Plasma Escuela de Física",
         fechaConstruccion: 2018,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 290.22,
         valorDolarPorM2: "1560",
         valorColonPorM2: "959166",
@@ -2703,13 +2686,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 129,
-        codigoEdificio: "I-11",
+        Id: 129,
+        idEdificio: "I-11",
         nombre: "Monitoreo y Producción Energía Solar Cuarto eléctrico, baños, bodega y otros",
         fechaConstruccion: 2018,
-        noFinca: 13,
+        noFinca: "C1521502-2011",
         m2Construccion: 180.14,
         valorDolarPorM2: "1550.53",
         valorColonPorM2: "953343.3705",
@@ -2724,13 +2707,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 130,
-        codigoEdificio: "J-1",
+        Id: 130,
+        idEdificio: "J-1",
         nombre: "Residencias Estudiantiles Hombres",
         fechaConstruccion: 1988,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 850.03,
         valorDolarPorM2: "1375",
         valorColonPorM2: "845418.75",
@@ -2745,13 +2728,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 131,
-        codigoEdificio: "J-2",
+        Id: 131,
+        idEdificio: "J-2",
         nombre: "Sala de Estudio Residencias",
         fechaConstruccion: 1988,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 100.57,
         valorDolarPorM2: "1075",
         valorColonPorM2: "660963.75",
@@ -2766,13 +2749,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 132,
-        codigoEdificio: "J-3",
+        Id: 132,
+        idEdificio: "J-3",
         nombre: "Residencias Estudiantiles Hombres",
         fechaConstruccion: 1988,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 850.03,
         valorDolarPorM2: "1375",
         valorColonPorM2: "845418.75",
@@ -2787,13 +2770,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 133,
-        codigoEdificio: "J-4",
+        Id: 133,
+        idEdificio: "J-4",
         nombre: "Residencias de Huéspedes (Casa un nivel)",
         fechaConstruccion: 2000,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 50.92,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -2808,13 +2791,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 134,
-        codigoEdificio: "J-5",
+        Id: 134,
+        idEdificio: "J-5",
         nombre: "Residencias Estudiantiles Mujeres",
         fechaConstruccion: 2000,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 763,
         valorDolarPorM2: "1300",
         valorColonPorM2: "799305",
@@ -2829,13 +2812,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 135,
-        codigoEdificio: "J-6",
+        Id: 135,
+        idEdificio: "J-6",
         nombre: "Residencias Estudiantiles Mujeres",
         fechaConstruccion: 2000,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 771.49,
         valorDolarPorM2: "1300",
         valorColonPorM2: "799305",
@@ -2850,13 +2833,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 136,
-        codigoEdificio: "J-7",
+        Id: 136,
+        idEdificio: "J-7",
         nombre: "Residencias Estudiantiles Mixtas (4 niveles)",
         fechaConstruccion: 2016,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 3849.13,
         valorDolarPorM2: "1550",
         valorColonPorM2: "953017.5",
@@ -2871,13 +2854,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 137,
-        codigoEdificio: "J-8",
+        Id: 137,
+        idEdificio: "J-8",
         nombre: "Caseta de bombas y tanques de agua",
         fechaConstruccion: 2016,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 55.5,
         valorDolarPorM2: "1550",
         valorColonPorM2: "953017.5",
@@ -2892,13 +2875,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 138,
-        codigoEdificio: "J-9",
+        Id: 138,
+        idEdificio: "J-9",
         nombre: "Residencias de Huéspedes (Casa dos niveles)",
         fechaConstruccion: 2000,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 48.38,
         valorDolarPorM2: "800",
         valorColonPorM2: "491880",
@@ -2913,13 +2896,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 139,
-        codigoEdificio: "K-1",
+        Id: 139,
+        idEdificio: "K-1",
         nombre: "Escuela de Ingeniería Electrónica (TICS) (5 niveles)",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 6174.84,
         valorDolarPorM2: "1268.02",
         valorColonPorM2: "779642.0970000001",
@@ -2934,13 +2917,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 140,
-        codigoEdificio: "K-2",
+        Id: 140,
+        idEdificio: "K-2",
         nombre: "Escuela de Seguridad Laboral (2 niveles)",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1501,
         valorDolarPorM2: "1072.07",
         valorColonPorM2: "659162.2395",
@@ -2955,13 +2938,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 141,
-        codigoEdificio: "K-3",
+        Id: 141,
+        idEdificio: "K-3",
         nombre: "Biblioteca Digital (2 niveles)",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1115,
         valorDolarPorM2: "2259.47",
         valorColonPorM2: "1389235.1295",
@@ -2976,13 +2959,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 142,
-        codigoEdificio: "K-3",
+        Id: 142,
+        idEdificio: "K-3",
         nombre: "Obras exteriores y calle de acceso",
         fechaConstruccion: 2017,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 5300,
         valorDolarPorM2: "201.65",
         valorColonPorM2: "123984.5025",
@@ -2997,13 +2980,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: true
-    },
+    }
     {
-        id: 143,
-        codigoEdificio: "K-4",
+        Id: 143,
+        idEdificio: "K-4",
         nombre: "Comedor Institucional Este (3 niveles)",
         fechaConstruccion: 2018,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1643,
         valorDolarPorM2: "1252.65",
         valorColonPorM2: "770191.8525",
@@ -3018,13 +3001,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 144,
-        codigoEdificio: "K-5",
+        Id: 144,
+        idEdificio: "K-5",
         nombre: "Núcleo Integrado de Química Ambiental (4 niveles)",
         fechaConstruccion: 2018,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 4182,
         valorDolarPorM2: "1929.82",
         valorColonPorM2: "1186549.827",
@@ -3039,13 +3022,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 145,
-        codigoEdificio: "K-6",
+        Id: 145,
+        idEdificio: "K-6",
         nombre: "Escuela de Diseño Industrial (2 niveles)",
         fechaConstruccion: 2018,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1310,
         valorDolarPorM2: "1719.75",
         valorColonPorM2: "1057388.2875",
@@ -3060,13 +3043,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 146,
-        codigoEdificio: "K-7",
+        Id: 146,
+        idEdificio: "K-7",
         nombre: "Taller Especializado de Escuela de Diseño Industrial",
         fechaConstruccion: 2018,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 360,
         valorDolarPorM2: "959.18",
         valorColonPorM2: "589751.823",
@@ -3081,13 +3064,13 @@ export async function insertarDatos() {
         UsoActual: 5,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 147,
-        codigoEdificio: "K-8",
+        Id: 147,
+        idEdificio: "K-8",
         nombre: "Lagunas de Occidación ITCR (Incluyen Casetas)",
         fechaConstruccion: 1980,
-        noFinca: 12,
+        noFinca: "3-246004-00/C-1689628-2013",
         m2Construccion: 3087.06,
         valorDolarPorM2: "258.96",
         valorColonPorM2: "159221.55599999998",
@@ -3102,13 +3085,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 148,
-        codigoEdificio: "K-9",
+        Id: 148,
+        idEdificio: "K-9",
         nombre: "Centro de Acopio ITCR",
         fechaConstruccion: 2012,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 92.87,
         valorDolarPorM2: "143.88",
         valorColonPorM2: "88464.618",
@@ -3123,13 +3106,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 149,
-        codigoEdificio: "L-1",
+        Id: 149,
+        idEdificio: "L-1",
         nombre: "Aulas, Oficinas y Laboratorios Escuela de Ingeniería Forestal (Incluye Remodelación 2012)",
         fechaConstruccion: 1995,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 970.57,
         valorDolarPorM2: "1275",
         valorColonPorM2: "783933.75",
@@ -3144,13 +3127,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 150,
-        codigoEdificio: "L-2",
+        Id: 150,
+        idEdificio: "L-2",
         nombre: "Oficinas y Laboratorios Escuela de Ingeniería Forestal (Inluye Remodelación 2015)",
         fechaConstruccion: 1981,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 604.54,
         valorDolarPorM2: "1350",
         valorColonPorM2: "830047.5",
@@ -3165,13 +3148,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 151,
-        codigoEdificio: "L-3",
+        Id: 151,
+        idEdificio: "L-3",
         nombre: "Aulas y Cubículos Escuela de Ingeniería Forestal (Incluye Reestructuración y  Remodelación, Obras exteriores 2015",
         fechaConstruccion: 1981,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 1526.8899999999999,
         valorDolarPorM2: "1200",
         valorColonPorM2: "737820",
@@ -3186,13 +3169,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 152,
-        codigoEdificio: "L-4",
+        Id: 152,
+        idEdificio: "L-4",
         nombre: "Laboratorios Maderas Escuela de Ingeniería Forestal (Incluye remodelación 2017)",
         fechaConstruccion: 1981,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 603.54,
         valorDolarPorM2: "1600",
         valorColonPorM2: "983760",
@@ -3207,13 +3190,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 153,
-        codigoEdificio: "L-5",
+        Id: 153,
+        idEdificio: "L-5",
         nombre: "Secadora de madera Escuela de Ingeniería Forestal",
         fechaConstruccion: 1981,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 62.25,
         valorDolarPorM2: "1500",
         valorColonPorM2: "922275",
@@ -3228,13 +3211,13 @@ export async function insertarDatos() {
         UsoActual: 4,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 154,
-        codigoEdificio: "L-6",
+        Id: 154,
+        idEdificio: "L-6",
         nombre: "Caseta de Guardas Sur - Bloque L",
         fechaConstruccion: 2016,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 12.46,
         valorDolarPorM2: "1150",
         valorColonPorM2: "707077.5",
@@ -3249,13 +3232,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 155,
-        codigoEdificio: "L-7",
+        Id: 155,
+        idEdificio: "L-7",
         nombre: "Casita Soda Escuela Forestal",
         fechaConstruccion: 2016,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 91.45,
         valorDolarPorM2: "450",
         valorColonPorM2: "276682.5",
@@ -3270,13 +3253,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 156,
-        codigoEdificio: "L-8",
+        Id: 156,
+        idEdificio: "L-8",
         nombre: "Secadora de madera solar Escuela de Ingeniería Forestal",
         fechaConstruccion: 2016,
-        noFinca: 2,
+        noFinca: "C-1515819-2011",
         m2Construccion: 14.09,
         valorDolarPorM2: "450",
         valorColonPorM2: "276682.5",
@@ -3291,13 +3274,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 157,
-        codigoEdificio: "M1",
+        Id: 157,
+        idEdificio: "M1",
         nombre: "Aulas - Taller infantil Psicopedagógico del TEC (TIPTEC)",
         fechaConstruccion: 2015,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 265.43,
         valorDolarPorM2: "400",
         valorColonPorM2: "245940",
@@ -3312,13 +3295,13 @@ export async function insertarDatos() {
         UsoActual: 20,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 158,
-        codigoEdificio: "M2",
+        Id: 158,
+        idEdificio: "M2",
         nombre: "Oficinas del Departamento de Administración de Mantenimiento (Incluye Ampliación de 48 m2 el 2015)",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 184.81,
         valorDolarPorM2: "1000",
         valorColonPorM2: "614850",
@@ -3333,13 +3316,13 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 159,
-        codigoEdificio: "M4",
+        Id: 159,
+        idEdificio: "M4",
         nombre: "Oficinas y Aulas Taller Infantil (TIPTEC)",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 322.37,
         valorDolarPorM2: "1100",
         valorColonPorM2: "676335",
@@ -3354,13 +3337,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 160,
-        codigoEdificio: "M6",
+        Id: 160,
+        idEdificio: "M6",
         nombre: "Talleres del Departamento de Administración y Mantenimiento",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 387.56,
         valorDolarPorM2: "200",
         valorColonPorM2: "122970",
@@ -3375,13 +3358,13 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 161,
-        codigoEdificio: "M7",
+        Id: 161,
+        idEdificio: "M7",
         nombre: "Plataforma de Parqueos de Unidad de Transportes  ITCR",
         fechaConstruccion: 2016,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 1511.4,
         valorDolarPorM2: "350",
         valorColonPorM2: "215197.5",
@@ -3396,13 +3379,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 162,
-        codigoEdificio: "M8",
+        Id: 162,
+        idEdificio: "M8",
         nombre: "Oficina de Ingeniería",
         fechaConstruccion: 2016,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 509.41,
         valorDolarPorM2: "1100",
         valorColonPorM2: "676335",
@@ -3417,13 +3400,13 @@ export async function insertarDatos() {
         UsoActual: 7,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 163,
-        codigoEdificio: "M9",
+        Id: 163,
+        idEdificio: "M9",
         nombre: "Unidad de Conserjería",
         fechaConstruccion: 2012,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 119.35,
         valorDolarPorM2: "250",
         valorColonPorM2: "153712.5",
@@ -3438,13 +3421,13 @@ export async function insertarDatos() {
         UsoActual: 19,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 164,
-        codigoEdificio: "M10",
+        Id: 164,
+        idEdificio: "M10",
         nombre: "Bodega del Departamento de Administración y Mantenimiento",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 506.06,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -3459,13 +3442,13 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 165,
-        codigoEdificio: "M11",
+        Id: 165,
+        idEdificio: "M11",
         nombre: "Bodega del Departamento de Administración y Mantenimiento",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 210.61,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -3480,13 +3463,13 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 166,
-        codigoEdificio: "M12",
+        Id: 166,
+        idEdificio: "M12",
         nombre: "Oficinas de la Unidad de Transportes ITCR (Inlcuye  Remodelación y ampliación 2017)",
         fechaConstruccion: 1990,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 93.86,
         valorDolarPorM2: "550",
         valorColonPorM2: "338167.5",
@@ -3501,13 +3484,13 @@ export async function insertarDatos() {
         UsoActual: 20,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 167,
-        codigoEdificio: "M13",
+        Id: 167,
+        idEdificio: "M13",
         nombre: "Bodega 2 del Departamento de Administración y Mantenimiento",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 171.8,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -3522,13 +3505,13 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 168,
-        codigoEdificio: "M14",
+        Id: 168,
+        idEdificio: "M14",
         nombre: "Bodega 3 del Departamento de Administración y Mantenimiento",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 135.33,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -3543,13 +3526,13 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 169,
-        codigoEdificio: "M15",
+        Id: 169,
+        idEdificio: "M15",
         nombre: "Caseta de combustibles del Departamento de Administración y Mantenimiento",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 23.05,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -3564,13 +3547,13 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
     {
-        id: 170,
-        codigoEdificio: "M16",
+        Id: 170,
+        idEdificio: "M16",
         nombre: "Unidad de Vigilancia",
         fechaConstruccion: 1985,
-        noFinca: 1,
+        noFinca: "3-255499-000/C-1895719-2016",
         m2Construccion: 109.57,
         valorDolarPorM2: "750",
         valorColonPorM2: "461137.5",
@@ -3585,11 +3568,5 @@ export async function insertarDatos() {
         UsoActual: 6,
         sede: 1,
         esRenovacion: false
-    },
+    }
 ]
-;
-
-  //await db.insert(Sedes).values(dataSede);
-  //await db.insert(NumeroFincas).values(dataNumeroFinca);
-  await db.insert(Construcciones).values(data);
-}

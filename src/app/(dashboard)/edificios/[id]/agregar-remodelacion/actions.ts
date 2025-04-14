@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "~/server/db";
-import { NumeroFincas, UsosActuales, Edificaciones } from "~/server/db/schema";
+import { NumeroFincas, UsosActuales, Construcciones } from "~/server/db/schema";
 import { revalidatePath } from "next/cache";
 
 export async function fetchFincas() {
@@ -46,7 +46,7 @@ export async function createRemodelacion(data: {
   updatedAt: Date;
 }) {
   try {
-    const edificio = await db.insert(Edificaciones).values(data).returning();
+    const edificio = await db.insert(Construcciones).values(data).returning();
 
     // Revalidar la página de detalles del edificio
     revalidatePath(`/edificios/${data.codigoEdificio}`);

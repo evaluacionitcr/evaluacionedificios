@@ -1,6 +1,6 @@
 import { db } from "~/server/db";
 import {
-  Edificaciones,
+  Construcciones,
   NumeroFincas,
   Sedes,
   UsosActuales,
@@ -1115,5 +1115,5 @@ export async function insertarDatos() {
 
     await db.insert(Sedes).values(dataSede);
     await db.insert(NumeroFincas).values(dataNumeroFinca);
-    await db.insert(Edificaciones).values(data);
+    await db.insert(Construcciones).values(data);
 }
