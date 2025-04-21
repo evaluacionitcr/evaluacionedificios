@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import { ArrowLeft, Building, Calendar, Trash2 } from "lucide-react";
+import { ArrowLeft, Building, Calendar, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -34,10 +34,82 @@ import {
   eliminarRegistroEdificio,
   obtenerDetallesEdificio,
   eliminarEdificioCompleto,
+  obtenerDetallesAceras,
+  obtenerDetallesTerreno,
+  obtenerDetallesZonasVerdes,
 } from "./actions";
 
 interface EdificioDetalle {
   id: number;
+  codigoEdificio: string;
+  sede: number | null;
+  sedeNombre: string | null;
+  esRenovacion: boolean | null;
+  nombre: string;
+  fechaConstruccion: number | null;
+  numeroFinca: string | null;
+  m2Construccion: number | null;
+  valorDolarPorM2: string | null;
+  valorColonPorM2: string | null;
+  edad: number | null;
+  vidaUtilHacienda: number | null;
+  vidaUtilExperto: number | null;
+  valorReposicion: string | null;
+  depreciacionLinealAnual: string | null;
+  valorActualRevaluado: string | null;
+  anoDeRevaluacion: number | null;
+  usoActual: string | null;
+}
+
+interface AcerasDetalle {
+  id: number;
+  idConstruccion: number | null;
+  codigoEdificio: string;
+  sede: number | null;
+  sedeNombre: string | null;
+  esRenovacion: boolean | null;
+  nombre: string;
+  fechaConstruccion: number | null;
+  numeroFinca: string | null;
+  m2Construccion: number | null;
+  valorDolarPorM2: string | null;
+  valorColonPorM2: string | null;
+  edad: number | null;
+  vidaUtilHacienda: number | null;
+  vidaUtilExperto: number | null;
+  valorReposicion: string | null;
+  depreciacionLinealAnual: string | null;
+  valorActualRevaluado: string | null;
+  anoDeRevaluacion: number | null;
+  usoActual: string | null;
+}
+
+interface TerrenoDetalle {
+  id: number;
+  idConstruccion: number | null;
+  codigoEdificio: string;
+  sede: number | null;
+  sedeNombre: string | null;
+  esRenovacion: boolean | null;
+  nombre: string;
+  fechaConstruccion: number | null;
+  numeroFinca: string | null;
+  m2Construccion: number | null;
+  valorDolarPorM2: string | null;
+  valorColonPorM2: string | null;
+  edad: number | null;
+  vidaUtilHacienda: number | null;
+  vidaUtilExperto: number | null;
+  valorReposicion: string | null;
+  depreciacionLinealAnual: string | null;
+  valorActualRevaluado: string | null;
+  anoDeRevaluacion: number | null;
+  usoActual: string | null;
+}
+
+interface ZonaVerdeDetalle {
+  id: number;
+  idConstruccion: number | null;
   codigoEdificio: string;
   sede: number | null;
   sedeNombre: string | null;
@@ -66,8 +138,14 @@ export default function BuildingPage({ params }: BuildingPageProps) {
   const router = useRouter();
   const { id } = use(params);
   const [edificios, setEdificios] = useState<EdificioDetalle[]>([]);
+  const [aceras, setAceras] = useState<AcerasDetalle[]>([]);
+  const [terrenos, setTerrenos] = useState<TerrenoDetalle[]>([]);
+  const [zonasVerdes, setZonasVerdes] = useState<ZonaVerdeDetalle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estado para las filas expandidas
+  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
   // Estado para AlertDialog de eliminación de registro
   const [registroToDelete, setRegistroToDelete] = useState<number | null>(null);
@@ -109,6 +187,99 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     };
 
     void cargarDatos();
+  }, [id]);
+
+  // Cargar los datos de las aceras al iniciar
+  useEffect(() => {
+    const cargarDatosAceras = async () => {
+      if (!id) {
+        setError("ID no proporcionado");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await obtenerDetallesAceras(id);
+        if (response.success && response.data) {
+          if (response.data.length === 0) {
+            setError("No se encontró las aceras del edificio");
+          } else {
+            setAceras(response.data);
+          }
+        } else {
+          setError(response.error ?? "Error al cargar los datos");
+        }
+      } catch (err) {
+        setError("Error al cargar los datos de la acera");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void cargarDatosAceras();
+  }, [id]);
+
+  // Cargar los datos de los terrenos al iniciar
+  useEffect(() => {
+    const cargarDatosTerrenos = async () => {
+      if (!id) {
+        setError("ID no proporcionado");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await obtenerDetallesTerreno(id);
+        if (response.success && response.data) {
+          if (response.data.length === 0) {
+            setError("No se encontró el terreno del edificio");
+          } else {
+            setTerrenos(response.data);
+          }
+        } else {
+          setError(response.error ?? "Error al cargar los datos");
+        }
+      } catch (err) {
+        setError("Error al cargar los datos del terreno");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void cargarDatosTerrenos();
+  }, [id]);
+
+  // Cargar los datos de las zonas verdes al iniciar
+  useEffect(() => {
+    const cargarDatosZonasVerdes = async () => {
+      if (!id) {
+        setError("ID no proporcionado");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await obtenerDetallesZonasVerdes(id);
+        if (response.success && response.data) {
+          if (response.data.length === 0) {
+            setError("No se encontró la zona verde del edificio");
+          } else {
+            setZonasVerdes(response.data);
+          }
+        } else {
+          setError(response.error ?? "Error al cargar los datos");
+        }
+      } catch (err) {
+        setError("Error al cargar los datos de la zona verde");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void cargarDatosZonasVerdes();
   }, [id]);
 
   // Función para abrir el diálogo de confirmación de eliminación de registro
@@ -190,6 +361,14 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     } finally {
       setIsDeletingEdificio(false);
     }
+  };
+
+  // Función para alternar el estado expandido/colapsado de una fila
+  const toggleRowExpansion = (edificioId: number) => {
+    setExpandedRows(prev => ({
+      ...prev,
+      [edificioId]: !prev[edificioId]
+    }));
   };
 
   if (isLoading) {
@@ -282,6 +461,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">Expandir</TableHead>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Fecha Const.</TableHead>
                     <TableHead>No. Finca</TableHead>
@@ -302,40 +482,134 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                 </TableHeader>
                 <TableBody>
                   {edificios.map((e) => (
-                    <TableRow key={e.id}>
-                      <TableCell>{e.nombre}</TableCell>
-                      <TableCell>{e.fechaConstruccion ?? "N/A"}</TableCell>
-                      <TableCell>{e.numeroFinca ?? "N/A"}</TableCell>
-                      <TableCell>{e.m2Construccion ?? "N/A"}</TableCell>
-                      <TableCell>{e.usoActual ?? "N/A"}</TableCell>
-                      <TableCell>${e.valorDolarPorM2 ?? "0.00"}</TableCell>
-                      <TableCell>₡{e.valorColonPorM2 ?? "0.00"}</TableCell>
-                      <TableCell>₡{e.valorReposicion ?? "0.00"}</TableCell>
-                      <TableCell>₡{e.valorActualRevaluado ?? "0.00"}</TableCell>
-                      <TableCell>
-                        ₡{e.depreciacionLinealAnual ?? "0.00"}
-                      </TableCell>
-                      <TableCell>{e.anoDeRevaluacion ?? "N/A"}</TableCell>
-                      <TableCell>{e.edad ?? 0} años</TableCell>
-                      <TableCell>{e.vidaUtilHacienda ?? 0} años</TableCell>
-                      <TableCell>{e.vidaUtilExperto ?? 0} años</TableCell>
-                      <TableCell>{e.esRenovacion ? "Sí" : "No"}</TableCell>
-                      <TableCell>
-                        <Button
-                          onClick={() => openDeleteDialog(e.id)}
-                          variant="destructive"
-                          size="sm"
-                          title="Eliminar registro"
-                          className="bg-[#EF3340] hover:bg-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                    <>
+                      <TableRow key={e.id} className="border-t-2 border-primary/10">
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="p-1"
+                            onClick={() => toggleRowExpansion(e.id)}
+                          >
+                            {expandedRows[e.id] ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="font-medium">{e.nombre}</TableCell>
+                        <TableCell>{e.fechaConstruccion ?? "N/A"}</TableCell>
+                        <TableCell>{e.numeroFinca ?? "N/A"}</TableCell>
+                        <TableCell>{e.m2Construccion ?? "N/A"}</TableCell>
+                        <TableCell>{e.usoActual ?? "N/A"}</TableCell>
+                        <TableCell>${e.valorDolarPorM2 ?? "0.00"}</TableCell>
+                        <TableCell>₡{e.valorColonPorM2 ?? "0.00"}</TableCell>
+                        <TableCell>₡{e.valorReposicion ?? "0.00"}</TableCell>
+                        <TableCell>₡{e.valorActualRevaluado ?? "0.00"}</TableCell>
+                        <TableCell>
+                          ₡{e.depreciacionLinealAnual ?? "0.00"}
+                        </TableCell>
+                        <TableCell>{e.anoDeRevaluacion ?? "N/A"}</TableCell>
+                        <TableCell>{e.edad ?? 0} años</TableCell>
+                        <TableCell>{e.vidaUtilHacienda ?? 0} años</TableCell>
+                        <TableCell>{e.vidaUtilExperto ?? 0} años</TableCell>
+                        <TableCell>{e.esRenovacion ? "Sí" : "No"}</TableCell>
+                        <TableCell>
+                          <Button
+                            onClick={() => openDeleteDialog(e.id)}
+                            variant="destructive"
+                            size="sm"
+                            title="Eliminar registro"
+                            className="bg-[#EF3340] hover:bg-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      
+                      {/* Filas expandibles para mostrar información de aceras relacionadas */}
+                      {expandedRows[e.id] && (
+                        <>
+                          {aceras
+                            .filter(a => a.idConstruccion === e.id)
+                            .map(acera => (
+                              <TableRow key={`acera-${acera.id}`} className="bg-blue-100 text-sm hover:bg-blue-50">
+                                <TableCell></TableCell>
+                                <TableCell className="pl-6 font-medium text-blue-700">{acera.nombre} (Acera)</TableCell>
+                                <TableCell>{acera.fechaConstruccion ?? "N/A"}</TableCell>
+                                <TableCell>{acera.numeroFinca ?? "N/A"}</TableCell>
+                                <TableCell>{acera.m2Construccion ?? "N/A"}</TableCell>
+                                <TableCell>{acera.usoActual ?? "N/A"}</TableCell>
+                                <TableCell>${acera.valorDolarPorM2 ?? "0.00"}</TableCell>
+                                <TableCell>₡{acera.valorColonPorM2 ?? "0.00"}</TableCell>
+                                <TableCell>₡{acera.valorReposicion ?? "0.00"}</TableCell>
+                                <TableCell>₡{acera.valorActualRevaluado ?? "0.00"}</TableCell>
+                                <TableCell>₡{acera.depreciacionLinealAnual ?? "0.00"}</TableCell>
+                                <TableCell>{acera.anoDeRevaluacion ?? "N/A"}</TableCell>
+                                <TableCell>{acera.edad ?? 0} años</TableCell>
+                                <TableCell>{acera.vidaUtilHacienda ?? 0} años</TableCell>
+                                <TableCell>{acera.vidaUtilExperto ?? 0} años</TableCell>
+                                <TableCell>{acera.esRenovacion ? "Sí" : "No"}</TableCell>
+                                <TableCell></TableCell>
+                              </TableRow>
+                            ))}
+                          
+                          {zonasVerdes
+                            .filter(z => z.idConstruccion === e.id)
+                            .map(zonasVerde => (
+                              <TableRow key={`zonaVerde-${zonasVerde.id}`} className="bg-blue-200 text-sm hover:bg-blue-50">
+                                <TableCell></TableCell>
+                                <TableCell className="pl-6 font-medium text-blue-700">{zonasVerde.nombre} (Zona Verde)</TableCell>
+                                <TableCell>{zonasVerde.fechaConstruccion ?? "N/A"}</TableCell>
+                                <TableCell>{zonasVerde.numeroFinca ?? "N/A"}</TableCell>
+                                <TableCell>{zonasVerde.m2Construccion ?? "N/A"}</TableCell>
+                                <TableCell>{zonasVerde.usoActual ?? "N/A"}</TableCell>
+                                <TableCell>${zonasVerde.valorDolarPorM2 ?? "0.00"}</TableCell>
+                                <TableCell>₡{zonasVerde.valorColonPorM2 ?? "0.00"}</TableCell>
+                                <TableCell>₡{zonasVerde.valorReposicion ?? "0.00"}</TableCell>
+                                <TableCell>₡{zonasVerde.valorActualRevaluado ?? "0.00"}</TableCell>
+                                <TableCell>₡{zonasVerde.depreciacionLinealAnual ?? "0.00"}</TableCell>
+                                <TableCell>{zonasVerde.anoDeRevaluacion ?? "N/A"}</TableCell>
+                                <TableCell>{zonasVerde.edad ?? 0} años</TableCell>
+                                <TableCell>{zonasVerde.vidaUtilHacienda ?? 0} años</TableCell>
+                                <TableCell>{zonasVerde.vidaUtilExperto ?? 0} años</TableCell>
+                                <TableCell>{zonasVerde.esRenovacion ? "Sí" : "No"}</TableCell>
+                                <TableCell></TableCell>
+                              </TableRow>
+                            ))}
+
+                      {terrenos
+                        .filter(t => t.idConstruccion === e.id)
+                        .map(terreno => (
+                          <TableRow key={`terreno-${terreno.id}`} className="bg-blue-300 text-sm hover:bg-blue-50">
+                            <TableCell></TableCell>
+                            <TableCell className="pl-6 font-medium text-blue-700">{terreno.nombre} (Terreno)</TableCell>
+                            <TableCell>{terreno.fechaConstruccion ?? "N/A"}</TableCell>
+                            <TableCell>{terreno.numeroFinca ?? "N/A"}</TableCell>
+                            <TableCell>{terreno.m2Construccion ?? "N/A"}</TableCell>
+                            <TableCell>{terreno.usoActual ?? "N/A"}</TableCell>
+                            <TableCell>${terreno.valorDolarPorM2 ?? "0.00"}</TableCell>
+                            <TableCell>₡{terreno.valorColonPorM2 ?? "0.00"}</TableCell>
+                            <TableCell>₡{terreno.valorReposicion ?? "0.00"}</TableCell>
+                            <TableCell>₡{terreno.valorActualRevaluado ?? "0.00"}</TableCell>
+                            <TableCell>₡{terreno.depreciacionLinealAnual ?? "0.00"}</TableCell>
+                            <TableCell>{terreno.anoDeRevaluacion ?? "N/A"}</TableCell>
+                            <TableCell>{terreno.edad ?? 0} años</TableCell>
+                            <TableCell>{terreno.vidaUtilHacienda ?? 0} años</TableCell>
+                            <TableCell>{terreno.vidaUtilExperto ?? 0} años</TableCell>
+                            <TableCell>{terreno.esRenovacion ? "Sí" : "No"}</TableCell>
+                            <TableCell></TableCell>
+                          </TableRow>
+                        ))}
+                        </>
+                      )}
+                    </>
                   ))}
                 </TableBody>
               </Table>
             </div>
+            
           </CardContent>
         </Card>
       </div>

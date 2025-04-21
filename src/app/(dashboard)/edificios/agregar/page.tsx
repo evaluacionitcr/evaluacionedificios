@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { fetchSedes, fetchFincas, fetchUsosActuales, createEdificio, checkCodigoEdificioExists } from "./actions"; // Importar la función para obtener sedes
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { NumericFormat } from "react-number-format" // Importar useRouter
+import { NumericFormat } from "react-number-format";
 
 interface Sede {
   id: number;
