@@ -14,11 +14,15 @@ export default function Page() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Parámetros</h1>
       </div>
-      <div className="container mx-auto py-6">
+
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Criterios para evaluación</h1>
+      </div>
+
+      <div className="container mx-auto py-6 border border-gray-300 rounded-xl">
         <Table>
-          <TableBody>
-            {parameters.map((param) => (
-              <TableRow key={param.id}>
+          <TableBody /* Componentes */>
+              <TableRow>
                 <TableCell className="text-xl font-semibold sm:text-2xl">Componentes</TableCell>
                 <TableCell className="text-right">
                   <Link href={`/parametros/componentes`}>
@@ -28,10 +32,65 @@ export default function Page() {
                   </Link>
                 </TableCell>
               </TableRow>
-            ))}
+
+           
+              <TableRow /* Estado de conservación */>
+                <TableCell className="text-xl font-semibold sm:text-2xl">Estado de conservación</TableCell>
+                <TableCell className="text-right">
+                  <Link href={`/parametros/conservacion`}>
+                    <Button>
+                      Editar
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+
+              <TableRow /* Funcionalidad */>
+                <TableCell className="text-xl font-semibold sm:text-2xl">Funcionalidad </TableCell>
+                <TableCell className="text-right">
+                  <Link href={`/parametros/funcionalidad`}>
+                    <Button>
+                      Editar
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+
+              <TableRow /* Normativa */>
+                <TableCell className="text-xl font-semibold sm:text-2xl">Normativa </TableCell>
+                <TableCell className="text-right">
+                  <Link href={`/parametros/normativa`}>
+                    <Button>
+                      Editar
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+
           </TableBody>
         </Table>
       </div>
+
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Priorización</h1>
+      </div>
+      <div className="container mx-auto py-6 border border-gray-300 rounded-xl">
+        <Table>
+          <TableBody /* Priorización */>
+              <TableRow>
+                <TableCell className="text-xl font-semibold sm:text-2xl">Criterios de evaluación</TableCell>
+                <TableCell className="text-right">
+                  <Link href={`/parametros/priorizacion`}>
+                    <Button>
+                      Editar
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+
+          </TableBody>
+        </Table>
+        </div>
     </div>
   );
 }
