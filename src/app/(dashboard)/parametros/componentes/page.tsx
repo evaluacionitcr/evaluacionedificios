@@ -1,70 +1,78 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
-import { ArrowLeft, Building, Calendar, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Card, CardContent } from "~/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { createComponente, getComponentes } from "./actions"; // Asegúrate de importar la función
 
 export default function Page() {
-  const [editRowIndex, setEditRowIndex] = useState(null);
-  const [tableData, setTableData] = useState([
-    {
-      componente: "Cimientos",
-      peso: 2.5,
-      elementos: "Placa corrida, placa aislada o losa de fundación; revisión de asentamientos diferenciales, agrietamiento o socavación",
-    },
-    {
-      componente: "Componente 2",
-      peso: 20.0,
-      elementos: "Elemento 3, Elemento 4",
-    },
-  ]);
+  const [editRowIndex, setEditRowIndex] = useState<number | null>(null);
+  const [tableData, setTableData] = useState<any[]>([]);
 
-  const handleEditClick = (index) => {
+  const handleEditClick = (index: number) => {
     setEditRowIndex(index);
   };
 
-  const handleInputChange = (index, field, value) => {
+  const handleInputChange = (index: number, field: string, value: any) => {
     const updatedData = [...tableData];
     updatedData[index][field] = value;
     setTableData(updatedData);
   };
 
-  const handleSaveClick = (index) => {
+  const handleSaveClick = (index: number) => {
     console.log("Saved row:", tableData[index]);
     setEditRowIndex(null);
   };
-  
 
   const calculateTotalWeight = () => {
     return tableData.reduce((total, row) => total + (parseFloat(row.peso) || 0), 0);
   };
+
+  // Agregar componente a la lista y base de datos
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const newRow = {
+      componente: "Nuevo Componente",
+      peso: 0,
+      elementos: "Nuevos elementos",
+    };
+
+    // Agregar al estado de la tabla
+    setTableData((prevData) => [...prevData, newRow]);
+
+    // Llamar a la función para insertar en la base de datos
+    try {
+      const response = await createComponente({
+        componente: newRow.componente,
+        peso: newRow.peso,
+        elementos: newRow.elementos
+      });
+      if (response.success) {
+        console.log("Componente agregado exitosamente");
+      } else {
+        console.error("Error al agregar componente");
+      }
+    } catch (error) {
+      console.error("Error al insertar componente:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Cargar los componentes desde la base de datos al cargar la página
+    const loadComponentes = async () => {
+      try {
+        // Aquí puedes usar tu función `getComponentes` si es necesario
+        const response = await getComponentes();
+        setTableData(response.data);
+      } catch (error) {
+        console.error("Error loading componentes:", error);
+      }
+    };
+    void loadComponentes();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -96,81 +104,82 @@ export default function Page() {
                   {tableData.map((row, index) => (
                     <TableRow key={index}>
                       <TableCell className="w-1/4">
-                          {editRowIndex === index ? (
-                            <input
-                              type="text"
-                              value={row.componente}
-                              onChange={(e) =>
-                                handleInputChange(index, "componente", e.target.value)
-                              }
-                              className="border rounded px-2 py-1 w-full" // 'w-full' asegura que el input ocupe todo el ancho disponible sin cambiar de tamaño
-                            />
-                          ) : (
-                            row.componente
-                          )}
-                        </TableCell>
-                      
-                        <TableCell className="w-1/4">
-                          {editRowIndex === index ? (
-                            <input
-                              type="number"
-                              value={row.peso}
-                              onChange={(e) => {
-                                const value = parseFloat(e.target.value);
-                                handleInputChange(index, "peso", isNaN(value) ? "" : value);
-                              }}
-                              className="border rounded px-2 py-1 w-full"
-                            />
-                          ) : (
-                            row.peso
-                          )}
-                        </TableCell>
-                      
-                        <TableCell className="w-1/2">
-                          {editRowIndex === index ? (
-                            <input
-                              type="text"
-                              value={row.elementos}
-                              onChange={(e) =>
-                                handleInputChange(index, "elementos", e.target.value)
-                              }
-                              className="border rounded px-2 py-1 w-full"
-                            />
-                          ) : (
-                            row.elementos
-                          )}
-                        </TableCell>
-                        <TableCell className="w-1/4 text-center justify-center items-center space-x-2">
-                          {editRowIndex === index ? (
-                            <Button
-                              className="text-white px-4 py-2 rounded bg-blue-500"
-                              onClick={() => handleSaveClick(index)} // Aquí pasamos el índice correctamente
-                            >
-                              Guardar
-                            </Button>
-                          ) : (
-                            <Button
-                              className="text-white px-4 py-2 rounded "
-                              onClick={() => handleEditClick(index)}
-                            >
-                              Editar
-                            </Button>
-                          )}
-                          <Button
-                            className="text-white px-4 py-2 rounded bg-red-500"
-                            onClick={() => {
-                              const updatedData = tableData.filter((_, i) => i !== index);
-                              setTableData(updatedData);
+                        {editRowIndex === index ? (
+                          <input
+                            type="text"
+                            value={row.componente}
+                            onChange={(e) =>
+                              handleInputChange(index, "componente", e.target.value)
+                            }
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        ) : (
+                          row.componente
+                        )}
+                      </TableCell>
+
+                      <TableCell className="w-1/4">
+                        {editRowIndex === index ? (
+                          <input
+                            type="number"
+                            value={row.peso}
+                            onChange={(e) => {
+                              const value = parseFloat(e.target.value);
+                              handleInputChange(index, "peso", isNaN(value) ? "" : value);
                             }}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        ) : (
+                          `${row.peso}%`
+                        )}
+                      </TableCell>
+
+                      <TableCell className="w-1/2">
+                        {editRowIndex === index ? (
+                          <input
+                            type="text"
+                            value={row.elementos}
+                            onChange={(e) =>
+                              handleInputChange(index, "elementos", e.target.value)
+                            }
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        ) : (
+                          row.elementos
+                        )}
+                      </TableCell>
+
+                      <TableCell className="w-1/4 text-center">
+                        {editRowIndex === index ? (
+                          <Button
+                            className="text-white px-4 py-2 rounded bg-blue-500"
+                            onClick={() => handleSaveClick(index)}
                           >
-                            Eliminar
+                            Guardar
                           </Button>
-                        </TableCell>
+                        ) : (
+                          <Button
+                            className="text-white px-4 py-2 rounded"
+                            onClick={() => handleEditClick(index)}
+                          >
+                            Editar
+                          </Button>
+                        )}
+                        <Button
+                          className="text-white px-4 py-2 rounded bg-red-500"
+                          onClick={() => {
+                            const updatedData = tableData.filter((_, i) => i !== index);
+                            setTableData(updatedData);
+                          }}
+                        >
+                          Eliminar
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
                     <TableCell className="w-1/4">Total</TableCell>
-                    <TableCell className="w-1/4">{calculateTotalWeight()}</TableCell>
+                    <TableCell className="w-1/4">{calculateTotalWeight()}%</TableCell>
                     <TableCell className="w-1/2"></TableCell>
                     <TableCell className="w-1/4"></TableCell>
                   </TableRow>
@@ -182,14 +191,9 @@ export default function Page() {
         <div className="text-center mt-4">
           <Button
             className="text-white px-4 py-2 rounded"
-            onClick={() => {
-              setTableData([
-                ...tableData,
-                { componente: "Nuevo Componente", peso: 0.0, elementos: "" },
-              ]);
-            }}
+            onClick={(event) => handleSubmit(event)} // Agregar componente al estado y la base de datos
           >
-            Agregar Fila
+            Agregar Componente
           </Button>
         </div>
       </div>

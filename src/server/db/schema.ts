@@ -257,5 +257,15 @@ export const images = createTable(
   }),
 );
 
+export const Componentes = createTable("components", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  componente: varchar("componente", { length: 256 }).notNull(),
+  peso: decimal("peso", { precision: 5, scale: 2 }).notNull(),
+  elementos: text("elementos").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+  }
+)
+
 export type Evaluation = typeof Evaluaciones.$inferSelect;
 export type NewEvaluation = typeof Evaluaciones.$inferInsert;
