@@ -19,9 +19,9 @@ export default function Page() {
           <TableBody>
             {parameters.map((param) => (
               <TableRow key={param.id}>
-                <TableCell className="text-xl font-semibold sm:text-2xl">{param.name}</TableCell>
+                <TableCell className="text-xl font-semibold sm:text-2xl">Componentes</TableCell>
                 <TableCell className="text-right">
-                  <Link href={`/parametros/${param.id}`}>
+                  <Link href={`/parametros/componentes`}>
                     <Button>
                       Editar
                     </Button>

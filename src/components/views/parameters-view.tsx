@@ -32,9 +32,7 @@ export default function ParametersView() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Parámetros</h1>
         <div className="flex gap-2">
-          <Button onClick={handleInsertData} disabled={isLoading}>
-            {isLoading ? "Insertando..." : "Insertar Datos"}
-          </Button>
+          
           <Link href="/parametro">
             <Button>Nuevo Parámetro</Button>
           </Link>
