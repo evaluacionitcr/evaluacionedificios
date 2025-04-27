@@ -22,7 +22,10 @@ export async function createComponente(data: {
   elementos: string;
 }) {
   try {
-    const componente = await db.insert(Componentes).values(data).returning();
+    const componente = await db.insert(Componentes).values({
+      ...data,
+      peso: data.peso.toString()
+    }).returning();
 
     revalidatePath("/parametros/componentes");
 
@@ -43,7 +46,10 @@ export async function updateComponente(data: {
   try {
     const updatedComponente = await db
       .update(Componentes)
-      .set(data)
+      .set({
+        ...data,
+        peso: data.peso.toString()
+      })
       .where(sql`${Componentes.id} = ${data.id}`)
       .returning();
 
