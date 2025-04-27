@@ -92,7 +92,7 @@ export const Aceras = createTable(
   "aceras",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    idConstruccion: integer("id_construccion").references(() => Construcciones.id),
+    idConstruccion: integer("id_construccion").references(() => Construcciones.id, { onDelete: "cascade" }),
     codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
     fechaConstruccion: integer("fecha_construccion"), // Año como entero
@@ -137,7 +137,7 @@ export const ZonasVerdes = createTable(
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     idConstruccion: integer("id_construccion").references(
-      () => Construcciones.id,
+      () => Construcciones.id, { onDelete: "cascade" }
     ),
     codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
@@ -183,7 +183,7 @@ export const Terrenos = createTable(
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     idConstruccion: integer("id_construccion").references(
-      () => Construcciones.id,
+      () => Construcciones.id, { onDelete: "cascade" }
     ),
     codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
@@ -215,7 +215,7 @@ export const Terrenos = createTable(
 
 export const Evaluaciones = createTable("evaluations", {
   id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
-  buildingId: integer("building_id").references(() => Construcciones.id),
+  buildingId: integer("building_id").references(() => Construcciones.id, { onDelete: "cascade" }),
   evaluatorId: varchar("evaluator_id").references(() => clerkUsers.id),
   score: integer("score").notNull(),
   comments: text("comments"),
@@ -230,7 +230,7 @@ export const images = createTable(
     name: varchar("name", { length: 256 }).notNull(),
     description: varchar("description", { length: 256 }).notNull(),
     url: varchar("url", { length: 1024 }).notNull(),
-    buildingId: integer("building_id").references(() => Construcciones  .id),
+    buildingId: integer("building_id").references(() => Construcciones.id, { onDelete: "cascade" }),
     evaluationId: integer("evaluation_id").references(() => Evaluaciones.id),
     userId: varchar("user_id", { length: 256 }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
