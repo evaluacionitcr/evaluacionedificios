@@ -90,7 +90,7 @@ export default function Page() {
         try {
           // Aquí puedes usar tu función `getComponentes` si es necesario
           const response = await getComponentes();
-          setTableData(response.data);
+          setTableData(response.data ?? []);
         } catch (error) {
           console.error("Error loading componentes:", error);
         }
