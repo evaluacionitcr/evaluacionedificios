@@ -1,6 +1,8 @@
 import { NumericFormat } from "react-number-format";
 import { useState, useEffect } from "react";
 import type { DatosFijos } from "~/utils/consts";
+import { createTerrenos } from "~/server/actions/components";
+import { toast } from "sonner";
 
 interface FormularioTerrenosProps {
   codigoEdificio: string;
@@ -46,30 +48,47 @@ export default function FormularioTerrenos({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Formatear números para la base de datos
     const formatNumber = (value: string) => {
       if (!value) return null;
-      return value.replace(/\./g, "").replace(",", ".");
+      return parseFloat(value.replace(/\./g, "").replace(",", "."));
     };
 
     const data = {
+      idConstruccion: datosFijos?.id ?? null,
       codigoEdificio,
-      nombre: "Terreno",
+      nombre: "Terreno (Huella)",
       fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
-      noFinca: datosFijos?.noFincaId ?? null,
-      m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
-      valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
-      valorColonPorM2: formatNumber(valorColonM2) ?? "0",
-      edad,
-      valorTerreno: valorTerreno.toString(),
+      m2Construccion: formatNumber(m2Construccion) ?? 0,
+      valorDolarPorM2: formatNumber(valorDolarM2) ?? 0,
+      valorColonPorM2: formatNumber(valorColonM2) ?? 0,
+      valorPorcionTerreno: formatNumber(valorTerreno) ?? 0,
       anoDeRevaluacion: parseInt(anoRevaluacion),
+      noFinca: datosFijos?.noFincaId ?? null,
       usoActual: datosFijos?.usoActualId ?? null,
+      vidaUtilHacienda: 0,
+      vidaUtilExperto: 0,
     };
 
     try {
-      // await createTerreno(data);
-      console.log("Datos a guardar:", data);
+      const result = await createTerrenos(data);
+      if (result.success) {
+        // Mostrar mensaje de éxito
+        toast.success("Terreno guardado exitosamente", {
+          description: "Los datos de terreno se han guardado correctamente, continue con el resto.",
+        });
+        console.log("Terreno guardado exitosamente");
+        // Aquí podrías agregar una notificación de éxito
+      } else {
+        toast.error("Error al guardar terreno", {
+          description: "Hubo un error al guardar los datos del terreno.",
+        });
+        console.error("Error al guardar:", result.error);
+        // Aquí podrías agregar una notificación de error
+      }
     } catch (error) {
       console.error("Error al guardar:", error);
+      // Aquí podrías agregar una notificación de error
     }
   };
 
@@ -96,7 +115,7 @@ export default function FormularioTerrenos({
         </label>
         <input
           type="text"
-          value={"Terreno"}
+          value={"Terreno (Huella)"}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />

@@ -1,6 +1,8 @@
 import { NumericFormat } from "react-number-format";
 import { useState, useEffect } from "react";
 import type { DatosFijos } from "~/utils/consts";
+import { createZonasVerdes } from "~/server/actions/components";
+import { toast } from "sonner";         
 
 interface FormularioZonasVerdesProps {
   codigoEdificio: string;
@@ -82,34 +84,50 @@ export default function FormularioZonasVerdes({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Formatear números para la base de datos
     const formatNumber = (value: string) => {
       if (!value) return null;
-      return value.replace(/\./g, "").replace(",", ".");
+      return parseFloat(value.replace(/\./g, "").replace(",", "."));
     };
 
     const data = {
+      idConstruccion: datosFijos?.id ?? null,
       codigoEdificio,
-      nombre: "Zonas Verdes",
+      nombre: "Porción de Zonas verdes",
+      m2Construccion: formatNumber(m2Construccion) ?? 0,
       fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
-      noFinca: datosFijos?.noFincaId ?? null,
-      m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
       valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
       valorColonPorM2: formatNumber(valorColonM2) ?? "0",
       edad,
       vidaUtilHacienda: parseInt(vidaUtilHacienda),
       vidaUtilExperto: parseInt(vidaUtilExperto),
-      valorReposicion: valorReposicion.toString(),
-      depreciacionLinealAnual: depreciacionAnual.toString(),
-      valorActualRevaluado: valorRevaluado.toString(),
+      valorReposicion: parseFloat(valorReposicion.toString()),
+      depreciacionLinealAnual: parseFloat(depreciacionAnual.toString()),
+      valorActualRevaluado: parseFloat(valorRevaluado.toString()),
       anoDeRevaluacion: parseInt(anoRevaluacion),
-      usoActual: datosFijos?.usoActualId ?? 0,
+      noFinca: datosFijos?.noFincaId ?? null,
+      usoActual: datosFijos?.usoActualId ?? null,
     };
 
     try {
-      // await createZonaVerde(data);
-      console.log("Datos a guardar:", data);
+      const result = await createZonasVerdes(data);
+      if (result.success) {
+        toast.success("Zona verde guardada exitosamente", {
+          description: "Los datos de la zona verde se han guardado correctamente.",
+        });
+        // Mostrar mensaje de éxito
+        console.log("Zona verde guardada exitosamente");
+        // Aquí podrías agregar una notificación de éxito
+      } else {
+        toast.error("Error al guardar la zona verde", {
+          description: "Ocurrió un error al guardar los datos de la zona verde.",
+        });
+        console.error("Error al guardar:", result.error);
+        // Aquí podrías agregar una notificación de error
+      }
     } catch (error) {
       console.error("Error al guardar:", error);
+      // Aquí podrías agregar una notificación de error
     }
   };
 
@@ -136,7 +154,7 @@ export default function FormularioZonasVerdes({
         </label>
         <input
           type="text"
-          value={"Zonas Verdes"}
+          value={"Porción de Zonas verdes"}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />

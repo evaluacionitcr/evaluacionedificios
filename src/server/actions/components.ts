@@ -3,12 +3,24 @@ import { db } from "~/server/db";
 import { Aceras, ZonasVerdes, Terrenos } from "../db/schema";
 import { revalidatePath } from "next/cache";
 
-interface ComponentData {
+export interface ComponentData {
+  idConstruccion?: number | null;
   codigoEdificio: string;
+  nombre: string;
+  fechaConstruccion?: number | null;
   m2Construccion: number;
-  valorDolarPorM2: string;
-  vidaUtilHacienda?: number;
-  vidaUtilExperto?: number;
+  valorDolarPorM2: string | number;
+  valorColonPorM2?: string | number;
+  edad?: number;
+  vidaUtilHacienda: number;
+  vidaUtilExperto: number;
+  valorReposicion?: number;
+  depreciacionLinealAnual?: number;
+  valorActualRevaluado?: number;
+  anoDeRevaluacion?: number;
+  noFinca?: number | null;
+  usoActual?: number | null;
+  valorPorcionTerreno?: number;
 }
 
 export async function createAceras(data: ComponentData) {
@@ -16,12 +28,22 @@ export async function createAceras(data: ComponentData) {
     const [acera] = await db
       .insert(Aceras)
       .values({
+        idConstruccion: data.idConstruccion,
         codigoEdificio: data.codigoEdificio,
-        nombre: `Acera de ${data.codigoEdificio}`,
+        fechaConstruccion: data.fechaConstruccion,
+        nombre: data.nombre,
         m2Construccion: data.m2Construccion,
-        valorDolarPorM2: data.valorDolarPorM2,
+        valorDolarPorM2: data.valorDolarPorM2.toString(),
+        valorColonPorM2: data.valorColonPorM2?.toString(),
+        edadAl2021: data.edad,
         vidaUtilHacienda: data.vidaUtilHacienda,
         vidaUtilExperto: data.vidaUtilExperto,
+        valorReposicion: data.valorReposicion?.toString(),
+        depreciacionLinealAnual: data.depreciacionLinealAnual?.toString(),
+        valorActualRevaluado: data.valorActualRevaluado?.toString(),
+        anoDeRevaluacion: data.anoDeRevaluacion,
+        noFinca: data.noFinca,
+        usoActual: data.usoActual,
       })
       .returning({ id: Aceras.id });
 
@@ -38,12 +60,22 @@ export async function createZonasVerdes(data: ComponentData) {
     const [zonaVerde] = await db
       .insert(ZonasVerdes)
       .values({
+        idConstruccion: data.idConstruccion,
+        fechaConstruccion: data.fechaConstruccion,
         codigoEdificio: data.codigoEdificio,
-        nombre: `Zona Verde de ${data.codigoEdificio}`,
+        nombre: data.nombre,
         m2Construccion: data.m2Construccion,
-        valorDolarPorM2: data.valorDolarPorM2,
+        valorDolarPorM2: data.valorDolarPorM2.toString(),
+        valorColonPorM2: data.valorColonPorM2?.toString(),
+        edadAl2021: data.edad,
         vidaUtilHacienda: data.vidaUtilHacienda,
         vidaUtilExperto: data.vidaUtilExperto,
+        valorReposicion: data.valorReposicion?.toString(),
+        depreciacionLinealAnual: data.depreciacionLinealAnual?.toString(),
+        valorActualRevaluado: data.valorActualRevaluado?.toString(),
+        anoDeRevaluacion: data.anoDeRevaluacion,
+        noFinca: data.noFinca,
+        usoActual: data.usoActual,
       })
       .returning({ id: ZonasVerdes.id });
 
@@ -60,10 +92,17 @@ export async function createTerrenos(data: ComponentData) {
     const [terreno] = await db
       .insert(Terrenos)
       .values({
+        idConstruccion: data.idConstruccion,
+        fechaConstruccion: data.fechaConstruccion,
         codigoEdificio: data.codigoEdificio,
-        nombre: `Terreno de ${data.codigoEdificio}`,
+        nombre: data.nombre,
         m2Construccion: data.m2Construccion,
-        valorDolarPorM2: data.valorDolarPorM2,
+        valorDolarPorM2: data.valorDolarPorM2.toString(),
+        valorColonPorM2: data.valorColonPorM2?.toString(),
+        valorPorcionTerreno: data.valorPorcionTerreno?.toString(),
+        anoDeRevaluacion: data.anoDeRevaluacion,
+        noFinca: data.noFinca,
+        usoActual: data.usoActual,
       })
       .returning({ id: Terrenos.id });
 

@@ -1,6 +1,8 @@
 import { NumericFormat } from "react-number-format";
 import { useState, useEffect } from "react";
 import type { DatosFijos } from "~/utils/consts";
+import { createAceras } from "~/server/actions/components";
+import { toast } from "sonner";
 
 interface FormularioAcerasProps {
   codigoEdificio: string;
@@ -90,33 +92,47 @@ export default function FormularioAceras({
     // Formatear números para la base de datos
     const formatNumber = (value: string) => {
       if (!value) return null;
-      return value.replace(/\./g, "").replace(",", ".");
+      return parseFloat(value.replace(/\./g, "").replace(",", "."));
     };
 
     const data = {
       codigoEdificio,
-      nombre: "Aceras",
-      fechaConstruccion: datosFijos?.fechaConstruccion ?? 0,
-      noFinca: datosFijos?.noFincaId ?? null,
-      m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
+      idConstruccion: datosFijos?.id ?? null,
+      nombre: "Aceras Perimetrales",
+      fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
+      m2Construccion: formatNumber(m2Construccion) ?? 0,
       valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
       valorColonPorM2: formatNumber(valorColonM2) ?? "0",
       edad,
       vidaUtilHacienda: parseInt(vidaUtilHacienda),
       vidaUtilExperto: parseInt(vidaUtilExperto),
-      valorReposicion: valorReposicion.toString(),
-      depreciacionLinealAnual: depreciacionAnual.toString(),
-      valorActualRevaluado: valorRevaluado.toString(),
+      valorReposicion: parseFloat(valorReposicion.toString()),
+      depreciacionLinealAnual: parseFloat(depreciacionAnual.toString()),
+      valorActualRevaluado: parseFloat(valorRevaluado.toString()),
       anoDeRevaluacion: parseInt(anoRevaluacion),
+      noFinca: datosFijos?.noFincaId ?? null,
       usoActual: datosFijos?.usoActualId ?? null,
     };
 
-    // TODO: Implementar la función para guardar en la base de datos
     try {
-      // await createAcera(data);
-      console.log("Datos a guardar:", data);
+      const result = await createAceras(data);
+      if (result.success) {
+        // Mostrar mensaje de éxito
+        toast.success("Acera guardada exitosamente", {
+          description: "Los datos de acera se han guardado correctamente, continue con el resto.",
+        });
+        console.log("Acera guardada exitosamente");
+        // Aquí podrías agregar una notificación de éxito
+      } else {
+        toast.error("Error al guardar acera", {
+          description: "Hubo un error al guardar los datos de la acera.",
+        });
+        console.error("Error al guardar:", result.error);
+        // Aquí podrías agregar una notificación de error
+      }
     } catch (error) {
       console.error("Error al guardar:", error);
+      // Aquí podrías agregar una notificación de error
     }
   };
 
@@ -143,7 +159,7 @@ export default function FormularioAceras({
         </label>
         <input
           type="text"
-          value={"Aceras"}
+          value={"Aceras Perimetrales"}
           onChange={(e) => setNombre(e.target.value)}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"

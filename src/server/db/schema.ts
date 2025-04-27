@@ -56,7 +56,9 @@ export const Construcciones = createTable(
   "construcciones",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
+    codigoEdificio: varchar("codigo_edificio", { length: 50 })
+      .notNull()
+      .unique(),
     sede: integer("sede").references(() => Sedes.id),
     esRenovacion: boolean("es_renovacion"),
     nombre: varchar("nombre", { length: 256 }).notNull(),
@@ -69,9 +71,18 @@ export const Construcciones = createTable(
     vidaUtilHacienda: integer("vida_util_hacienda"),
     vidaUtilExperto: integer("vida_util_experto"),
     valorReposicion: decimal("valor_reposicion", { precision: 14, scale: 2 }),
-    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {precision: 14,scale: 2,}),
-    valorActualRevaluado: decimal("valor_actual_revaluado", {precision: 14,scale: 2,}),
-    valorPorcionTerreno: decimal("valor_porcion_terreno", {precision: 14,scale: 2,}),
+    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorActualRevaluado: decimal("valor_actual_revaluado", {
+      precision: 14,
+      scale: 2,
+    }),
+    valorPorcionTerreno: decimal("valor_porcion_terreno", {
+      precision: 14,
+      scale: 2,
+    }),
     anoDeRevaluacion: integer("ano_de_revaluacion"), // Año como entero
     usoActual: integer("uso_actual").references(() => UsosActuales.id),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -92,8 +103,13 @@ export const Aceras = createTable(
   "aceras",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    idConstruccion: integer("id_construccion").references(() => Construcciones.id, { onDelete: "cascade" }),
-    codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
+    idConstruccion: integer("id_construccion").references(
+      () => Construcciones.id,
+      { onDelete: "cascade" },
+    ),
+    codigoEdificio: varchar("codigo_edificio", { length: 50 })
+      .notNull()
+      .unique(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
     fechaConstruccion: integer("fecha_construccion"), // Año como entero
     noFinca: integer("no_finca").references(() => NumeroFincas.id),
@@ -137,7 +153,8 @@ export const ZonasVerdes = createTable(
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     idConstruccion: integer("id_construccion").references(
-      () => Construcciones.id, { onDelete: "cascade" }
+      () => Construcciones.id,
+      { onDelete: "cascade" },
     ),
     codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
@@ -183,9 +200,12 @@ export const Terrenos = createTable(
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     idConstruccion: integer("id_construccion").references(
-      () => Construcciones.id, { onDelete: "cascade" }
+      () => Construcciones.id,
+      { onDelete: "cascade" },
     ),
-    codigoEdificio: varchar("codigo_edificio", { length: 50 }).notNull(),
+    codigoEdificio: varchar("codigo_edificio", { length: 50 })
+      .notNull()
+      .unique(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
     fechaConstruccion: integer("fecha_construccion"), // Año como entero
     noFinca: integer("no_finca").references(() => NumeroFincas.id),
@@ -212,10 +232,11 @@ export const Terrenos = createTable(
   }),
 );
 
-
 export const Evaluaciones = createTable("evaluations", {
   id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
-  buildingId: integer("building_id").references(() => Construcciones.id, { onDelete: "cascade" }),
+  buildingId: integer("building_id").references(() => Construcciones.id, {
+    onDelete: "cascade",
+  }),
   evaluatorId: varchar("evaluator_id").references(() => clerkUsers.id),
   score: integer("score").notNull(),
   comments: text("comments"),
@@ -230,7 +251,9 @@ export const images = createTable(
     name: varchar("name", { length: 256 }).notNull(),
     description: varchar("description", { length: 256 }).notNull(),
     url: varchar("url", { length: 1024 }).notNull(),
-    buildingId: integer("building_id").references(() => Construcciones.id, { onDelete: "cascade" }),
+    buildingId: integer("building_id").references(() => Construcciones.id, {
+      onDelete: "cascade",
+    }),
     evaluationId: integer("evaluation_id").references(() => Evaluaciones.id),
     userId: varchar("user_id", { length: 256 }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -251,9 +274,8 @@ export const Componentes = createTable("components", {
   peso: decimal("peso", { precision: 5, scale: 2 }).notNull(),
   elementos: text("elementos").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull()
-  }
-)
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 export type Evaluation = typeof Evaluaciones.$inferSelect;
 export type NewEvaluation = typeof Evaluaciones.$inferInsert;
