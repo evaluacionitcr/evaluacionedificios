@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, Fragment } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -19,7 +19,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import { ArrowLeft, Building, Calendar, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowLeft,
+  Building,
+  Calendar,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -143,7 +150,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
   const [zonasVerdes, setZonasVerdes] = useState<ZonaVerdeDetalle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Estado para las filas expandidas
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
@@ -365,9 +372,9 @@ export default function BuildingPage({ params }: BuildingPageProps) {
 
   // Función para alternar el estado expandido/colapsado de una fila
   const toggleRowExpansion = (edificioId: number) => {
-    setExpandedRows(prev => ({
+    setExpandedRows((prev) => ({
       ...prev,
-      [edificioId]: !prev[edificioId]
+      [edificioId]: !prev[edificioId],
     }));
   };
 
@@ -420,6 +427,16 @@ export default function BuildingPage({ params }: BuildingPageProps) {
           <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link href={`/edificios/${id}/componentes`}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-primary text-white hover:bg-primary/90"
+            >
+              <Building className="mr-2 h-4 w-4" />
+              Gestionar Componentes
+            </Button>
+          </Link>
           <Button
             variant="outline"
             size="sm"
@@ -482,12 +499,12 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                 </TableHeader>
                 <TableBody>
                   {edificios.map((e) => (
-                    <>
-                      <TableRow key={e.id} className="border-t-2 border-primary/10">
+                    <Fragment key={e.id}>
+                      <TableRow className="border-t-2 border-primary/10">
                         <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="p-1"
                             onClick={() => toggleRowExpansion(e.id)}
                           >
@@ -498,7 +515,9 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                             )}
                           </Button>
                         </TableCell>
-                        <TableCell className="font-medium">{e.nombre}</TableCell>
+                        <TableCell className="font-medium">
+                          {e.nombre}
+                        </TableCell>
                         <TableCell>{e.fechaConstruccion ?? "N/A"}</TableCell>
                         <TableCell>{e.numeroFinca ?? "N/A"}</TableCell>
                         <TableCell>{e.m2Construccion ?? "N/A"}</TableCell>
@@ -506,7 +525,9 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                         <TableCell>${e.valorDolarPorM2 ?? "0.00"}</TableCell>
                         <TableCell>₡{e.valorColonPorM2 ?? "0.00"}</TableCell>
                         <TableCell>₡{e.valorReposicion ?? "0.00"}</TableCell>
-                        <TableCell>₡{e.valorActualRevaluado ?? "0.00"}</TableCell>
+                        <TableCell>
+                          ₡{e.valorActualRevaluado ?? "0.00"}
+                        </TableCell>
                         <TableCell>
                           ₡{e.depreciacionLinealAnual ?? "0.00"}
                         </TableCell>
@@ -527,89 +548,184 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                           </Button>
                         </TableCell>
                       </TableRow>
-                      
+
                       {/* Filas expandibles para mostrar información de aceras relacionadas */}
                       {expandedRows[e.id] && (
                         <>
                           {aceras
-                            .filter(a => a.idConstruccion === e.id)
-                            .map(acera => (
-                              <TableRow key={`acera-${acera.id}`} className="bg-blue-100 text-sm hover:bg-blue-50">
+                            .filter((a) => a.idConstruccion === e.id)
+                            .map((acera) => (
+                              <TableRow
+                                key={`acera-${acera.id}`}
+                                className="bg-blue-100 text-sm hover:bg-blue-50"
+                              >
                                 <TableCell></TableCell>
-                                <TableCell className="pl-6 font-medium text-blue-700">{acera.nombre} (Acera)</TableCell>
-                                <TableCell>{acera.fechaConstruccion ?? "N/A"}</TableCell>
-                                <TableCell>{acera.numeroFinca ?? "N/A"}</TableCell>
-                                <TableCell>{acera.m2Construccion ?? "N/A"}</TableCell>
-                                <TableCell>{acera.usoActual ?? "N/A"}</TableCell>
-                                <TableCell>${acera.valorDolarPorM2 ?? "0.00"}</TableCell>
-                                <TableCell>₡{acera.valorColonPorM2 ?? "0.00"}</TableCell>
-                                <TableCell>₡{acera.valorReposicion ?? "0.00"}</TableCell>
-                                <TableCell>₡{acera.valorActualRevaluado ?? "0.00"}</TableCell>
-                                <TableCell>₡{acera.depreciacionLinealAnual ?? "0.00"}</TableCell>
-                                <TableCell>{acera.anoDeRevaluacion ?? "N/A"}</TableCell>
+                                <TableCell className="pl-6 font-medium text-blue-700">
+                                  {acera.nombre} (Acera)
+                                </TableCell>
+                                <TableCell>
+                                  {acera.fechaConstruccion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {acera.numeroFinca ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {acera.m2Construccion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {acera.usoActual ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  ${acera.valorDolarPorM2 ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{acera.valorColonPorM2 ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{acera.valorReposicion ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{acera.valorActualRevaluado ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{acera.depreciacionLinealAnual ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  {acera.anoDeRevaluacion ?? "N/A"}
+                                </TableCell>
                                 <TableCell>{acera.edad ?? 0} años</TableCell>
-                                <TableCell>{acera.vidaUtilHacienda ?? 0} años</TableCell>
-                                <TableCell>{acera.vidaUtilExperto ?? 0} años</TableCell>
-                                <TableCell>{acera.esRenovacion ? "Sí" : "No"}</TableCell>
-                                <TableCell></TableCell>
-                              </TableRow>
-                            ))}
-                          
-                          {zonasVerdes
-                            .filter(z => z.idConstruccion === e.id)
-                            .map(zonasVerde => (
-                              <TableRow key={`zonaVerde-${zonasVerde.id}`} className="bg-blue-200 text-sm hover:bg-blue-50">
-                                <TableCell></TableCell>
-                                <TableCell className="pl-6 font-medium text-blue-700">{zonasVerde.nombre} (Zona Verde)</TableCell>
-                                <TableCell>{zonasVerde.fechaConstruccion ?? "N/A"}</TableCell>
-                                <TableCell>{zonasVerde.numeroFinca ?? "N/A"}</TableCell>
-                                <TableCell>{zonasVerde.m2Construccion ?? "N/A"}</TableCell>
-                                <TableCell>{zonasVerde.usoActual ?? "N/A"}</TableCell>
-                                <TableCell>${zonasVerde.valorDolarPorM2 ?? "0.00"}</TableCell>
-                                <TableCell>₡{zonasVerde.valorColonPorM2 ?? "0.00"}</TableCell>
-                                <TableCell>₡{zonasVerde.valorReposicion ?? "0.00"}</TableCell>
-                                <TableCell>₡{zonasVerde.valorActualRevaluado ?? "0.00"}</TableCell>
-                                <TableCell>₡{zonasVerde.depreciacionLinealAnual ?? "0.00"}</TableCell>
-                                <TableCell>{zonasVerde.anoDeRevaluacion ?? "N/A"}</TableCell>
-                                <TableCell>{zonasVerde.edad ?? 0} años</TableCell>
-                                <TableCell>{zonasVerde.vidaUtilHacienda ?? 0} años</TableCell>
-                                <TableCell>{zonasVerde.vidaUtilExperto ?? 0} años</TableCell>
-                                <TableCell>{zonasVerde.esRenovacion ? "Sí" : "No"}</TableCell>
+                                <TableCell>
+                                  {acera.vidaUtilHacienda ?? 0} años
+                                </TableCell>
+                                <TableCell>
+                                  {acera.vidaUtilExperto ?? 0} años
+                                </TableCell>
+                                <TableCell>
+                                  {acera.esRenovacion ? "Sí" : "No"}
+                                </TableCell>
                                 <TableCell></TableCell>
                               </TableRow>
                             ))}
 
-                      {terrenos
-                        .filter(t => t.idConstruccion === e.id)
-                        .map(terreno => (
-                          <TableRow key={`terreno-${terreno.id}`} className="bg-blue-300 text-sm hover:bg-blue-50">
-                            <TableCell></TableCell>
-                            <TableCell className="pl-6 font-medium text-blue-700">{terreno.nombre} (Terreno)</TableCell>
-                            <TableCell>{terreno.fechaConstruccion ?? "N/A"}</TableCell>
-                            <TableCell>{terreno.numeroFinca ?? "N/A"}</TableCell>
-                            <TableCell>{terreno.m2Construccion ?? "N/A"}</TableCell>
-                            <TableCell>{terreno.usoActual ?? "N/A"}</TableCell>
-                            <TableCell>${terreno.valorDolarPorM2 ?? "0.00"}</TableCell>
-                            <TableCell>₡{terreno.valorColonPorM2 ?? "0.00"}</TableCell>
-                            <TableCell>₡{terreno.valorReposicion ?? "0.00"}</TableCell>
-                            <TableCell>₡{terreno.valorActualRevaluado ?? "0.00"}</TableCell>
-                            <TableCell>₡{terreno.depreciacionLinealAnual ?? "0.00"}</TableCell>
-                            <TableCell>{terreno.anoDeRevaluacion ?? "N/A"}</TableCell>
-                            <TableCell>{terreno.edad ?? 0} años</TableCell>
-                            <TableCell>{terreno.vidaUtilHacienda ?? 0} años</TableCell>
-                            <TableCell>{terreno.vidaUtilExperto ?? 0} años</TableCell>
-                            <TableCell>{terreno.esRenovacion ? "Sí" : "No"}</TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                        ))}
+                          {zonasVerdes
+                            .filter((z) => z.idConstruccion === e.id)
+                            .map((zonasVerde) => (
+                              <TableRow
+                                key={`zonaVerde-${zonasVerde.id}`}
+                                className="bg-blue-200 text-sm hover:bg-blue-50"
+                              >
+                                <TableCell></TableCell>
+                                <TableCell className="pl-6 font-medium text-blue-700">
+                                  {zonasVerde.nombre} (Zona Verde)
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.fechaConstruccion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.numeroFinca ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.m2Construccion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.usoActual ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  ${zonasVerde.valorDolarPorM2 ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{zonasVerde.valorColonPorM2 ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{zonasVerde.valorReposicion ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{zonasVerde.valorActualRevaluado ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡
+                                  {zonasVerde.depreciacionLinealAnual ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.anoDeRevaluacion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.edad ?? 0} años
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.vidaUtilHacienda ?? 0} años
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.vidaUtilExperto ?? 0} años
+                                </TableCell>
+                                <TableCell>
+                                  {zonasVerde.esRenovacion ? "Sí" : "No"}
+                                </TableCell>
+                                <TableCell></TableCell>
+                              </TableRow>
+                            ))}
+
+                          {terrenos
+                            .filter((t) => t.idConstruccion === e.id)
+                            .map((terreno) => (
+                              <TableRow
+                                key={`terreno-${terreno.id}`}
+                                className="bg-blue-300 text-sm hover:bg-blue-50"
+                              >
+                                <TableCell></TableCell>
+                                <TableCell className="pl-6 font-medium text-blue-700">
+                                  {terreno.nombre} (Terreno)
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.fechaConstruccion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.numeroFinca ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.m2Construccion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.usoActual ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  ${terreno.valorDolarPorM2 ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{terreno.valorColonPorM2 ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{terreno.valorReposicion ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{terreno.valorActualRevaluado ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  ₡{terreno.depreciacionLinealAnual ?? "0.00"}
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.anoDeRevaluacion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>{terreno.edad ?? 0} años</TableCell>
+                                <TableCell>
+                                  {terreno.vidaUtilHacienda ?? 0} años
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.vidaUtilExperto ?? 0} años
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.esRenovacion ? "Sí" : "No"}
+                                </TableCell>
+                                <TableCell></TableCell>
+                              </TableRow>
+                            ))}
                         </>
                       )}
-                    </>
+                    </Fragment>
                   ))}
                 </TableBody>
               </Table>
             </div>
-            
           </CardContent>
         </Card>
       </div>
@@ -674,6 +790,8 @@ export default function BuildingPage({ params }: BuildingPageProps) {
               disabled={isDeletingEdificio}
               className="bg-red-600 hover:bg-red-700"
             >
+
+
               {isDeletingEdificio ? "Eliminando..." : "Eliminar Edificio"}
             </AlertDialogAction>
           </AlertDialogFooter>

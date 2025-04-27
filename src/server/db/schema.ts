@@ -192,18 +192,6 @@ export const Terrenos = createTable(
     m2Construccion: real("m2_construccion"), // Área en metros cuadrados
     valorDolarPorM2: decimal("valor_dolar_por_m2", { precision: 12, scale: 2 }),
     valorColonPorM2: decimal("valor_colon_por_m2", { precision: 12, scale: 2 }),
-    edadAl2021: integer("edad_al_2021"),
-    vidaUtilHacienda: integer("vida_util_hacienda"),
-    vidaUtilExperto: integer("vida_util_experto"),
-    valorReposicion: decimal("valor_reposicion", { precision: 14, scale: 2 }),
-    depreciacionLinealAnual: decimal("depreciacion_lineal_anual", {
-      precision: 14,
-      scale: 2,
-    }),
-    valorActualRevaluado: decimal("valor_actual_revaluado", {
-      precision: 14,
-      scale: 2,
-    }),
     valorPorcionTerreno: decimal("valor_porcion_terreno", {
       precision: 14,
       scale: 2,

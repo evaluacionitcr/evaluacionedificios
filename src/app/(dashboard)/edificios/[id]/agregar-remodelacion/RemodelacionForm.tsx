@@ -62,7 +62,9 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
   const [usosActuales, setUsosActuales] = useState<UsoActual[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {},
+  );
 
   // Cargar los datos del edificio original y las tablas relacionadas al iniciar
   useEffect(() => {
@@ -77,10 +79,14 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
           throw new Error("No se pudo cargar los datos del edificio");
         }
         const edificioData = await edificioResponse.json();
-        
+
         console.log("API Response:", edificioData); // Debug log
-        
-        if (edificioData.success && edificioData.data && edificioData.data.length > 0) {
+
+        if (
+          edificioData.success &&
+          edificioData.data &&
+          edificioData.data.length > 0
+        ) {
           const edificio = edificioData.data[0];
           setEdificioOriginal({
             codigoEdificio: edificio.codigoEdificio,
@@ -127,7 +133,8 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       errors.metrosCuadrados = "Los metros cuadrados son requeridos";
       isValid = false;
     } else if (isNaN(Number(metrosCuadrados)) || Number(metrosCuadrados) <= 0) {
-      errors.metrosCuadrados = "Los metros cuadrados deben ser un número positivo";
+      errors.metrosCuadrados =
+        "Los metros cuadrados deben ser un número positivo";
       isValid = false;
     }
 
@@ -135,7 +142,8 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       errors.valorDolarM2 = "El valor en dólares por m² es requerido";
       isValid = false;
     } else if (isNaN(Number(valorDolarM2)) || Number(valorDolarM2) <= 0) {
-      errors.valorDolarM2 = "El valor en dólares por m² debe ser un número positivo";
+      errors.valorDolarM2 =
+        "El valor en dólares por m² debe ser un número positivo";
       isValid = false;
     }
 
@@ -143,15 +151,20 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       errors.valorColonM2 = "El valor en colones por m² es requerido";
       isValid = false;
     } else if (isNaN(Number(valorColonM2)) || Number(valorColonM2) <= 0) {
-      errors.valorColonM2 = "El valor en colones por m² debe ser un número positivo";
+      errors.valorColonM2 =
+        "El valor en colones por m² debe ser un número positivo";
       isValid = false;
     }
 
     if (!vidaUtilHacienda.trim()) {
       errors.vidaUtilHacienda = "La vida útil según Hacienda es requerida";
       isValid = false;
-    } else if (isNaN(Number(vidaUtilHacienda)) || Number(vidaUtilHacienda) <= 0) {
-      errors.vidaUtilHacienda = "La vida útil según Hacienda debe ser un número positivo";
+    } else if (
+      isNaN(Number(vidaUtilHacienda)) ||
+      Number(vidaUtilHacienda) <= 0
+    ) {
+      errors.vidaUtilHacienda =
+        "La vida útil según Hacienda debe ser un número positivo";
       isValid = false;
     }
 
@@ -159,15 +172,20 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       errors.vidaUtilExperto = "La vida útil según experto es requerida";
       isValid = false;
     } else if (isNaN(Number(vidaUtilExperto)) || Number(vidaUtilExperto) <= 0) {
-      errors.vidaUtilExperto = "La vida útil según experto debe ser un número positivo";
+      errors.vidaUtilExperto =
+        "La vida útil según experto debe ser un número positivo";
       isValid = false;
     }
 
     if (!anioConstruccion.trim()) {
       errors.anioConstruccion = "El año de construcción es requerido";
       isValid = false;
-    } else if (isNaN(Number(anioConstruccion)) || Number(anioConstruccion) <= 0) {
-      errors.anioConstruccion = "El año de construcción debe ser un número positivo";
+    } else if (
+      isNaN(Number(anioConstruccion)) ||
+      Number(anioConstruccion) <= 0
+    ) {
+      errors.anioConstruccion =
+        "El año de construcción debe ser un número positivo";
       isValid = false;
     }
 
@@ -185,7 +203,8 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       errors.anioRevaluacion = "El año de revaluación es requerido";
       isValid = false;
     } else if (isNaN(Number(anioRevaluacion)) || Number(anioRevaluacion) <= 0) {
-      errors.anioRevaluacion = "El año de revaluación debe ser un número positivo";
+      errors.anioRevaluacion =
+        "El año de revaluación debe ser un número positivo";
       isValid = false;
     }
 
@@ -215,7 +234,8 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       setDepreciacionLinealAnual(depreciacion.toString());
 
       // Calcular el valor actual revaluado
-      const valorActual = valorIR - (depreciacion * (2021 - Number(anioRevaluacion)));
+      const valorActual =
+        valorIR - depreciacion * (2021 - Number(anioRevaluacion));
       setValorActualRevaluado(valorActual.toString());
 
       // Crear el objeto con los datos del edificio
@@ -265,7 +285,9 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
   if (error || !edificioOriginal) {
     return (
       <div>
-        <p className="text-red-500">{error || "No se pudo cargar el edificio"}</p>
+        <p className="text-red-500">
+          {error || "No se pudo cargar el edificio"}
+        </p>
         <Link href={`/edificios/${buildingId}`}>
           <Button variant="outline" className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -279,7 +301,9 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-primary">Agregar Remodelación</h1>
+        <h1 className="text-2xl font-bold text-primary">
+          Agregar Remodelación
+        </h1>
         <Link href={`/edificios/${buildingId}`}>
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -289,14 +313,19 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       </div>
 
       <div className="mb-6 rounded-lg bg-blue-50 p-4 text-blue-800">
-        <p className="font-medium">Edificio original: {edificioOriginal.nombre}</p>
+        <p className="font-medium">
+          Edificio original: {edificioOriginal.nombre}
+        </p>
         <p>Código: {edificioOriginal.codigoEdificio}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="nombreEdificio" className="block text-sm font-medium">
+            <label
+              htmlFor="nombreEdificio"
+              className="block text-sm font-medium"
+            >
               Nombre del edificio
             </label>
             <input
@@ -308,12 +337,17 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Nombre del edificio"
             />
             {validationErrors.nombreEdificio && (
-              <p className="text-sm text-red-500">{validationErrors.nombreEdificio}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.nombreEdificio}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="metrosCuadrados" className="block text-sm font-medium">
+            <label
+              htmlFor="metrosCuadrados"
+              className="block text-sm font-medium"
+            >
               Metros cuadrados
             </label>
             <input
@@ -325,7 +359,9 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Metros cuadrados"
             />
             {validationErrors.metrosCuadrados && (
-              <p className="text-sm text-red-500">{validationErrors.metrosCuadrados}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.metrosCuadrados}
+              </p>
             )}
           </div>
 
@@ -342,7 +378,9 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Valor en dólares por m²"
             />
             {validationErrors.valorDolarM2 && (
-              <p className="text-sm text-red-500">{validationErrors.valorDolarM2}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.valorDolarM2}
+              </p>
             )}
           </div>
 
@@ -359,12 +397,17 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Valor en colones por m²"
             />
             {validationErrors.valorColonM2 && (
-              <p className="text-sm text-red-500">{validationErrors.valorColonM2}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.valorColonM2}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="vidaUtilHacienda" className="block text-sm font-medium">
+            <label
+              htmlFor="vidaUtilHacienda"
+              className="block text-sm font-medium"
+            >
               Vida útil según Hacienda (años)
             </label>
             <input
@@ -376,12 +419,17 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Vida útil según Hacienda"
             />
             {validationErrors.vidaUtilHacienda && (
-              <p className="text-sm text-red-500">{validationErrors.vidaUtilHacienda}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.vidaUtilHacienda}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="vidaUtilExperto" className="block text-sm font-medium">
+            <label
+              htmlFor="vidaUtilExperto"
+              className="block text-sm font-medium"
+            >
               Vida útil según experto (años)
             </label>
             <input
@@ -393,12 +441,17 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Vida útil según experto"
             />
             {validationErrors.vidaUtilExperto && (
-              <p className="text-sm text-red-500">{validationErrors.vidaUtilExperto}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.vidaUtilExperto}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="anioConstruccion" className="block text-sm font-medium">
+            <label
+              htmlFor="anioConstruccion"
+              className="block text-sm font-medium"
+            >
               Año de construcción
             </label>
             <input
@@ -410,12 +463,17 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Año de construcción"
             />
             {validationErrors.anioConstruccion && (
-              <p className="text-sm text-red-500">{validationErrors.anioConstruccion}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.anioConstruccion}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="fincaSeleccionada" className="block text-sm font-medium">
+            <label
+              htmlFor="fincaSeleccionada"
+              className="block text-sm font-medium"
+            >
               Número de finca
             </label>
             <select
@@ -432,7 +490,9 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               ))}
             </select>
             {validationErrors.fincaSeleccionada && (
-              <p className="text-sm text-red-500">{validationErrors.fincaSeleccionada}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.fincaSeleccionada}
+              </p>
             )}
           </div>
 
@@ -444,22 +504,29 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               id="usoActual"
               value={usoActual}
               onChange={(e) => setUsoActual(e.target.value)}
-              className="w-full rounded-md border border-gray-300 p-2"
+              className={`mt-1 w-full rounded-md border ${validationErrors.usoActual ? "border-red-500" : "border-gray-300"} p-2`}
             >
-              <option value="">Seleccione un uso actual</option>
-              {usosActuales.map((uso) => (
+              <option value="" disabled>
+                Seleccione un uso actual
+              </option>
+              {(usosActuales || []).map((uso) => (
                 <option key={uso.id} value={uso.id}>
                   {uso.descripcion}
                 </option>
               ))}
             </select>
             {validationErrors.usoActual && (
-              <p className="text-sm text-red-500">{validationErrors.usoActual}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.usoActual}
+              </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="anioRevaluacion" className="block text-sm font-medium">
+            <label
+              htmlFor="anioRevaluacion"
+              className="block text-sm font-medium"
+            >
               Año de revaluación
             </label>
             <input
@@ -471,17 +538,22 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               placeholder="Año de revaluación"
             />
             {validationErrors.anioRevaluacion && (
-              <p className="text-sm text-red-500">{validationErrors.anioRevaluacion}</p>
+              <p className="text-sm text-red-500">
+                {validationErrors.anioRevaluacion}
+              </p>
             )}
           </div>
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" className="bg-primary text-white hover:bg-primary/90">
+          <Button
+            type="submit"
+            className="bg-primary text-white hover:bg-primary/90"
+          >
             Crear Remodelación
           </Button>
         </div>
       </form>
     </div>
   );
-} 
+}

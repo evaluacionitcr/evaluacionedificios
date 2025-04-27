@@ -1,10 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Button } from "~/components/ui/button";
-import { fetchSedes, fetchFincas, fetchUsosActuales, createEdificio, checkCodigoEdificioExists } from "./actions"; // Importar la función para obtener sedes
+import {
+  fetchSedes,
+  fetchFincas,
+  fetchUsosActuales,
+  createEdificio,
+  checkCodigoEdificioExists,
+} from "./actions"; // Importar la función para obtener sedes
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NumericFormat } from "react-number-format";
+import { toast } from "sonner";
 
 interface Sede {
   id: number;
@@ -70,11 +77,17 @@ export default function CreateEdificioPage() {
   const [loading, setLoading] = useState(false); // Estado para manejar el estado de carga
   const [errors, setErrors] = useState<ValidationErrors>({});
 
+  const formatNumber = (value: string) => {
+    if (!value) return null;
+    // Remove thousand separators and replace comma with period
+    return value.replace(/\./g, "").replace(",", ".");
+  };
+
   // Calcula automáticamente el valor IR
   useEffect(() => {
     const m2 = parseFloat(metrosCuadrados.replace(/\./g, "").replace(",", "."));
     const dolar = parseFloat(valorDolarM2.replace(/\./g, "").replace(",", "."));
-  
+
     if (!isNaN(m2) && !isNaN(dolar)) {
       setValorEdificioIR(m2 * dolar);
     } else {
@@ -84,8 +97,10 @@ export default function CreateEdificioPage() {
 
   // Calcular Depreciación Anual
   useEffect(() => {
-    const vidaUtil = parseFloat(vidaUtilHacienda.replace(/\./g, "").replace(",", "."));
-  
+    const vidaUtil = parseFloat(
+      vidaUtilHacienda.replace(/\./g, "").replace(",", "."),
+    );
+
     if (valorEdificioIR > 0 && !isNaN(vidaUtil) && vidaUtil > 0) {
       setDepreciacionAnual(valorEdificioIR / vidaUtil);
     } else {
@@ -102,9 +117,13 @@ export default function CreateEdificioPage() {
 
   // Cálculo: Valor Actual Revaluado
   useEffect(() => {
-    const vidaHacienda = parseFloat(vidaUtilHacienda.replace(/\./g, "").replace(",", "."));
-    const vidaExperto = parseFloat(vidaUtilExperto.replace(/\./g, "").replace(",", "."));
-  
+    const vidaHacienda = parseFloat(
+      vidaUtilHacienda.replace(/\./g, "").replace(",", "."),
+    );
+    const vidaExperto = parseFloat(
+      vidaUtilExperto.replace(/\./g, "").replace(",", "."),
+    );
+
     if (!isNaN(vidaHacienda) && vidaHacienda > 0 && !isNaN(vidaExperto)) {
       const valor = (valorEdificioIR / vidaHacienda) * vidaExperto;
       setValorRevaluado(valor);
@@ -118,7 +137,7 @@ export default function CreateEdificioPage() {
     // Convertir "10,00" => 10.00 y "615,50" => 615.50
     const dolar = parseFloat(valorDolarM2.replace(/\./g, "").replace(",", "."));
     const cambio = parseFloat(tipoCambio.replace(/\./g, "").replace(",", "."));
-  
+
     if (!isNaN(dolar) && !isNaN(cambio)) {
       const resultado = dolar * cambio;
       setValorColonM2(resultado.toFixed(2));
@@ -177,52 +196,61 @@ export default function CreateEdificioPage() {
     const newErrors: ValidationErrors = {};
 
     // Validación de campos obligatorios
-    if (!codigoEdificio.trim()) newErrors.codigoEdificio = "El código del edificio es obligatorio";
-    if (!nombreEdificio.trim()) newErrors.nombreEdificio = "El nombre del edificio es obligatorio";
+    if (!codigoEdificio.trim())
+      newErrors.codigoEdificio = "El código del edificio es obligatorio";
+    if (!nombreEdificio.trim())
+      newErrors.nombreEdificio = "El nombre del edificio es obligatorio";
     if (!sedeId) newErrors.sedeId = "Debe seleccionar una sede";
-    if (!fincaSeleccionada) newErrors.fincaSeleccionada = "Debe seleccionar una finca";
+    if (!fincaSeleccionada)
+      newErrors.fincaSeleccionada = "Debe seleccionar una finca";
     if (!usoActual) newErrors.usoActual = "Debe seleccionar un uso actual";
-    
+
     // Validación de campos numéricos
-    if (!metrosCuadrados) newErrors.metrosCuadrados = "Los metros cuadrados son obligatorios";
-    if (!valorDolarM2) newErrors.valorDolarM2 = "El valor en dólar por m² es obligatorio";
+    if (!metrosCuadrados)
+      newErrors.metrosCuadrados = "Los metros cuadrados son obligatorios";
+    if (!valorDolarM2)
+      newErrors.valorDolarM2 = "El valor en dólar por m² es obligatorio";
     if (!tipoCambio) newErrors.tipoCambio = "Debe ingresar el tipo de cambio";
-    if (!valorColonM2) newErrors.valorColonM2 = "El valor en colón por m² es obligatorio";
-    if (!vidaUtilHacienda) newErrors.vidaUtilHacienda = "La vida útil según Hacienda es obligatoria";
-    if (!vidaUtilExperto) newErrors.vidaUtilExperto = "La vida útil según experto es obligatoria";
-    if (!anioConstruccion) newErrors.anioConstruccion = "El año de construcción es obligatorio";
-    if (!anioRevaluacion) newErrors.anioRevaluacion = "El año de revaluación es obligatorio";
+    if (!valorColonM2)
+      newErrors.valorColonM2 = "El valor en colón por m² es obligatorio";
+    if (!vidaUtilHacienda)
+      newErrors.vidaUtilHacienda = "La vida útil según Hacienda es obligatoria";
+    if (!vidaUtilExperto)
+      newErrors.vidaUtilExperto = "La vida útil según experto es obligatoria";
+    if (!anioConstruccion)
+      newErrors.anioConstruccion = "El año de construcción es obligatorio";
+    if (!anioRevaluacion)
+      newErrors.anioRevaluacion = "El año de revaluación es obligatorio";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-
   //Nota: Checkear si un edificio existe y agregar primero sede y finca en caso de que se agregue una nueva
-  const handleSubmit = async (e: React.FormEvent) => { 
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validar formulario antes de enviar
     if (!validateForm()) {
       alert("Por favor complete todos los campos obligatorios.");
       return;
     }
-    
+
     setLoading(true);
 
     try {
       // Primero verificamos si el código ya existe
       const codigoCheck = await checkCodigoEdificioExists(codigoEdificio);
-      
+
       // Si el código ya existe, marcarlo como remodelación
       const esRemodelacion = codigoCheck.exists;
-      
+
       if (esRemodelacion) {
         // Opcionalmente mostrar confirmación al usuario
         const confirmar = confirm(
-          "El código de edificio ya existe. ¿Desea continuar y agregarlo como una remodelación?"
+          "El código de edificio ya existe. ¿Desea continuar y agregarlo como una remodelación?",
         );
-        
+
         if (!confirmar) {
           setLoading(false);
           return;
@@ -236,9 +264,9 @@ export default function CreateEdificioPage() {
         nombre: nombreEdificio,
         fechaConstruccion: parseInt(anioConstruccion),
         noFinca: Number(fincaSeleccionada),
-        m2Construccion: parseFloat(metrosCuadrados),
-        valorDolarPorM2: valorDolarM2,
-        valorColonPorM2: valorColonM2,
+        m2Construccion: parseFloat(formatNumber(metrosCuadrados) || "0"),
+        valorDolarPorM2: formatNumber(valorDolarM2) || "0",
+        valorColonPorM2: formatNumber(valorColonM2) || "0",
         edadAl2021: edad,
         vidaUtilHacienda: parseInt(vidaUtilHacienda),
         vidaUtilExperto: parseInt(vidaUtilExperto),
@@ -254,45 +282,52 @@ export default function CreateEdificioPage() {
       const response = await createEdificio(data);
 
       if (response?.success) {
-        alert(esRemodelacion 
-          ? "✅ Remodelación de edificio registrada exitosamente" 
-          : "✅ Edificio creado exitosamente"
+        toast.success(
+          "Edificio creado exitosamente. Complete los datos de los componentes.",
         );
-        router.push("/edificios"); // Redireccionar a la página de edificios
+        router.push(`/edificios/${codigoEdificio}/componentes`);
       } else {
-        alert("❌ Error al guardar: " + response?.error);
+        toast.error("Error al guardar: " + response?.error);
       }
     } catch (err) {
       console.error("Error inesperado al crear edificio:", err);
-      alert("❌ Ocurrió un error inesperado");
+      toast.error("Ocurrió un error inesperado");
     } finally {
       setLoading(false);
     }
   };
 
-  return (   
+  return (
     <div className="mx-auto max-w-4xl rounded-lg bg-white p-8 shadow-md">
       <h1 className="mb-6 text-3xl font-bold">Creación de Edificios</h1>
       <form onSubmit={handleSubmit}>
         <h2 className="mb-4 text-xl font-semibold">Información del Edificio</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Código Edificio */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Código Edificio*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Código Edificio*
+            </label>
             <input
               type="text"
               placeholder="Ej: A1-SC"
               value={codigoEdificio}
               onChange={(e) => setCodigoEdificio(e.target.value)}
-              className={`mt-1 w-full rounded-md border ${errors.codigoEdificio ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.codigoEdificio ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.codigoEdificio && <p className="mt-1 text-sm text-red-500">{errors.codigoEdificio}</p>}
+            {errors.codigoEdificio && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.codigoEdificio}
+              </p>
+            )}
           </div>
 
           {/* Sede */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Sede*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Sede*
+            </label>
             <select
               value={sedeId}
               onChange={(e) => {
@@ -305,9 +340,11 @@ export default function CreateEdificioPage() {
                   setSedeId(value);
                 }
               }}
-              className={`mt-1 w-full rounded-md border ${errors.sedeId ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.sedeId ? "border-red-500" : "border-gray-300"} p-2`}
             >
-              <option value="" disabled>Seleccione una sede</option>
+              <option value="" disabled>
+                Seleccione una sede
+              </option>
               {sedes.map((sede) => (
                 <option key={sede.id} value={sede.id.toString()}>
                   {sede.nombre}
@@ -315,7 +352,9 @@ export default function CreateEdificioPage() {
               ))}
               <option value="nueva">+ Nueva Sede...</option>
             </select>
-            {errors.sedeId && <p className="mt-1 text-sm text-red-500">{errors.sedeId}</p>}
+            {errors.sedeId && (
+              <p className="mt-1 text-sm text-red-500">{errors.sedeId}</p>
+            )}
             {mostrarNuevaSede && (
               <input
                 type="text"
@@ -329,32 +368,46 @@ export default function CreateEdificioPage() {
 
           {/* Nombre */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Nombre del Edificio e Infraestructura*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Nombre del Edificio e Infraestructura*
+            </label>
             <input
               type="text"
               value={nombreEdificio}
               onChange={(e) => setNombreEdificio(e.target.value)}
               placeholder="Nombre del edificio"
-              className={`mt-1 w-full rounded-md border ${errors.nombreEdificio ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.nombreEdificio ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.nombreEdificio && <p className="mt-1 text-sm text-red-500">{errors.nombreEdificio}</p>}
+            {errors.nombreEdificio && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.nombreEdificio}
+              </p>
+            )}
           </div>
 
           {/* Año de Construcción */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Fecha de Construcción*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Fecha de Construcción*
+            </label>
             <input
               type="number"
               value={anioConstruccion}
               onChange={(e) => setAnioConstruccion(e.target.value)}
-              className={`mt-1 w-full rounded-md border ${errors.anioConstruccion ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.anioConstruccion ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.anioConstruccion && <p className="mt-1 text-sm text-red-500">{errors.anioConstruccion}</p>}
+            {errors.anioConstruccion && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.anioConstruccion}
+              </p>
+            )}
           </div>
 
           {/* No. Finca */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">No./Finca*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              No./Finca*
+            </label>
             <select
               value={fincaSeleccionada}
               onChange={(e) => {
@@ -367,9 +420,11 @@ export default function CreateEdificioPage() {
                   setFincaSeleccionada(value);
                 }
               }}
-              className={`mt-1 w-full rounded-md border ${errors.fincaSeleccionada ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.fincaSeleccionada ? "border-red-500" : "border-gray-300"} p-2`}
             >
-              <option value="" disabled>Seleccione una finca</option>
+              <option value="" disabled>
+                Seleccione una finca
+              </option>
               {fincas.map((finca) => (
                 <option key={finca.id} value={finca.id.toString()}>
                   {finca.numero}
@@ -377,7 +432,11 @@ export default function CreateEdificioPage() {
               ))}
               <option value="nueva">+ Nueva Finca...</option>
             </select>
-            {errors.fincaSeleccionada && <p className="mt-1 text-sm text-red-500">{errors.fincaSeleccionada}</p>}
+            {errors.fincaSeleccionada && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.fincaSeleccionada}
+              </p>
+            )}
             {mostrarNuevaFinca && (
               <input
                 type="text"
@@ -391,7 +450,9 @@ export default function CreateEdificioPage() {
 
           {/* m² Construcción */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">m² Construcción*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              m² Construcción*
+            </label>
             <NumericFormat
               value={metrosCuadrados}
               onValueChange={(values) => {
@@ -403,14 +464,20 @@ export default function CreateEdificioPage() {
               fixedDecimalScale
               allowNegative={false}
               placeholder="Ej: 1.200,50"
-              className={`mt-1 w-full rounded-md border ${errors.metrosCuadrados ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.metrosCuadrados ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.metrosCuadrados && <p className="mt-1 text-sm text-red-500">{errors.metrosCuadrados}</p>}
+            {errors.metrosCuadrados && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.metrosCuadrados}
+              </p>
+            )}
           </div>
 
           {/* Valor Dólar por m² */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor $ por m²*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Valor $ por m²*
+            </label>
             <NumericFormat
               value={valorDolarM2}
               onValueChange={(values) => {
@@ -422,13 +489,17 @@ export default function CreateEdificioPage() {
               fixedDecimalScale
               allowNegative={false}
               placeholder="Ej: 10.000,00"
-              className={`mt-1 w-full rounded-md border ${errors.valorDolarM2 ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.valorDolarM2 ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.valorDolarM2 && <p className="mt-1 text-sm text-red-500">{errors.valorDolarM2}</p>}
+            {errors.valorDolarM2 && (
+              <p className="mt-1 text-sm text-red-500">{errors.valorDolarM2}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Tipo de Cambio (₡/USD)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Tipo de Cambio (₡/USD)
+            </label>
             <NumericFormat
               value={tipoCambio}
               onValueChange={(values) => {
@@ -440,14 +511,18 @@ export default function CreateEdificioPage() {
               fixedDecimalScale
               allowNegative={false}
               placeholder="Ej: 615,50"
-              className={`mt-1 w-full rounded-md border ${errors.tipoCambio ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.tipoCambio ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.tipoCambio && <p className="mt-1 text-sm text-red-500">{errors.tipoCambio}</p>}
+            {errors.tipoCambio && (
+              <p className="mt-1 text-sm text-red-500">{errors.tipoCambio}</p>
+            )}
           </div>
 
           {/* Valor Colón por m² */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor ₡ por m²*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Valor ₡ por m²*
+            </label>
             <NumericFormat
               value={valorColonM2}
               displayType="input"
@@ -456,14 +531,18 @@ export default function CreateEdificioPage() {
               decimalScale={2}
               fixedDecimalScale
               readOnly
-              className={`mt-1 w-full rounded-md border ${errors.valorColonM2 ? 'border-red-500' : 'border-gray-300'} p-2 bg-gray-100`}
+              className={`mt-1 w-full rounded-md border ${errors.valorColonM2 ? "border-red-500" : "border-gray-300"} bg-gray-100 p-2`}
             />
-            {errors.valorColonM2 && <p className="mt-1 text-sm text-red-500">{errors.valorColonM2}</p>}
+            {errors.valorColonM2 && (
+              <p className="mt-1 text-sm text-red-500">{errors.valorColonM2}</p>
+            )}
           </div>
 
           {/* Año base para cálculo de edad */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Año base para cálculo de edad</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Año base para cálculo de edad
+            </label>
             <input
               type="number"
               value={anioCalculoEdad}
@@ -474,42 +553,58 @@ export default function CreateEdificioPage() {
 
           {/* Edad calculada */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Edad calculada</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Edad calculada
+            </label>
             <input
               type="text"
               value={edad}
               readOnly
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 bg-gray-100"
+              className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
             />
           </div>
 
           {/* Vida Útil Hacienda */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Vida Útil Hacienda (años)*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Vida Útil Hacienda (años)*
+            </label>
             <input
               type="number"
               value={vidaUtilHacienda}
               onChange={(e) => setVidaUtilHacienda(e.target.value)}
-              className={`mt-1 w-full rounded-md border ${errors.vidaUtilHacienda ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.vidaUtilHacienda ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.vidaUtilHacienda && <p className="mt-1 text-sm text-red-500">{errors.vidaUtilHacienda}</p>}
+            {errors.vidaUtilHacienda && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.vidaUtilHacienda}
+              </p>
+            )}
           </div>
 
           {/* Vida Útil Experto */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Vida Útil Experto esperada (años)*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Vida Útil Experto esperada (años)*
+            </label>
             <input
               type="number"
               value={vidaUtilExperto}
               onChange={(e) => setVidaUtilExperto(e.target.value)}
-              className={`mt-1 w-full rounded-md border ${errors.vidaUtilExperto ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.vidaUtilExperto ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.vidaUtilExperto && <p className="mt-1 text-sm text-red-500">{errors.vidaUtilExperto}</p>}
+            {errors.vidaUtilExperto && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.vidaUtilExperto}
+              </p>
+            )}
           </div>
 
           {/* Valor Edificio IR (calculado) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor de Edificio e Infraestructura reposición ($)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Valor de Edificio e Infraestructura reposición ($)
+            </label>
             <NumericFormat
               value={valorEdificioIR}
               displayType="input"
@@ -518,13 +613,15 @@ export default function CreateEdificioPage() {
               decimalScale={2}
               fixedDecimalScale
               readOnly
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 bg-gray-100"
+              className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
             />
           </div>
 
           {/* Depreciación Acumulada */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Depreciación Lineal Anual restante ($)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Depreciación Lineal Anual restante ($)
+            </label>
             <NumericFormat
               value={depreciacionAnual}
               displayType="input"
@@ -533,13 +630,15 @@ export default function CreateEdificioPage() {
               decimalScale={2}
               fixedDecimalScale
               readOnly
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 bg-gray-100"
+              className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
             />
           </div>
 
           {/* Valor Actual Revaluado */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Valor de Edificio ó Infraestructura Actual Revaluado ($)</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Valor de Edificio ó Infraestructura Actual Revaluado ($)
+            </label>
             <NumericFormat
               value={valorRevaluado}
               displayType="input"
@@ -548,66 +647,74 @@ export default function CreateEdificioPage() {
               decimalScale={2}
               fixedDecimalScale
               readOnly
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 bg-gray-100"
+              className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
             />
           </div>
-              
+
           {/* Año de Revaluación */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Año de Revaluación*</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Año de Revaluación*
+            </label>
             <input
               type="number"
               value={anioRevaluacion}
               onChange={(e) => setAnioRevaluacion(e.target.value)}
               placeholder="2021"
-              className={`mt-1 w-full rounded-md border ${errors.anioRevaluacion ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.anioRevaluacion ? "border-red-500" : "border-gray-300"} p-2`}
             />
-            {errors.anioRevaluacion && <p className="mt-1 text-sm text-red-500">{errors.anioRevaluacion}</p>}
+            {errors.anioRevaluacion && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.anioRevaluacion}
+              </p>
+            )}
           </div>
-              
+
           {/* Uso Actual */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Uso Actual*</label>
-            <select 
+            <label className="block text-sm font-medium text-gray-700">
+              Uso Actual*
+            </label>
+            <select
               value={usoActual}
               onChange={(e) => setUsoActual(e.target.value)}
-              className={`mt-1 w-full rounded-md border ${errors.usoActual ? 'border-red-500' : 'border-gray-300'} p-2`}
+              className={`mt-1 w-full rounded-md border ${errors.usoActual ? "border-red-500" : "border-gray-300"} p-2`}
             >
               <option value="" disabled>
                 Seleccione un uso actual
               </option>
-              {usosActuales.map((uso) => (
+              {(usosActuales || []).map((uso) => (
                 <option key={uso.id} value={uso.id}>
                   {uso.descripcion}
                 </option>
               ))}
             </select>
-            {errors.usoActual && <p className="mt-1 text-sm text-red-500">{errors.usoActual}</p>}
+            {errors.usoActual && (
+              <p className="mt-1 text-sm text-red-500">{errors.usoActual}</p>
+            )}
           </div>
         </div>
 
-        <div className="mt-4 text-sm text-gray-500">
-          * Campos obligatorios
-        </div>
+        <div className="mt-4 text-sm text-gray-500">* Campos obligatorios</div>
 
         <div className="mt-8 flex justify-end space-x-4">
           <Link href="/edificios">
-            <button 
-              type="button" 
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+            <button
+              type="button"
+              className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
               Cancelar
             </button>
           </Link>
           <Button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
+            className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:bg-blue-300"
             disabled={loading}
           >
             {loading ? "Creando..." : "Crear Edificio"}
           </Button>
         </div>
-      </form>        
+      </form>
     </div>
   );
 }
