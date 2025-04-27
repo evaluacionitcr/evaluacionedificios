@@ -17,12 +17,7 @@ interface DetallesTerreno {
     m2Construccion: number | null;
     valorDolarPorM2: string | null;
     valorColonPorM2: string | null;
-    edad: number | null;
-    vidaUtilHacienda: number | null;
-    vidaUtilExperto: number | null;
-    valorReposicion: string | null;
-    depreciacionLinealAnual: string | null;
-    valorActualRevaluado: string | null;
+    valorPorcionTerreno: string | null;
     anoDeRevaluacion: number | null;
     usoActual: string | null;
 }
@@ -52,7 +47,7 @@ export async function getDetallesTerreno(
         m2Construccion: Terrenos.m2Construccion,
         valorDolarPorM2: Terrenos.valorDolarPorM2,
         valorColonPorM2: Terrenos.valorColonPorM2,
-        edad: Construcciones.edad,
+        valorPorcionTerreno: Terrenos.valorPorcionTerreno,
         anoDeRevaluacion: Terrenos.anoDeRevaluacion,
         usoActual: UsosActuales.descripcion,
       })
