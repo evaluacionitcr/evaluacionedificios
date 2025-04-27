@@ -63,15 +63,15 @@ export default function FormularioTerrenos({
     const data = {
       codigoEdificio,
       nombre,
-      fechaConstruccion: datosFijos?.fechaConstruccion || null,
-      noFinca: datosFijos?.noFinca || null,
-      m2Construccion: parseFloat(formatNumber(m2Construccion) || "0"),
-      valorDolarPorM2: formatNumber(valorDolarM2) || "0",
-      valorColonPorM2: formatNumber(valorColonM2) || "0",
+      fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
+      noFinca: datosFijos?.noFinca ?? null,
+      m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
+      valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
+      valorColonPorM2: formatNumber(valorColonM2) ?? "0",
       edad,
       valorTerreno: valorTerreno.toString(),
       anoDeRevaluacion: parseInt(anoRevaluacion),
-      usoActual: datosFijos?.usoActualId || null,
+      usoActual: datosFijos?.usoActualId ?? null,
     };
 
     try {
@@ -117,7 +117,7 @@ export default function FormularioTerrenos({
         </label>
         <input
           type="number"
-          value={datosFijos?.fechaConstruccion || 0}
+          value={datosFijos?.fechaConstruccion ?? 0}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
@@ -129,7 +129,7 @@ export default function FormularioTerrenos({
         </label>
         <input
           type="text"
-          value={datosFijos?.noFinca || ""}
+          value={datosFijos?.noFinca ?? ""}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
@@ -254,7 +254,7 @@ export default function FormularioTerrenos({
         </label>
         <input
           type="text"
-          value={datosFijos?.usoActualDescripcion || ""}
+          value={datosFijos?.usoActualDescripcion ?? ""}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />

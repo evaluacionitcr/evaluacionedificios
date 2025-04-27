@@ -90,7 +90,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
           const edificio = edificioData.data[0];
           setEdificioOriginal({
             codigoEdificio: edificio.codigoEdificio,
-            sede: edificio.sedeId || null,
+            sede: edificio.sedeId ?? null,
             nombre: edificio.nombre,
           });
         } else {
@@ -132,7 +132,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
     if (!metrosCuadrados.trim()) {
       errors.metrosCuadrados = "Los metros cuadrados son requeridos";
       isValid = false;
-    } else if (isNaN(Number(metrosCuadrados)) || Number(metrosCuadrados) <= 0) {
+    } else if (isNaN(Number(metrosCuadrados)) ?? Number(metrosCuadrados) <= 0) {
       errors.metrosCuadrados =
         "Los metros cuadrados deben ser un número positivo";
       isValid = false;
@@ -141,7 +141,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
     if (!valorDolarM2.trim()) {
       errors.valorDolarM2 = "El valor en dólares por m² es requerido";
       isValid = false;
-    } else if (isNaN(Number(valorDolarM2)) || Number(valorDolarM2) <= 0) {
+    } else if (isNaN(Number(valorDolarM2)) ?? Number(valorDolarM2) <= 0) {
       errors.valorDolarM2 =
         "El valor en dólares por m² debe ser un número positivo";
       isValid = false;
@@ -150,7 +150,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
     if (!valorColonM2.trim()) {
       errors.valorColonM2 = "El valor en colones por m² es requerido";
       isValid = false;
-    } else if (isNaN(Number(valorColonM2)) || Number(valorColonM2) <= 0) {
+    } else if (isNaN(Number(valorColonM2)) ?? Number(valorColonM2) <= 0) {
       errors.valorColonM2 =
         "El valor en colones por m² debe ser un número positivo";
       isValid = false;
@@ -160,7 +160,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       errors.vidaUtilHacienda = "La vida útil según Hacienda es requerida";
       isValid = false;
     } else if (
-      isNaN(Number(vidaUtilHacienda)) ||
+      isNaN(Number(vidaUtilHacienda)) ??
       Number(vidaUtilHacienda) <= 0
     ) {
       errors.vidaUtilHacienda =
@@ -171,7 +171,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
     if (!vidaUtilExperto.trim()) {
       errors.vidaUtilExperto = "La vida útil según experto es requerida";
       isValid = false;
-    } else if (isNaN(Number(vidaUtilExperto)) || Number(vidaUtilExperto) <= 0) {
+    } else if (isNaN(Number(vidaUtilExperto)) ?? Number(vidaUtilExperto) <= 0) {
       errors.vidaUtilExperto =
         "La vida útil según experto debe ser un número positivo";
       isValid = false;
@@ -181,7 +181,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       errors.anioConstruccion = "El año de construcción es requerido";
       isValid = false;
     } else if (
-      isNaN(Number(anioConstruccion)) ||
+      isNaN(Number(anioConstruccion)) ??
       Number(anioConstruccion) <= 0
     ) {
       errors.anioConstruccion =
@@ -202,7 +202,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
     if (!anioRevaluacion.trim()) {
       errors.anioRevaluacion = "El año de revaluación es requerido";
       isValid = false;
-    } else if (isNaN(Number(anioRevaluacion)) || Number(anioRevaluacion) <= 0) {
+    } else if (isNaN(Number(anioRevaluacion)) ?? Number(anioRevaluacion) <= 0) {
       errors.anioRevaluacion =
         "El año de revaluación debe ser un número positivo";
       isValid = false;
@@ -241,7 +241,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       // Crear el objeto con los datos del edificio
       const edificioData = {
         codigoEdificio: edificioOriginal.codigoEdificio,
-        sede: edificioOriginal.sede || null,
+        sede: edificioOriginal.sede ?? null,
         esRenovacion: true,
         nombre: nombreEdificio,
         fechaConstruccion: Number(anioConstruccion),
@@ -270,7 +270,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
         // Redirigir a la página de detalles del edificio
         router.push(`/edificios/${buildingId}`);
       } else {
-        setError(response.error || "Error al crear la remodelación");
+        setError(response.error ?? "Error al crear la remodelación");
       }
     } catch (err) {
       console.error("Error al crear la remodelación:", err);
@@ -282,11 +282,11 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
     return <div>Cargando datos...</div>;
   }
 
-  if (error || !edificioOriginal) {
+  if (error ?? !edificioOriginal) {
     return (
       <div>
         <p className="text-red-500">
-          {error || "No se pudo cargar el edificio"}
+          {error ?? "No se pudo cargar el edificio"}
         </p>
         <Link href={`/edificios/${buildingId}`}>
           <Button variant="outline" className="mt-4">
@@ -509,7 +509,7 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
               <option value="" disabled>
                 Seleccione un uso actual
               </option>
-              {(usosActuales || []).map((uso) => (
+              {(usosActuales ?? []).map((uso) => (
                 <option key={uso.id} value={uso.id}>
                   {uso.descripcion}
                 </option>

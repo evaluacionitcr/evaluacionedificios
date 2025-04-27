@@ -30,7 +30,7 @@ export const ourFileRouter = {
       return {
         userId: user.userId,
         evaluationId: input.evaluationId,
-        description: input.description || "No description provided",
+        description: input.description ?? "No description provided",
       };
     })
     .onUploadComplete(async ({ metadata, file }) => {

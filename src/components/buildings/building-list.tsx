@@ -57,7 +57,7 @@ function BuildingList({ sedesConEdificios }: { sedesConEdificios: Sede[] }) {
   
   // Función para filtrar edificios por búsqueda local
   const getFilteredEdificios = (sede: Sede) => {
-    const searchTerm = localSearches[sede.id] || "";
+    const searchTerm = localSearches[sede.id] ?? "";
     
     if (!searchTerm.trim()) {
       return sede.edificios;
@@ -65,7 +65,7 @@ function BuildingList({ sedesConEdificios }: { sedesConEdificios: Sede[] }) {
     
     return sede.edificios.filter(
       (edificio) => 
-        edificio.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        edificio.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ??
         edificio.codigo?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
@@ -107,7 +107,7 @@ function BuildingList({ sedesConEdificios }: { sedesConEdificios: Sede[] }) {
                     type="search"
                     placeholder="Buscar edificios en esta sede..."
                     className="pl-10"
-                    value={localSearches[sede.id] || ""}
+                    value={localSearches[sede.id] ?? ""}
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => updateLocalSearch(sede.id, e.target.value)}
                   />

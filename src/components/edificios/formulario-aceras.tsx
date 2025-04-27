@@ -33,7 +33,7 @@ export default function FormularioAceras({
       try {
         const response = await fetch(`/api/datosEdificio/${codigoEdificio}`);
         const data = await response.json();
-        setDatosFijos(data || null);
+        setDatosFijos(data ?? null);
       } catch (error) {
         console.error("Error al cargar usos actuales:", error);
       }
@@ -104,11 +104,11 @@ export default function FormularioAceras({
     const data = {
       codigoEdificio,
       nombre,
-      fechaConstruccion: datosFijos?.fechaConstruccion || 0,
-      noFinca: datosFijos?.noFinca || "",
-      m2Construccion: parseFloat(formatNumber(m2Construccion) || "0"),
-      valorDolarPorM2: formatNumber(valorDolarM2) || "0",
-      valorColonPorM2: formatNumber(valorColonM2) || "0",
+      fechaConstruccion: datosFijos?.fechaConstruccion ?? 0,
+      noFinca: datosFijos?.noFinca ?? "",
+      m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
+      valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
+      valorColonPorM2: formatNumber(valorColonM2) ?? "0",
       edad,
       vidaUtilHacienda: parseInt(vidaUtilHacienda),
       vidaUtilExperto: parseInt(vidaUtilExperto),
@@ -116,7 +116,7 @@ export default function FormularioAceras({
       depreciacionLinealAnual: depreciacionAnual.toString(),
       valorActualRevaluado: valorRevaluado.toString(),
       anoDeRevaluacion: parseInt(anoRevaluacion),
-      usoActual: datosFijos?.usoActualId || null,
+      usoActual: datosFijos?.usoActualId ?? null,
     };
 
     // TODO: Implementar la función para guardar en la base de datos
@@ -164,7 +164,7 @@ export default function FormularioAceras({
         </label>
         <input
           type="text"
-          value={datosFijos?.fechaConstruccion || ""}
+          value={datosFijos?.fechaConstruccion ?? ""}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
@@ -176,7 +176,7 @@ export default function FormularioAceras({
         </label>
         <input
           type="text"
-          value={datosFijos?.noFinca || ""}
+          value={datosFijos?.noFinca ?? ""}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
@@ -367,7 +367,7 @@ export default function FormularioAceras({
         </label>
         <input
           type="text"
-          value={datosFijos?.usoActualDescripcion || ""}
+          value={datosFijos?.usoActualDescripcion ?? ""}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />

@@ -99,11 +99,11 @@ export default function FormularioZonasVerdes({
     const data = {
       codigoEdificio,
       nombre,
-      fechaConstruccion: datosFijos?.fechaConstruccion || null,
-      noFinca: datosFijos?.noFinca || "",
-      m2Construccion: parseFloat(formatNumber(m2Construccion) || "0"),
-      valorDolarPorM2: formatNumber(valorDolarM2) || "0",
-      valorColonPorM2: formatNumber(valorColonM2) || "0",
+      fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
+      noFinca: datosFijos?.noFinca ?? "",
+      m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
+      valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
+      valorColonPorM2: formatNumber(valorColonM2) ?? "0",
       edad,
       vidaUtilHacienda: parseInt(vidaUtilHacienda),
       vidaUtilExperto: parseInt(vidaUtilExperto),
@@ -111,7 +111,7 @@ export default function FormularioZonasVerdes({
       depreciacionLinealAnual: depreciacionAnual.toString(),
       valorActualRevaluado: valorRevaluado.toString(),
       anoDeRevaluacion: parseInt(anoRevaluacion),
-      usoActual: datosFijos?.usoActualId || 0,
+      usoActual: datosFijos?.usoActualId ?? 0,
     };
 
     try {
@@ -157,7 +157,7 @@ export default function FormularioZonasVerdes({
         </label>
         <input
           type="number"
-          value={datosFijos?.fechaConstruccion || 0}
+          value={datosFijos?.fechaConstruccion ?? 0}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
@@ -169,7 +169,7 @@ export default function FormularioZonasVerdes({
         </label>
         <input
           type="text"
-          value={datosFijos?.noFinca || ""}
+          value={datosFijos?.noFinca ?? ""}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
@@ -356,7 +356,7 @@ export default function FormularioZonasVerdes({
         </label>
         <input
           type="text"
-          value={datosFijos?.usoActualDescripcion || ""}
+          value={datosFijos?.usoActualDescripcion ?? ""}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
