@@ -53,11 +53,6 @@ export async function getDetallesTerreno(
         valorDolarPorM2: Terrenos.valorDolarPorM2,
         valorColonPorM2: Terrenos.valorColonPorM2,
         edad: Construcciones.edad,
-        vidaUtilHacienda: Terrenos.vidaUtilHacienda,
-        vidaUtilExperto: Terrenos.vidaUtilExperto,
-        valorReposicion: Terrenos.valorReposicion,
-        depreciacionLinealAnual: Terrenos.depreciacionLinealAnual,
-        valorActualRevaluado: Terrenos.valorActualRevaluado,
         anoDeRevaluacion: Terrenos.anoDeRevaluacion,
         usoActual: UsosActuales.descripcion,
       })
