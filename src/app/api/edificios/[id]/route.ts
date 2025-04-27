@@ -3,10 +3,10 @@ import { getDetallesEdificio } from "~/server/actions/edificios";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  {params} : { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(
