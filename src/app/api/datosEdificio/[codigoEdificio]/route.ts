@@ -26,6 +26,7 @@ export async function GET(
         usoActualId: Construcciones.usoActual,
         usoActualDescripcion: UsosActuales.descripcion,
         noFinca: NumeroFincas.numero,
+        noFincaId: Construcciones.noFinca,
         fechaConstruccion: Construcciones.fechaConstruccion,
       })
       .from(Construcciones)

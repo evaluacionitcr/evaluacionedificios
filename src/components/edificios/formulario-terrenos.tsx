@@ -8,38 +8,30 @@ interface FormularioTerrenosProps {
     usoActual: number | null;
     numeroFinca: string | null;
   };
+  datosFijos?: DatosFijos;
 }
 
 export default function FormularioTerrenos({
   codigoEdificio,
+  datosFijos,
 }: FormularioTerrenosProps) {
   const [nombre] = useState("");
   const [m2Construccion, setM2Construccion] = useState("");
   const [valorDolarM2, setValorDolarM2] = useState("");
   const [valorColonM2, setValorColonM2] = useState("");
   const [edad, setEdad] = useState(0);
+  const [anioCalculoEdad, setAnioCalculoEdad] = useState("");
 
   const [valorTerreno, setValorTerreno] = useState("");
   const [anoRevaluacion, setAnoRevaluacion] = useState("");
-  const [datosFijos, setDatosFijos] = useState<DatosFijos | null>(null);
   const [tipoCambio, setTipoCambio] = useState("");
 
-  // Cargar usos actuales y establecer valores por defecto
   useEffect(() => {
-    const fetchUsosActuales = async () => {
-      try {
-        const response = await fetch(`/api/datosEdificio/${codigoEdificio}`);
-        const data = (await response.json()) as DatosFijos;
-        setDatosFijos(data ?? null);
-      } catch (error) {
-        console.error("Error al cargar usos actuales:", error);
-      }
-    };
-
-    void fetchUsosActuales();
-
-    // Establecer valores por defecto de la construcción
-  }, [codigoEdificio]);
+    const anio = datosFijos?.fechaConstruccion;
+    const anioBase = parseInt(anioCalculoEdad);
+    if (!anio) return;
+    setEdad(!isNaN(anio) && !isNaN(anioBase) ? anioBase - anio : 0);
+  }, [datosFijos?.fechaConstruccion, anioCalculoEdad]);
 
   const calcularValorColon = (valorDolar: string, cambio: string) => {
     const dolar = parseFloat(valorDolar.replace(/\./g, "").replace(",", "."));
@@ -61,9 +53,9 @@ export default function FormularioTerrenos({
 
     const data = {
       codigoEdificio,
-      nombre,
+      nombre: "Terreno",
       fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
-      noFinca: datosFijos?.noFinca ?? null,
+      noFinca: datosFijos?.noFincaId ?? null,
       m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
       valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
       valorColonPorM2: formatNumber(valorColonM2) ?? "0",
@@ -143,6 +135,7 @@ export default function FormularioTerrenos({
           onValueChange={(values) => {
             setM2Construccion(values.formattedValue);
           }}
+          required
           thousandSeparator="."
           decimalSeparator=","
           decimalScale={2}
@@ -162,6 +155,7 @@ export default function FormularioTerrenos({
             setValorDolarM2(values.formattedValue);
             calcularValorColon(values.formattedValue, tipoCambio);
           }}
+          required
           thousandSeparator="."
           decimalSeparator=","
           decimalScale={2}
@@ -181,6 +175,7 @@ export default function FormularioTerrenos({
             setTipoCambio(values.formattedValue);
             calcularValorColon(valorDolarM2, values.formattedValue);
           }}
+          required
           thousandSeparator="."
           decimalSeparator=","
           decimalScale={2}
@@ -208,12 +203,24 @@ export default function FormularioTerrenos({
       </div>
 
       <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Año base para cálculo de edad
+        </label>
+        <input
+          type="number"
+          value={anioCalculoEdad}
+          onChange={(e) => setAnioCalculoEdad(e.target.value)}
+          className="mt-1 w-full rounded-md border border-gray-300 p-2"
+        />
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-gray-700">Edad</label>
         <input
           type="number"
           value={edad}
-          onChange={(e) => setEdad(parseInt(e.target.value))}
-          className="mt-1 w-full rounded-md border border-gray-300 p-2"
+          disabled
+          className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />
       </div>
 
@@ -226,6 +233,7 @@ export default function FormularioTerrenos({
           onValueChange={(values) => {
             setValorTerreno(values.formattedValue);
           }}
+          required
           thousandSeparator="."
           decimalSeparator=","
           decimalScale={2}
@@ -243,6 +251,7 @@ export default function FormularioTerrenos({
           type="number"
           value={anoRevaluacion}
           onChange={(e) => setAnoRevaluacion(e.target.value)}
+          required
           className="mt-1 w-full rounded-md border border-gray-300 p-2"
         />
       </div>

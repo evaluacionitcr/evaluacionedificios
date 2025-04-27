@@ -4,5 +4,6 @@ export interface DatosFijos {
   usoActualId: number;
   usoActualDescripcion: string;
   noFinca: string;
+  noFincaId: number;
   fechaConstruccion: number;
 }

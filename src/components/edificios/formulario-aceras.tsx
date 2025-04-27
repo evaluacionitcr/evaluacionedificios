@@ -8,10 +8,12 @@ interface FormularioAcerasProps {
     usoActual: number | null;
     numeroFinca: string | null;
   };
+  datosFijos?: DatosFijos;
 }
 
 export default function FormularioAceras({
   codigoEdificio,
+  datosFijos,
 }: FormularioAcerasProps) {
   const [nombre, setNombre] = useState("");
   const [m2Construccion, setM2Construccion] = useState("");
@@ -25,24 +27,15 @@ export default function FormularioAceras({
   const [valorRevaluado, setValorRevaluado] = useState(0);
   const [anoRevaluacion, setAnoRevaluacion] = useState("");
   const [tipoCambio, setTipoCambio] = useState("");
-  const [datosFijos, setDatosFijos] = useState<DatosFijos | null>(null);
+  const [anioCalculoEdad, setAnioCalculoEdad] = useState("");
 
-  // Cargar usos actuales y establecer valores por defecto
+  // Cálculo: Edad
   useEffect(() => {
-    const fetchUsosActuales = async () => {
-      try {
-        const response = await fetch(`/api/datosEdificio/${codigoEdificio}`);
-        const data = (await response.json()) as DatosFijos;
-        setDatosFijos(data ?? null);
-      } catch (error) {
-        console.error("Error al cargar usos actuales:", error);
-      }
-    };
-
-    void fetchUsosActuales();
-
-    // Establecer valores por defecto de la construcción
-  }, [codigoEdificio]);
+    const anio = datosFijos?.fechaConstruccion;
+    const anioBase = parseInt(anioCalculoEdad);
+    if (!anio) return;
+    setEdad(!isNaN(anio) && !isNaN(anioBase) ? anioBase - anio : 0);
+  }, [datosFijos?.fechaConstruccion, anioCalculoEdad]);
 
   // Cálculo automático de valor en colones
   const calcularValorColon = (valorDolar: string, cambio: string) => {
@@ -102,9 +95,9 @@ export default function FormularioAceras({
 
     const data = {
       codigoEdificio,
-      nombre,
+      nombre: "Aceras",
       fechaConstruccion: datosFijos?.fechaConstruccion ?? 0,
-      noFinca: datosFijos?.noFinca ?? "",
+      noFinca: datosFijos?.noFincaId ?? null,
       m2Construccion: parseFloat(formatNumber(m2Construccion) ?? "0"),
       valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
       valorColonPorM2: formatNumber(valorColonM2) ?? "0",
@@ -191,6 +184,7 @@ export default function FormularioAceras({
             setM2Construccion(values.formattedValue);
             calcularValorReposicion();
           }}
+          required
           thousandSeparator="."
           decimalSeparator=","
           decimalScale={2}
@@ -211,6 +205,7 @@ export default function FormularioAceras({
             calcularValorColon(values.formattedValue, tipoCambio);
             calcularValorReposicion();
           }}
+          required
           thousandSeparator="."
           decimalSeparator=","
           decimalScale={2}
@@ -230,6 +225,7 @@ export default function FormularioAceras({
             setTipoCambio(values.formattedValue);
             calcularValorColon(valorDolarM2, values.formattedValue);
           }}
+          required
           thousandSeparator="."
           decimalSeparator=","
           decimalScale={2}
@@ -257,12 +253,26 @@ export default function FormularioAceras({
       </div>
 
       <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Año base para cálculo de edad
+        </label>
+        <input
+          type="number"
+          value={anioCalculoEdad}
+          onChange={(e) => setAnioCalculoEdad(e.target.value)}
+          required
+          className="mt-1 w-full rounded-md border border-gray-300 p-2"
+        />
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-gray-700">Edad</label>
         <input
           type="number"
           value={edad}
+          disabled
+          className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
           onChange={(e) => setEdad(parseInt(e.target.value))}
-          className="mt-1 w-full rounded-md border border-gray-300 p-2"
         />
       </div>
 
@@ -278,6 +288,7 @@ export default function FormularioAceras({
             calcularDepreciacionAnual();
             calcularValorRevaluado();
           }}
+          required
           className="mt-1 w-full rounded-md border border-gray-300 p-2"
         />
       </div>
@@ -293,6 +304,7 @@ export default function FormularioAceras({
             setVidaUtilExperto(e.target.value);
             calcularValorRevaluado();
           }}
+          required
           className="mt-1 w-full rounded-md border border-gray-300 p-2"
         />
       </div>
@@ -356,6 +368,7 @@ export default function FormularioAceras({
           type="number"
           value={anoRevaluacion}
           onChange={(e) => setAnoRevaluacion(e.target.value)}
+          required
           className="mt-1 w-full rounded-md border border-gray-300 p-2"
         />
       </div>
