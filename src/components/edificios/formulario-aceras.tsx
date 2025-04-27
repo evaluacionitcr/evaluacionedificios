@@ -1,6 +1,6 @@
 import { NumericFormat } from "react-number-format";
 import { useState, useEffect } from "react";
-import { DatosFijos } from "~/utils/consts";
+import type { DatosFijos } from "~/utils/consts";
 
 interface FormularioAcerasProps {
   codigoEdificio: string;
@@ -11,7 +11,7 @@ interface FormularioAcerasProps {
 }
 
 export default function FormularioAceras({
-  codigoEdificio
+  codigoEdificio,
 }: FormularioAcerasProps) {
   const [nombre, setNombre] = useState("");
   const [m2Construccion, setM2Construccion] = useState("");
@@ -32,7 +32,7 @@ export default function FormularioAceras({
     const fetchUsosActuales = async () => {
       try {
         const response = await fetch(`/api/datosEdificio/${codigoEdificio}`);
-        const data = await response.json();
+        const data = (await response.json()) as DatosFijos;
         setDatosFijos(data ?? null);
       } catch (error) {
         console.error("Error al cargar usos actuales:", error);
@@ -42,8 +42,7 @@ export default function FormularioAceras({
     void fetchUsosActuales();
 
     // Establecer valores por defecto de la construcción
-
-  }, [ codigoEdificio]);
+  }, [codigoEdificio]);
 
   // Cálculo automático de valor en colones
   const calcularValorColon = (valorDolar: string, cambio: string) => {

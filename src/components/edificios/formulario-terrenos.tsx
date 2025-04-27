@@ -1,6 +1,6 @@
 import { NumericFormat } from "react-number-format";
 import { useState, useEffect } from "react";
-import { DatosFijos } from "~/utils/consts";
+import type { DatosFijos } from "~/utils/consts";
 
 interface FormularioTerrenosProps {
   codigoEdificio: string;
@@ -11,9 +11,9 @@ interface FormularioTerrenosProps {
 }
 
 export default function FormularioTerrenos({
-  codigoEdificio
+  codigoEdificio,
 }: FormularioTerrenosProps) {
-  const [nombre, setNombre] = useState("");
+  const [nombre] = useState("");
   const [m2Construccion, setM2Construccion] = useState("");
   const [valorDolarM2, setValorDolarM2] = useState("");
   const [valorColonM2, setValorColonM2] = useState("");
@@ -29,8 +29,8 @@ export default function FormularioTerrenos({
     const fetchUsosActuales = async () => {
       try {
         const response = await fetch(`/api/datosEdificio/${codigoEdificio}`);
-        const data = await response.json();
-        setDatosFijos(data);
+        const data = (await response.json()) as DatosFijos;
+        setDatosFijos(data ?? null);
       } catch (error) {
         console.error("Error al cargar usos actuales:", error);
       }
@@ -39,7 +39,6 @@ export default function FormularioTerrenos({
     void fetchUsosActuales();
 
     // Establecer valores por defecto de la construcción
-
   }, [codigoEdificio]);
 
   const calcularValorColon = (valorDolar: string, cambio: string) => {

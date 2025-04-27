@@ -7,20 +7,22 @@ import { toast } from "sonner";
 // inferred input off useUploadThing
 type Input = Parameters<typeof useUploadThing>;
 
+type CustomData = {
+  evaluationId?: number;
+  description?: string;
+};
+
 const useUploadThingInputProps = (
   endpoint: Input[0],
   options: Input[1],
-  customData?: { evaluationId?: number; description?: string },
+  customData?: CustomData,
 ) => {
   const $ut = useUploadThing(endpoint, options);
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const selectedFiles = Array.from(e.target.files);
 
-    // Aquí está el problema - customData debe ser pasado como el segundo argumento
-    // Pero la firma del método startUpload espera un tipo específico
-    // Vamos a corregirlo:
-    const result = await $ut.startUpload(selectedFiles, customData as any);
+    const result = await $ut.startUpload(selectedFiles, customData ?? {});
     console.log("uploaded files", result);
   };
   return {

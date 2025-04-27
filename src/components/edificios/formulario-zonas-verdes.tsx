@@ -1,6 +1,6 @@
 import { NumericFormat } from "react-number-format";
 import { useState, useEffect } from "react";
-import { DatosFijos } from "~/utils/consts";
+import type { DatosFijos } from "~/utils/consts";
 
 interface FormularioZonasVerdesProps {
   codigoEdificio: string;
@@ -11,9 +11,9 @@ interface FormularioZonasVerdesProps {
 }
 
 export default function FormularioZonasVerdes({
-  codigoEdificio
+  codigoEdificio,
 }: FormularioZonasVerdesProps) {
-  const [nombre, setNombre] = useState("");
+  const [nombre] = useState(""); // Removed unused setNombre
   const [m2Construccion, setM2Construccion] = useState("");
   const [valorDolarM2, setValorDolarM2] = useState("");
   const [valorColonM2, setValorColonM2] = useState("");
@@ -32,18 +32,15 @@ export default function FormularioZonasVerdes({
     const fetchUsosActuales = async () => {
       try {
         const response = await fetch(`/api/datosEdificio/${codigoEdificio}`);
-        const data = await response.json();
-        setDatosFijos(data);
+        const data = (await response.json()) as DatosFijos;
+        setDatosFijos(data ?? null);
       } catch (error) {
         console.error("Error al cargar usos actuales:", error);
       }
     };
 
     void fetchUsosActuales();
-
   }, [codigoEdificio]);
-
-
 
   const calcularValorColon = (valorDolar: string, cambio: string) => {
     const dolar = parseFloat(valorDolar.replace(/\./g, "").replace(",", "."));

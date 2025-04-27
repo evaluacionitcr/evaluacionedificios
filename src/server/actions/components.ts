@@ -13,14 +13,17 @@ interface ComponentData {
 
 export async function createAceras(data: ComponentData) {
   try {
-    const acera = await db.insert(Aceras).values({
-      codigoEdificio: data.codigoEdificio,
-      nombre: `Acera de ${data.codigoEdificio}`,
-      m2Construccion: data.m2Construccion,
-      valorDolarPorM2: data.valorDolarPorM2,
-      vidaUtilHacienda: data.vidaUtilHacienda,
-      vidaUtilExperto: data.vidaUtilExperto,
-    });
+    const [acera] = await db
+      .insert(Aceras)
+      .values({
+        codigoEdificio: data.codigoEdificio,
+        nombre: `Acera de ${data.codigoEdificio}`,
+        m2Construccion: data.m2Construccion,
+        valorDolarPorM2: data.valorDolarPorM2,
+        vidaUtilHacienda: data.vidaUtilHacienda,
+        vidaUtilExperto: data.vidaUtilExperto,
+      })
+      .returning({ id: Aceras.id });
 
     revalidatePath(`/edificios/${data.codigoEdificio}`);
     return { success: true, data: acera };
@@ -32,14 +35,17 @@ export async function createAceras(data: ComponentData) {
 
 export async function createZonasVerdes(data: ComponentData) {
   try {
-    const zonaVerde = await db.insert(ZonasVerdes).values({
-      codigoEdificio: data.codigoEdificio,
-      nombre: `Zona Verde de ${data.codigoEdificio}`,
-      m2Construccion: data.m2Construccion,
-      valorDolarPorM2: data.valorDolarPorM2,
-      vidaUtilHacienda: data.vidaUtilHacienda,
-      vidaUtilExperto: data.vidaUtilExperto,
-    });
+    const [zonaVerde] = await db
+      .insert(ZonasVerdes)
+      .values({
+        codigoEdificio: data.codigoEdificio,
+        nombre: `Zona Verde de ${data.codigoEdificio}`,
+        m2Construccion: data.m2Construccion,
+        valorDolarPorM2: data.valorDolarPorM2,
+        vidaUtilHacienda: data.vidaUtilHacienda,
+        vidaUtilExperto: data.vidaUtilExperto,
+      })
+      .returning({ id: ZonasVerdes.id });
 
     revalidatePath(`/edificios/${data.codigoEdificio}`);
     return { success: true, data: zonaVerde };
@@ -51,12 +57,15 @@ export async function createZonasVerdes(data: ComponentData) {
 
 export async function createTerrenos(data: ComponentData) {
   try {
-    const terreno = await db.insert(Terrenos).values({
-      codigoEdificio: data.codigoEdificio,
-      nombre: `Terreno de ${data.codigoEdificio}`,
-      m2Construccion: data.m2Construccion,
-      valorDolarPorM2: data.valorDolarPorM2,
-    });
+    const [terreno] = await db
+      .insert(Terrenos)
+      .values({
+        codigoEdificio: data.codigoEdificio,
+        nombre: `Terreno de ${data.codigoEdificio}`,
+        m2Construccion: data.m2Construccion,
+        valorDolarPorM2: data.valorDolarPorM2,
+      })
+      .returning({ id: Terrenos.id });
 
     revalidatePath(`/edificios/${data.codigoEdificio}`);
     return { success: true, data: terreno };
@@ -64,6 +73,14 @@ export async function createTerrenos(data: ComponentData) {
     console.error("Error al crear terreno:", error);
     return { success: false, error: "Error al crear terreno" };
   }
+}
+
+interface ComponentResult {
+  aceras: { id: number } | null;
+  zonasVerdes: { id: number } | null;
+  terrenos: { id: number } | null;
+  success: boolean;
+  error?: string;
 }
 
 export async function createComponents(
@@ -78,10 +95,10 @@ export async function createComponents(
     terrenos?: Omit<ComponentData, "codigoEdificio">;
   },
 ) {
-  const results = {
-    aceras: null as any,
-    zonasVerdes: null as any,
-    terrenos: null as any,
+  const results: ComponentResult = {
+    aceras: null,
+    zonasVerdes: null,
+    terrenos: null,
     success: true,
   };
 
@@ -94,7 +111,7 @@ export async function createComponents(
       if (!acerasResult.success) {
         throw new Error("Error creating aceras");
       }
-      results.aceras = acerasResult.data;
+      results.aceras = acerasResult.data ?? null;
     }
 
     if (zonasVerdes) {
@@ -105,7 +122,7 @@ export async function createComponents(
       if (!zonasVerdesResult.success) {
         throw new Error("Error creating zonas verdes");
       }
-      results.zonasVerdes = zonasVerdesResult.data;
+      results.zonasVerdes = zonasVerdesResult.data ?? null;
     }
 
     if (terrenos) {
@@ -116,7 +133,7 @@ export async function createComponents(
       if (!terrenosResult.success) {
         throw new Error("Error creating terrenos");
       }
-      results.terrenos = terrenosResult.data;
+      results.terrenos = terrenosResult.data ?? null;
     }
 
     return results;

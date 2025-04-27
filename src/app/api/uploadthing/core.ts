@@ -1,5 +1,4 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "~/server/db";
 import { images } from "~/server/db/schema";
@@ -24,7 +23,7 @@ export const ourFileRouter = {
       const user = await auth();
 
       if (!user.userId) {
-        throw new UploadThingError("Unauthorized");
+        throw new Error("Unauthorized");
       }
 
       return {
@@ -49,7 +48,7 @@ export const ourFileRouter = {
         return { success: true };
       } catch (error) {
         console.error("Failed to insert image:", error);
-        throw new UploadThingError("Database insertion failed");
+        throw new Error("Database insertion failed");
       }
     }),
 } satisfies FileRouter;
