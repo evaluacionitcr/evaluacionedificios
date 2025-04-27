@@ -104,12 +104,7 @@ interface TerrenoDetalle {
   m2Construccion: number | null;
   valorDolarPorM2: string | null;
   valorColonPorM2: string | null;
-  edad: number | null;
-  vidaUtilHacienda: number | null;
-  vidaUtilExperto: number | null;
-  valorReposicion: string | null;
-  depreciacionLinealAnual: string | null;
-  valorActualRevaluado: string | null;
+  valorPorcionTerreno: string | null;
   anoDeRevaluacion: number | null;
   usoActual: string | null;
 }
@@ -695,23 +690,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                                   ₡{terreno.valorColonPorM2 ?? "0.00"}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{terreno.valorReposicion ?? "0.00"}
-                                </TableCell>
-                                <TableCell>
-                                  ₡{terreno.valorActualRevaluado ?? "0.00"}
-                                </TableCell>
-                                <TableCell>
-                                  ₡{terreno.depreciacionLinealAnual ?? "0.00"}
-                                </TableCell>
-                                <TableCell>
-                                  {terreno.anoDeRevaluacion ?? "N/A"}
-                                </TableCell>
-                                <TableCell>{terreno.edad ?? 0} años</TableCell>
-                                <TableCell>
-                                  {terreno.vidaUtilHacienda ?? 0} años
-                                </TableCell>
-                                <TableCell>
-                                  {terreno.vidaUtilExperto ?? 0} años
+                                  ₡{terreno.valorPorcionTerreno ?? "0.00"}
                                 </TableCell>
                                 <TableCell>
                                   {terreno.esRenovacion ? "Sí" : "No"}
