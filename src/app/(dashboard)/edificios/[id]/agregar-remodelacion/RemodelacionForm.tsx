@@ -29,6 +29,15 @@ interface ValidationErrors {
   anioRevaluacion?: string;
 }
 
+interface EdificioResponse {
+  success: boolean;
+  data: Array<{
+    codigoEdificio: string;
+    sedeId: number | null;
+    nombre: string;
+  }>;
+}
+
 interface RemodelacionFormProps {
   buildingId: string;
 }
@@ -78,16 +87,13 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
         if (!edificioResponse.ok) {
           throw new Error("No se pudo cargar los datos del edificio");
         }
-        const edificioData = await edificioResponse.json();
+        const edificioData =
+          (await edificioResponse.json()) as EdificioResponse;
 
         console.log("API Response:", edificioData); // Debug log
 
-        if (
-          edificioData.success &&
-          edificioData.data &&
-          edificioData.data.length > 0
-        ) {
-          const edificio = edificioData.data[0];
+        const edificio = edificioData.data?.[0];
+        if (edificioData.success && edificio) {
           setEdificioOriginal({
             codigoEdificio: edificio.codigoEdificio,
             sede: edificio.sedeId ?? null,
