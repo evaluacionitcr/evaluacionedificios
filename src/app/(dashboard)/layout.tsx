@@ -17,24 +17,24 @@ export default function DashboardLayout({
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Actualizar la pestaña activa basada en la ruta actual
-  if (pathname !== null) {
-    useEffect(() => {
-      if (pathname === "/") {
-        setActiveTab("dashboard");
-      } else if (pathname.startsWith("/edificios")) {
-        setActiveTab("edificios");
-      } else if (pathname.startsWith("/evaluaciones")) {
-        setActiveTab("evaluaciones");
-      } else if (pathname.startsWith("/reportes")) {
-        setActiveTab("reportes");
-      } else if (pathname.startsWith("/admin/usuarios")) {
-        setActiveTab("usuarios");
-      } else if (pathname.startsWith("/parametros")) {
-        setActiveTab("parametros");
-      }
-    }, [pathname]);
-  }
+  // Move the effect outside of the conditional
+  useEffect(() => {
+    if (pathname === null) return;
+
+    if (pathname === "/") {
+      setActiveTab("dashboard");
+    } else if (pathname.startsWith("/edificios")) {
+      setActiveTab("edificios");
+    } else if (pathname.startsWith("/evaluaciones")) {
+      setActiveTab("evaluaciones");
+    } else if (pathname.startsWith("/reportes")) {
+      setActiveTab("reportes");
+    } else if (pathname.startsWith("/admin/usuarios")) {
+      setActiveTab("usuarios");
+    } else if (pathname.startsWith("/parametros")) {
+      setActiveTab("parametros");
+    }
+  }, [pathname]);
 
   // Manejar el estado del sidebar basado en el tamaño de la pantalla
   useEffect(() => {
