@@ -5,12 +5,12 @@ import { eq, ilike } from "drizzle-orm";
 
 export async function GET(
   request: Request,
-  { params }: { params: { codigoEdificio: string } },
+  { params }: { params: Promise<{ codigoEdificio: string }> },
 ) {
   try {
     // Await the params object before accessing properties
-    const paramsData = await params;
-    const { codigoEdificio } = paramsData;
+    
+    const { codigoEdificio } = await params;
 
     if (!codigoEdificio) {
       return NextResponse.json(
