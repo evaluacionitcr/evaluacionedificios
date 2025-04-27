@@ -3,26 +3,21 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ComponentesTabs from "~/components/edificios/componentes-tabs";
-import { DatosFijos } from "~/utils/consts";
+import type { DatosFijos } from "~/utils/consts";
 
 export default function ComponentesPage() {
   const params = useParams();
-  const [datosFijos, setDatosFijos] = useState<DatosFijos | undefined>(undefined);
+  const [datosFijos, setDatosFijos] = useState<DatosFijos | undefined>(
+    undefined,
+  );
 
-  if (!params) {
-    return <div>Error: Parámetros no disponibles</div>;
-  }
-
-  const id = params.id;
-  if (!id) {
-    return <div>Error: No se encontró el ID del edificio</div>;
-  }
-
-  // Cargar usos actuales y establecer valores por defecto
   useEffect(() => {
+    const id = params?.id;
+    if (!id) return;
+
     const fetchUsosActuales = async () => {
       try {
-        const response = await fetch(`/api/datosEdificio/${id}`);
+        const response = await fetch(`/api/datosEdificio/${id.toString()}`);
         const data = (await response.json()) as DatosFijos;
         if (response.ok) {
           setDatosFijos(data);
@@ -35,9 +30,17 @@ export default function ComponentesPage() {
     };
 
     void fetchUsosActuales();
+  }, [params?.id]);
 
-    // Establecer valores por defecto de la construcción
-  }, [id]);
+  if (!params) {
+    return <div>Error: Parámetros no disponibles</div>;
+  }
+
+  const id = params.id;
+  if (!id) {
+    return <div>Error: No se encontró el ID del edificio</div>;
+  }
+
   return (
     <div className="space-y-6">
       <ComponentesTabs codigoEdificio={id.toString()} datosFijos={datosFijos} />
