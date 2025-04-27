@@ -382,7 +382,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     return <div>Cargando datos del edificio...</div>;
   }
 
-  if (error || edificios.length === 0) {
+  if (edificios.length === 0) {
     return (
       <div>
         <p className="text-red-500">
