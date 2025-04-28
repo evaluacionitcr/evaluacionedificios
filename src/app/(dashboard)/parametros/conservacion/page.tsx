@@ -12,8 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { getEstadoConservacion, createEstadoConservacion, updateEstadoConservacion } from "./actions";
-import { get } from "http";
+import { getEstadoConservacion, createEstadoConservacion, updateEstadoConservacion, deleteEstadoConservacion } from "./actions";
 
 interface EstadoConservacion {
   id: number;
@@ -71,6 +70,25 @@ export default function Page() {
         console.error("Error al actualizar el estado de conservación:", error);
     });
     };
+
+
+    const handleDeleteClick = (id: number) => {
+        deleteEstadoConservacion(id)
+        .then((response) => {
+            if (response.success) {
+                console.log("Estado de conservación eliminado");
+                setTableData((prevData) => prevData.filter((row) => row.id !== id));
+            } else {
+                console.error("Error al eliminar el estado de conservación:", response.error);
+            }
+        })
+        .catch((error) => {
+            console.error("Error al eliminar el estado de conservación:", error);
+        });
+    };
+
+
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -249,10 +267,7 @@ export default function Page() {
                           <Button
                             className="rounded bg-red-500 px-4 py-2 text-white"
                             onClick={() => {
-                              const updatedData = tableData.filter(
-                                (_, i) => i !== index
-                              );
-                              setTableData(updatedData);
+                              handleDeleteClick(row.id); // Función para eliminar el estado de conservación
                             }}
                           >
                             Eliminar

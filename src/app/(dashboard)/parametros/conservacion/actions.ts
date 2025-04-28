@@ -61,3 +61,19 @@ export async function updateEstadoConservacion(data: {
         return { success: false, error: "No se pudo actualizar el estado de conservación" };
     }
 }
+
+export async function deleteEstadoConservacion(id: number) {
+    try {
+        const deletedEstadoConservacion = await db
+            .delete(EstadosConservacion)
+            .where(sql`${EstadosConservacion.id} = ${id}`)
+            .returning();
+
+        revalidatePath("/parametros/conservacion");
+
+        return { success: true, data: deletedEstadoConservacion };
+    } catch (error) {
+        console.error("Error al eliminar el estado de conservación:", error);
+        return { success: false, error: "No se pudo eliminar el estado de conservación" };
+    }
+}

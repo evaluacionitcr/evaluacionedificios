@@ -302,5 +302,17 @@ export const Funcionalidades = createTable("funcionalidades", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const Normativas = createTable("normativa", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  Estado: varchar("estado", { length: 256 }).notNull(),
+  Puntuacion: decimal("puntuacion", {
+    precision: 5,
+    scale: 2,
+  }).notNull(),
+  Descripcion: varchar("descripcion", { length: 256 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export type Evaluation = typeof Evaluaciones.$inferSelect;
 export type NewEvaluation = typeof Evaluaciones.$inferInsert;
