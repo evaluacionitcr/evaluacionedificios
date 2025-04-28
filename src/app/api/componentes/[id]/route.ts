@@ -1,36 +1,42 @@
 import { db } from "~/server/db";
 import { NextResponse } from "next/server";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { Aceras, Terrenos, ZonasVerdes } from "~/server/db/schema";
 import { type NextRequest } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
-    // Usar el parámetro directamente en las consultas como string
+    const url = new URL(request.url);
+    const id = url.pathname.split("/").pop(); // extraemos el id de la URL
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "No se proporcionó id" },
+        { status: 400 }
+      );
+    }
+
     const [aceras, terrenos, zonasVerdes] = await Promise.all([
       db.select()
         .from(Aceras)
-        .where(eq(Aceras.codigoEdificio, context.params.id))
+        .where(eq(Aceras.codigoEdificio, id))
         .orderBy(desc(Aceras.createdAt))
         .limit(1),
 
       db.select()
         .from(Terrenos)
-        .where(eq(Terrenos.codigoEdificio, context.params.id))
+        .where(eq(Terrenos.codigoEdificio, id))
         .orderBy(desc(Terrenos.createdAt))
         .limit(1),
 
       db.select()
         .from(ZonasVerdes)
-        .where(eq(ZonasVerdes.codigoEdificio, context.params.id))
+        .where(eq(ZonasVerdes.codigoEdificio, id))
         .orderBy(desc(ZonasVerdes.createdAt))
         .limit(1)
     ]);
 
-    console.log('Búsqueda por código:', context.params.id);
+    console.log('Búsqueda por código:', id);
     console.log('Componentes encontrados:', { aceras, terrenos, zonasVerdes });
 
     const existingComponents = {

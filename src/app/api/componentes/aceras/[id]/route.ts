@@ -3,11 +3,18 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { Aceras } from "~/server/db/schema";
 
-export async function PUT(
-  request: Request,
-  context: { params: { id: string } }
-) {
+export async function PUT(request: Request) {
   try {
+    const url = new URL(request.url);
+    const id = url.pathname.split("/").pop(); // extraemos el id de la URL
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "No se proporcionó id" },
+        { status: 400 }
+      );
+    }
+
     const data = await request.json();
     const result = await db
       .update(Aceras)
@@ -15,7 +22,7 @@ export async function PUT(
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(Aceras.id, parseInt(context.params.id)))
+      .where(eq(Aceras.id, parseInt(id)))
       .returning();
 
     if (!result.length) {
