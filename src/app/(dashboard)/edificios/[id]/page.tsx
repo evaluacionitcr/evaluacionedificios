@@ -26,6 +26,7 @@ import {
   Trash2,
   ChevronDown,
   ChevronUp,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -422,6 +423,16 @@ export default function BuildingPage({ params }: BuildingPageProps) {
           <h1 className="text-2xl font-bold text-primary">{edificio.nombre}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link href={`/edificios/${id}/editar`}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-primary text-white hover:bg-primary/90"
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              Editar Edificio
+            </Button>
+          </Link>
           <Link href={`/edificios/${id}/componentes`}>
             <Button
               variant="outline"
@@ -769,8 +780,6 @@ export default function BuildingPage({ params }: BuildingPageProps) {
               disabled={isDeletingEdificio}
               className="bg-red-600 hover:bg-red-700"
             >
-
-
               {isDeletingEdificio ? "Eliminando..." : "Eliminar Edificio"}
             </AlertDialogAction>
           </AlertDialogFooter>

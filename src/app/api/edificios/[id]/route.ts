@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDetallesEdificio } from "~/server/actions/edificios";
+import { db } from "~/server/db";
+import { Construcciones } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
@@ -43,6 +46,50 @@ export async function GET(
     console.error("Error al obtener detalles del edificio:", error);
     return NextResponse.json(
       { success: false, error: "Error al obtener detalles del edificio" },
+      { status: 500 }
+    );
+  }
+} 
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const data = await request.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "ID no proporcionado" },
+        { status: 400 }
+      );
+    }
+
+    const edificio = await db
+      .update(Construcciones)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(Construcciones.codigoEdificio, id))
+      .returning();
+
+    if (!edificio || edificio.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "No se encontró el edificio" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: edificio[0],
+    });
+  } catch (error) {
+    console.error("Error al actualizar el edificio:", error);
+    return NextResponse.json(
+      { success: false, error: "Error al actualizar el edificio" },
       { status: 500 }
     );
   }

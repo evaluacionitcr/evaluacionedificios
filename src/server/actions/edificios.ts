@@ -107,12 +107,26 @@ export async function getDetallesEdificio(
   codigoEdificio: string,
 ): Promise<DetallesEdificio[]> {
   try {
-    if (!codigoEdificio) {
-      console.log("codigoEdificio es nulo o vacío");
-      return [];
+    if (!codigoEdificio?.trim()) {
+      throw new Error("El código del edificio es requerido");
     }
 
     console.log("Buscando edificio con código:", codigoEdificio);
+
+    // Primero, obtenemos los IDs más recientes para este código de edificio
+    const idsRecientes = await db
+      .select({
+        id: Construcciones.id,
+      })
+      .from(Construcciones)
+      .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
+      .orderBy(sql`${Construcciones.id} DESC`)
+      .limit(1);
+
+    if (idsRecientes.length === 0) {
+      console.log("No se encontraron registros para el código:", codigoEdificio);
+      return [];
+    }
 
     const edificios = await db
       .select({
@@ -123,6 +137,7 @@ export async function getDetallesEdificio(
         esRenovacion: Construcciones.esRenovacion,
         nombre: Construcciones.nombre,
         fechaConstruccion: Construcciones.fechaConstruccion,
+        noFinca: Construcciones.noFinca,
         numeroFinca: NumeroFincas.numero,
         m2Construccion: Construcciones.m2Construccion,
         valorDolarPorM2: Construcciones.valorDolarPorM2,
@@ -140,14 +155,14 @@ export async function getDetallesEdificio(
       .leftJoin(Sedes, eq(Construcciones.sede, Sedes.id))
       .leftJoin(NumeroFincas, eq(Construcciones.noFinca, NumeroFincas.id))
       .leftJoin(UsosActuales, eq(Construcciones.usoActual, UsosActuales.id))
-      .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
-      .orderBy(Construcciones.id);
+      .where(eq(Construcciones.id, idsRecientes[0].id));
 
     console.log("Resultados encontrados:", edificios.length);
+    console.log("Datos del edificio:", edificios[0]);
     return edificios;
   } catch (error) {
     console.error("Error obteniendo detalles del edificio:", error);
-    return [];
+    throw error;
   }
 }
 

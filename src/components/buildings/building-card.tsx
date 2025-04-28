@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import Link from "next/link";
+import { Eye } from "lucide-react";
 
 interface BuildingCardProps {
   building: {
@@ -33,6 +34,7 @@ export default function BuildingCard({ building }: BuildingCardProps) {
       <CardFooter>
         <Link href={`/edificios/${buildingId}`} className="w-full">
           <Button variant="outline" className="w-full">
+            <Eye className="mr-2 h-4 w-4" />
             Ver Detalles
           </Button>
         </Link>
