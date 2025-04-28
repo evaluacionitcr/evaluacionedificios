@@ -3,12 +3,12 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { Aceras } from "~/server/db/schema";
 
-export async function PUT(request: Request) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const url = new URL(request.url);
-    const id = url.pathname.split("/").pop(); // extraemos el id de la URL
-
-    if (!id) {
+    if (!params.id) {
       return NextResponse.json(
         { error: "No se proporcionó id" },
         { status: 400 }
@@ -22,7 +22,7 @@ export async function PUT(request: Request) {
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(Aceras.id, parseInt(id)))
+      .where(eq(Aceras.id, parseInt(params.id)))
       .returning();
 
     if (!result.length) {
