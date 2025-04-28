@@ -7,29 +7,47 @@ import type { DatosFijos } from "~/utils/consts";
 
 export default function ComponentesPage() {
   const params = useParams();
-  const [datosFijos, setDatosFijos] = useState<DatosFijos | undefined>(
-    undefined,
-  );
+  const [datosFijos, setDatosFijos] = useState<DatosFijos | undefined>(undefined);
+  const [componentesExistentes, setComponentesExistentes] = useState({
+    aceras: null,
+    terrenos: null,
+    zonasVerdes: null,
+  });
 
   useEffect(() => {
     const id = params?.id;
     if (!id) return;
 
-    const fetchUsosActuales = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`/api/datosEdificio/${id.toString()}`);
-        const data = (await response.json()) as DatosFijos;
-        if (response.ok) {
-          setDatosFijos(data);
-        } else {
-          console.error("Error al cargar datos fijos:", data);
+        const [datosResponse, componentesResponse] = await Promise.all([
+          fetch(`/api/datosEdificio/${id.toString()}`),
+          fetch(`/api/componentes/${id.toString()}`),
+        ]);
+
+        const datos = await datosResponse.json();
+        const componentes = await componentesResponse.json();
+
+        console.log("Datos del edificio:", datos);
+        console.log("Componentes encontrados:", componentes);
+
+        if (datosResponse.ok) {
+          setDatosFijos(datos);
+        }
+
+        if (componentesResponse.ok) {
+          setComponentesExistentes({
+            aceras: componentes.aceras || null,
+            terrenos: componentes.terrenos || null,
+            zonasVerdes: componentes.zonasVerdes || null,
+          });
         }
       } catch (error) {
-        console.error("Error al cargar usos actuales:", error);
+        console.error("Error al cargar datos:", error);
       }
     };
 
-    void fetchUsosActuales();
+    void fetchData();
   }, [params?.id]);
 
   if (!params) {
@@ -43,7 +61,11 @@ export default function ComponentesPage() {
 
   return (
     <div className="space-y-6">
-      <ComponentesTabs codigoEdificio={id.toString()} datosFijos={datosFijos} />
+      <ComponentesTabs 
+        codigoEdificio={id.toString()} 
+        datosFijos={datosFijos} 
+        componentesExistentes={componentesExistentes}
+      />
     </div>
   );
 }

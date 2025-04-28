@@ -6,16 +6,14 @@ import { toast } from "sonner";
 
 interface FormularioZonasVerdesProps {
   codigoEdificio: string;
-  construccionData?: {
-    usoActual: number | null;
-    numeroFinca: string | null;
-  };
   datosFijos?: DatosFijos;
+  datosExistentes?: any; // Agregar prop
 }
 
 export default function FormularioZonasVerdes({
   codigoEdificio,
   datosFijos,
+  datosExistentes,
 }: FormularioZonasVerdesProps) {
   const [nombre] = useState(""); // Removed unused setNombre
   const [m2Construccion, setM2Construccion] = useState("");
@@ -37,6 +35,19 @@ export default function FormularioZonasVerdes({
     if (!anio) return;
     setEdad(!isNaN(anio) && !isNaN(anioBase) ? anioBase - anio : 0);
   }, [datosFijos?.fechaConstruccion, anioCalculoEdad]);
+
+  // Añadir efecto para cargar datos existentes
+  useEffect(() => {
+    if (datosExistentes) {
+      setM2Construccion(datosExistentes.m2Construccion?.toString() ?? "");
+      setValorDolarM2(datosExistentes.valorDolarPorM2?.toString() ?? "");
+      setValorColonM2(datosExistentes.valorColonPorM2?.toString() ?? "");
+      setVidaUtilHacienda(datosExistentes.vidaUtilHacienda?.toString() ?? "");
+      setVidaUtilExperto(datosExistentes.vidaUtilExperto?.toString() ?? "");
+      setAnoRevaluacion(datosExistentes.anoDeRevaluacion?.toString() ?? "");
+      setTipoCambio(""); // Esto no se guarda, hay que ingresarlo de nuevo
+    }
+  }, [datosExistentes]);
 
   const calcularValorColon = (valorDolar: string, cambio: string) => {
     const dolar = parseFloat(valorDolar.replace(/\./g, "").replace(",", "."));
@@ -110,24 +121,32 @@ export default function FormularioZonasVerdes({
     };
 
     try {
-      const result = await createZonasVerdes(data);
-      if (result.success) {
-        toast.success("Zona verde guardada exitosamente", {
-          description: "Los datos de la zona verde se han guardado correctamente.",
+      let result;
+      if (datosExistentes) {
+        // Si existen datos, actualizar
+        result = await fetch(`/api/componentes/zonas-verdes/${datosExistentes.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
         });
-        // Mostrar mensaje de éxito
-        console.log("Zona verde guardada exitosamente");
-        // Aquí podrías agregar una notificación de éxito
+        const jsonResult = await result.json();
+        if (jsonResult.success) {
+          toast.success("Zona verde actualizada exitosamente");
+        } else {
+          toast.error("Error al actualizar zona verde");
+        }
       } else {
-        toast.error("Error al guardar la zona verde", {
-          description: "Ocurrió un error al guardar los datos de la zona verde.",
-        });
-        console.error("Error al guardar:", result.error);
-        // Aquí podrías agregar una notificación de error
+        // Si no existen datos, crear
+        result = await createZonasVerdes(data);
+        if (result.success) {
+          toast.success("Zona verde guardada exitosamente");
+        } else {
+          toast.error("Error al guardar zona verde");
+        }
       }
     } catch (error) {
-      console.error("Error al guardar:", error);
-      // Aquí podrías agregar una notificación de error
+      console.error("Error:", error);
+      toast.error("Error inesperado");
     }
   };
 

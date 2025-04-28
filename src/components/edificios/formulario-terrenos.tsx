@@ -6,16 +6,14 @@ import { toast } from "sonner";
 
 interface FormularioTerrenosProps {
   codigoEdificio: string;
-  construccionData?: {
-    usoActual: number | null;
-    numeroFinca: string | null;
-  };
   datosFijos?: DatosFijos;
+  datosExistentes?: any; // Agregar prop
 }
 
 export default function FormularioTerrenos({
   codigoEdificio,
   datosFijos,
+  datosExistentes,
 }: FormularioTerrenosProps) {
   const [nombre] = useState("");
   const [m2Construccion, setM2Construccion] = useState("");
@@ -34,6 +32,18 @@ export default function FormularioTerrenos({
     if (!anio) return;
     setEdad(!isNaN(anio) && !isNaN(anioBase) ? anioBase - anio : 0);
   }, [datosFijos?.fechaConstruccion, anioCalculoEdad]);
+
+  // Añadir efecto para cargar datos existentes
+  useEffect(() => {
+    if (datosExistentes) {
+      setM2Construccion(datosExistentes.m2Construccion?.toString() ?? "");
+      setValorDolarM2(datosExistentes.valorDolarPorM2?.toString() ?? "");
+      setValorColonM2(datosExistentes.valorColonPorM2?.toString() ?? "");
+      setValorTerreno(datosExistentes.valorPorcionTerreno?.toString() ?? "");
+      setAnoRevaluacion(datosExistentes.anoDeRevaluacion?.toString() ?? "");
+      setTipoCambio(""); // Esto no se guarda, hay que ingresarlo de nuevo
+    }
+  }, [datosExistentes]);
 
   const calcularValorColon = (valorDolar: string, cambio: string) => {
     const dolar = parseFloat(valorDolar.replace(/\./g, "").replace(",", "."));
@@ -71,24 +81,32 @@ export default function FormularioTerrenos({
     };
 
     try {
-      const result = await createTerrenos(data);
-      if (result.success) {
-        // Mostrar mensaje de éxito
-        toast.success("Terreno guardado exitosamente", {
-          description: "Los datos de terreno se han guardado correctamente, continue con el resto.",
+      let result;
+      if (datosExistentes) {
+        // Si existen datos, actualizar
+        result = await fetch(`/api/componentes/terrenos/${datosExistentes.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
         });
-        console.log("Terreno guardado exitosamente");
-        // Aquí podrías agregar una notificación de éxito
+        const jsonResult = await result.json();
+        if (jsonResult.success) {
+          toast.success("Terreno actualizado exitosamente");
+        } else {
+          toast.error("Error al actualizar terreno");
+        }
       } else {
-        toast.error("Error al guardar terreno", {
-          description: "Hubo un error al guardar los datos del terreno.",
-        });
-        console.error("Error al guardar:", result.error);
-        // Aquí podrías agregar una notificación de error
+        // Si no existen datos, crear
+        result = await createTerrenos(data);
+        if (result.success) {
+          toast.success("Terreno guardado exitosamente");
+        } else {
+          toast.error("Error al guardar terreno");
+        }
       }
     } catch (error) {
-      console.error("Error al guardar:", error);
-      // Aquí podrías agregar una notificación de error
+      console.error("Error:", error);
+      toast.error("Error inesperado");
     }
   };
 

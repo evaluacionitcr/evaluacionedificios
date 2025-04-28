@@ -6,16 +6,14 @@ import { toast } from "sonner";
 
 interface FormularioAcerasProps {
   codigoEdificio: string;
-  construccionData?: {
-    usoActual: number | null;
-    numeroFinca: string | null;
-  };
   datosFijos?: DatosFijos;
+  datosExistentes?: any;
 }
 
 export default function FormularioAceras({
   codigoEdificio,
   datosFijos,
+  datosExistentes,
 }: FormularioAcerasProps) {
   const [nombre, setNombre] = useState("");
   const [m2Construccion, setM2Construccion] = useState("");
@@ -30,6 +28,19 @@ export default function FormularioAceras({
   const [anoRevaluacion, setAnoRevaluacion] = useState("");
   const [tipoCambio, setTipoCambio] = useState("");
   const [anioCalculoEdad, setAnioCalculoEdad] = useState("");
+
+  // Cargar datos existentes
+  useEffect(() => {
+    if (datosExistentes) {
+      setM2Construccion(datosExistentes.m2Construccion?.toString() ?? "");
+      setValorDolarM2(datosExistentes.valorDolarPorM2?.toString() ?? "");
+      setValorColonM2(datosExistentes.valorColonPorM2?.toString() ?? "");
+      setVidaUtilHacienda(datosExistentes.vidaUtilHacienda?.toString() ?? "");
+      setVidaUtilExperto(datosExistentes.vidaUtilExperto?.toString() ?? "");
+      setAnoRevaluacion(datosExistentes.anoDeRevaluacion?.toString() ?? "");
+      // ...set other fields...
+    }
+  }, [datosExistentes]);
 
   // Cálculo: Edad
   useEffect(() => {
@@ -115,24 +126,32 @@ export default function FormularioAceras({
     };
 
     try {
-      const result = await createAceras(data);
-      if (result.success) {
-        // Mostrar mensaje de éxito
-        toast.success("Acera guardada exitosamente", {
-          description: "Los datos de acera se han guardado correctamente, continue con el resto.",
+      let result;
+      if (datosExistentes) {
+        // Si existen datos, actualizar
+        const response = await fetch(`/api/componentes/aceras/${datosExistentes.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
         });
-        console.log("Acera guardada exitosamente");
-        // Aquí podrías agregar una notificación de éxito
+        const jsonResult = await response.json();
+        if (jsonResult.success) {
+          toast.success("Acera actualizada exitosamente");
+        } else {
+          toast.error("Error al actualizar acera");
+        }
       } else {
-        toast.error("Error al guardar acera", {
-          description: "Hubo un error al guardar los datos de la acera.",
-        });
-        console.error("Error al guardar:", result.error);
-        // Aquí podrías agregar una notificación de error
+        // Si no existen datos, crear
+        result = await createAceras(data);
+        if (result.success) {
+          toast.success("Acera guardada exitosamente");
+        } else {
+          toast.error("Error al guardar acera");
+        }
       }
     } catch (error) {
-      console.error("Error al guardar:", error);
-      // Aquí podrías agregar una notificación de error
+      console.error("Error:", error);
+      toast.error("Error inesperado");
     }
   };
 

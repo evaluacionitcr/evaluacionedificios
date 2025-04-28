@@ -2,6 +2,7 @@
 import { db } from "~/server/db";
 import { Aceras, ZonasVerdes, Terrenos } from "../db/schema";
 import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
 
 export interface ComponentData {
   idConstruccion?: number | null;
@@ -23,94 +24,100 @@ export interface ComponentData {
   valorPorcionTerreno?: number;
 }
 
-export async function createAceras(data: ComponentData) {
-  try {
-    const [acera] = await db
-      .insert(Aceras)
-      .values({
-        idConstruccion: data.idConstruccion,
-        codigoEdificio: data.codigoEdificio,
-        fechaConstruccion: data.fechaConstruccion,
-        nombre: data.nombre,
-        m2Construccion: data.m2Construccion,
-        valorDolarPorM2: data.valorDolarPorM2.toString(),
-        valorColonPorM2: data.valorColonPorM2?.toString(),
-        edadAl2021: data.edad,
-        vidaUtilHacienda: data.vidaUtilHacienda,
-        vidaUtilExperto: data.vidaUtilExperto,
-        valorReposicion: data.valorReposicion?.toString(),
-        depreciacionLinealAnual: data.depreciacionLinealAnual?.toString(),
-        valorActualRevaluado: data.valorActualRevaluado?.toString(),
-        anoDeRevaluacion: data.anoDeRevaluacion,
-        noFinca: data.noFinca,
-        usoActual: data.usoActual,
-      })
-      .returning({ id: Aceras.id });
+// Función auxiliar para verificar componente existente
+async function checkExistingComponent(codigoEdificio: string, table: any) {
+  return await db
+    .select()
+    .from(table)
+    .where(eq(table.codigoEdificio, codigoEdificio))
+    .execute();
+}
 
-    revalidatePath(`/edificios/${data.codigoEdificio}`);
-    return { success: true, data: acera };
+export async function createAceras(data: any) {
+  try {
+    // Verificar si ya existe una acera para este edificio
+    const existing = await checkExistingComponent(data.codigoEdificio, Aceras);
+    
+    if (existing.length > 0) {
+      // Si existe, actualizar en lugar de crear
+      const result = await db
+        .update(Aceras)
+        .set({
+          ...data,
+          updatedAt: new Date(),
+        })
+        .where(eq(Aceras.codigoEdificio, data.codigoEdificio))
+        .returning();
+      return { success: true, data: result[0] };
+    }
+
+    // Si no existe, crear nuevo
+    const result = await db.insert(Aceras).values({
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
+    return { success: true, data: result[0] };
   } catch (error) {
-    console.error("Error al crear acera:", error);
-    return { success: false, error: "Error al crear acera" };
+    console.error("Error en createAceras:", error);
+    return { success: false, error: "Error al crear/actualizar acera" };
   }
 }
 
-export async function createZonasVerdes(data: ComponentData) {
+// Aplicar la misma lógica para terrenos y zonas verdes
+export async function createTerrenos(data: any) {
   try {
-    const [zonaVerde] = await db
-      .insert(ZonasVerdes)
-      .values({
-        idConstruccion: data.idConstruccion,
-        fechaConstruccion: data.fechaConstruccion,
-        codigoEdificio: data.codigoEdificio,
-        nombre: data.nombre,
-        m2Construccion: data.m2Construccion,
-        valorDolarPorM2: data.valorDolarPorM2.toString(),
-        valorColonPorM2: data.valorColonPorM2?.toString(),
-        edadAl2021: data.edad,
-        vidaUtilHacienda: data.vidaUtilHacienda,
-        vidaUtilExperto: data.vidaUtilExperto,
-        valorReposicion: data.valorReposicion?.toString(),
-        depreciacionLinealAnual: data.depreciacionLinealAnual?.toString(),
-        valorActualRevaluado: data.valorActualRevaluado?.toString(),
-        anoDeRevaluacion: data.anoDeRevaluacion,
-        noFinca: data.noFinca,
-        usoActual: data.usoActual,
-      })
-      .returning({ id: ZonasVerdes.id });
+    const existing = await checkExistingComponent(data.codigoEdificio, Terrenos);
+    
+    if (existing.length > 0) {
+      const result = await db
+        .update(Terrenos)
+        .set({
+          ...data,
+          updatedAt: new Date(),
+        })
+        .where(eq(Terrenos.codigoEdificio, data.codigoEdificio))
+        .returning();
+      return { success: true, data: result[0] };
+    }
 
-    revalidatePath(`/edificios/${data.codigoEdificio}`);
-    return { success: true, data: zonaVerde };
+    const result = await db.insert(Terrenos).values({
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
+    return { success: true, data: result[0] };
   } catch (error) {
-    console.error("Error al crear zona verde:", error);
-    return { success: false, error: "Error al crear zona verde" };
+    console.error("Error en createTerrenos:", error);
+    return { success: false, error: "Error al crear/actualizar terreno" };
   }
 }
 
-export async function createTerrenos(data: ComponentData) {
+export async function createZonasVerdes(data: any) {
   try {
-    const [terreno] = await db
-      .insert(Terrenos)
-      .values({
-        idConstruccion: data.idConstruccion,
-        fechaConstruccion: data.fechaConstruccion,
-        codigoEdificio: data.codigoEdificio,
-        nombre: data.nombre,
-        m2Construccion: data.m2Construccion,
-        valorDolarPorM2: data.valorDolarPorM2.toString(),
-        valorColonPorM2: data.valorColonPorM2?.toString(),
-        valorPorcionTerreno: data.valorPorcionTerreno?.toString(),
-        anoDeRevaluacion: data.anoDeRevaluacion,
-        noFinca: data.noFinca,
-        usoActual: data.usoActual,
-      })
-      .returning({ id: Terrenos.id });
+    const existing = await checkExistingComponent(data.codigoEdificio, ZonasVerdes);
+    
+    if (existing.length > 0) {
+      const result = await db
+        .update(ZonasVerdes)
+        .set({
+          ...data,
+          updatedAt: new Date(),
+        })
+        .where(eq(ZonasVerdes.codigoEdificio, data.codigoEdificio))
+        .returning();
+      return { success: true, data: result[0] };
+    }
 
-    revalidatePath(`/edificios/${data.codigoEdificio}`);
-    return { success: true, data: terreno };
+    const result = await db.insert(ZonasVerdes).values({
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
+    return { success: true, data: result[0] };
   } catch (error) {
-    console.error("Error al crear terreno:", error);
-    return { success: false, error: "Error al crear terreno" };
+    console.error("Error en createZonasVerdes:", error);
+    return { success: false, error: "Error al crear/actualizar zona verde" };
   }
 }
 
