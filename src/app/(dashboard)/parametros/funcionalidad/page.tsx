@@ -218,7 +218,7 @@ export default function Page() {
                             className="w-full rounded border px-2 py-1"
                           />
                         ) : (
-                          `${row.puntuacion}%`
+                          `${row.puntuacion}`
                         )}
                       </TableCell>
 
