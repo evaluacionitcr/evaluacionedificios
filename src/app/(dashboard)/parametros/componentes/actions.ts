@@ -61,3 +61,19 @@ export async function updateComponente(data: {
     return { success: false, error: "No se pudo actualizar el componente" };
   }
 }
+
+export async function deleteComponente(id: number) {
+  try {
+    const deletedComponente = await db
+      .delete(Componentes)
+      .where(sql`${Componentes.id} = ${id}`)
+      .returning();
+
+    revalidatePath("/parametros/componentes");
+
+    return { success: true, data: deletedComponente };
+  } catch (error) {
+    console.error("Error al eliminar el componente:", error);
+    return { success: false, error: "No se pudo eliminar el componente" };
+  }
+}

@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { getComponentes, createComponente, updateComponente } from "./actions";
+import { getComponentes, createComponente, updateComponente, deleteComponente } from "./actions";
 
 interface Componente {
   id: number;
@@ -85,6 +85,21 @@ export default function Page() {
       })
       .catch((error) => {
         console.error("Error al actualizar componente:", error);
+      });
+  };
+
+  const handleDeleteClick = (id: number) => {
+    deleteComponente(id)
+      .then((response) => {
+        if (response.success) {
+          console.log("Componente eliminado exitosamente");
+          setTableData((prevData) => prevData.filter((row) => row.id !== id));
+        } else {
+          console.error("Error al eliminar componente");
+        }
+      })
+      .catch((error) => {
+        console.error("Error al eliminar componente:", error);
       });
   };
 
@@ -262,12 +277,7 @@ export default function Page() {
                           )}
                           <Button
                             className="rounded bg-red-500 px-4 py-2 text-white"
-                            onClick={() => {
-                              const updatedData = tableData.filter(
-                                (_, i) => i !== index,
-                              );
-                              setTableData(updatedData);
-                            }}
+                            onClick={() => handleDeleteClick(row.id)}
                           >
                             Eliminar
                           </Button>
