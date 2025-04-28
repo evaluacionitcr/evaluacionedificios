@@ -277,5 +277,30 @@ export const Componentes = createTable("components", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const EstadosConservacion = createTable("estado_conservacion", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  estado_conservacion: varchar("estado", { length: 256 }).notNull(),
+  condiciones_fisicas: varchar("condiciones", { length: 256 }).notNull(),
+  clasificacion: varchar("clasificacion", { length: 256 }).notNull(),
+  coef_depreciacion: decimal("coef_depreciacion", {
+    precision: 5,
+    scale: 2,
+  }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const Funcionalidades = createTable("funcionalidades", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  Estado: varchar("estado", { length: 256 }).notNull(),
+  Puntuacion: decimal("puntuacion", {
+    precision: 5,
+    scale: 2,
+  }).notNull(),
+  Descripcion: varchar("descripcion", { length: 256 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export type Evaluation = typeof Evaluaciones.$inferSelect;
 export type NewEvaluation = typeof Evaluaciones.$inferInsert;
