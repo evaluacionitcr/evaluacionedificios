@@ -2,15 +2,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import FormularioAceras from "./formulario-aceras";
 import FormularioTerrenos from "./formulario-terrenos";
 import FormularioZonasVerdes from "./formulario-zonas-verdes";
-import { DatosFijos } from "~/utils/consts";
+import type { DatosFijos } from "~/utils/consts";
+
+interface ComponentData {
+  id: number;
+  idConstruccion: number | null;
+  codigoEdificio: string;
+  sede: number | null;
+  sedeNombre: string | null;
+  esRenovacion: boolean | null;
+  nombre: string;
+  fechaConstruccion: number | null;
+  numeroFinca: string | null;
+  m2Construccion: number | null;
+  valorDolarPorM2: string | null;
+  valorColonPorM2: string | null;
+  edad?: number | null;
+  vidaUtilHacienda?: number | null;
+  vidaUtilExperto?: number | null;
+  valorReposicion?: string | null;
+  depreciacionLinealAnual?: string | null;
+  valorActualRevaluado?: string | null;
+  anoDeRevaluacion: number | null;
+  usoActual: number | null;
+  valorPorcionTerreno?: string | null;
+}
 
 interface ComponentesTabsProps {
   codigoEdificio: string;
   datosFijos?: DatosFijos;
   componentesExistentes: {
-    aceras: any;
-    terrenos: any;
-    zonasVerdes: any;
+    aceras: ComponentData | null;
+    terrenos: ComponentData | null;
+    zonasVerdes: ComponentData | null;
   };
 }
 

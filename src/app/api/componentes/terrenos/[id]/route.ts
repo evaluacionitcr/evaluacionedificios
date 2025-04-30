@@ -52,9 +52,9 @@ export async function PUT(request: Request) {
     const result = await db
       .update(Terrenos)
       .set({
-        ...body,
+        ...(body as Omit<TerrenosUpdateData, 'updatedAt'>),
         updatedAt: new Date(),
-      })
+      } satisfies Partial<typeof Terrenos.$inferInsert>)
       .where(eq(Terrenos.id, parseInt(id)))
       .returning();
 

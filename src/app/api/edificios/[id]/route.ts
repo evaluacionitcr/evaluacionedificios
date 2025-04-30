@@ -1,16 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { getDetallesEdificio } from "~/server/actions/edificios";
 import { db } from "~/server/db";
 import { Construcciones } from "~/server/db/schema";
+import type { InferSelectModel } from "drizzle-orm";
 import { eq } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
-  {params} : { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    
+
     if (!id) {
       return NextResponse.json(
         { success: false, error: "ID no proporcionado" },
@@ -19,7 +21,7 @@ export async function GET(
     }
 
     const edificios = await getDetallesEdificio(id);
-    
+
     if (edificios.length === 0) {
       return NextResponse.json(
         { success: false, error: "No se encontró el edificio" },
@@ -29,7 +31,7 @@ export async function GET(
 
     // Obtener el ID de la sede del primer edificio
     const edificio = edificios[0]!;
-    
+
     // Agregar el ID de la sede al objeto de respuesta
     const edificioConSedeId = {
       ...edificio,
@@ -49,7 +51,7 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}
 
 export async function PUT(
   request: NextRequest,
@@ -57,7 +59,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const data = await request.json();
+    const data = await request.json() as Partial<InferSelectModel<typeof Construcciones>>;
 
     if (!id) {
       return NextResponse.json(
@@ -66,12 +68,14 @@ export async function PUT(
       );
     }
 
+    const updateData: Partial<InferSelectModel<typeof Construcciones>> = {
+      ...data,
+      updatedAt: new Date(),
+    };
+
     const edificio = await db
       .update(Construcciones)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(Construcciones.codigoEdificio, id))
       .returning();
 
@@ -93,4 +97,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-} 
+}

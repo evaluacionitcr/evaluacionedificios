@@ -71,7 +71,8 @@ interface ApiResponse<T> {
 
 async function getEdificioData(id: string): Promise<ApiResponse<EdificioData[]>> {
   const response = await fetch(`/api/edificios/${id}`);
-  return response.json();
+  const data = await response.json() as ApiResponse<EdificioData[]>;
+  return data;
 }
 
 export default function EditarEdificioPage({ params }: { params: Promise<{ id: string }> }) {
@@ -105,7 +106,7 @@ export default function EditarEdificioPage({ params }: { params: Promise<{ id: s
     const fetchEdificioData = async () => {
       try {
         const response = await fetch(`/api/edificios/${resolvedParams.id}`);
-        const datosJson = await response.json();
+        const datosJson = (await response.json()) as ApiResponse<EdificioData[]>;
 
         // Type validation for API response
         if (!isValidEdificioResponse(datosJson)) {

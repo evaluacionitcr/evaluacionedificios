@@ -60,9 +60,9 @@ export async function PUT(
     const result = await db
       .update(Aceras)
       .set({
-        ...body,
+        ...(body as Omit<AcerasUpdateData, 'updatedAt'>),
         updatedAt: new Date(),
-      })
+      } satisfies Partial<typeof Aceras.$inferInsert>)
       .where(eq(Aceras.id, parseInt(id)))
       .returning();
 
