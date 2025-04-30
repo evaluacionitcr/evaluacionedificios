@@ -57,12 +57,29 @@ export async function PUT(
       );
     }
 
+    const updateData = {
+      idConstruccion: body.idConstruccion,
+      codigoEdificio: body.codigoEdificio,
+      nombre: body.nombre,
+      fechaConstruccion: body.fechaConstruccion,
+      m2Construccion: body.m2Construccion,
+      valorDolarPorM2: body.valorDolarPorM2,
+      valorColonPorM2: body.valorColonPorM2,
+      edad: body.edad,
+      vidaUtilHacienda: body.vidaUtilHacienda,
+      vidaUtilExperto: body.vidaUtilExperto,
+      valorReposicion: body.valorReposicion,
+      depreciacionLinealAnual: body.depreciacionLinealAnual,
+      valorActualRevaluado: body.valorActualRevaluado,
+      anoDeRevaluacion: body.anoDeRevaluacion,
+      noFinca: body.noFinca,
+      usoActual: body.usoActual,
+      updatedAt: new Date(),
+    };
+
     const result = await db
       .update(Aceras)
-      .set({
-        ...(body as Omit<AcerasUpdateData, 'updatedAt'>),
-        updatedAt: new Date(),
-      } satisfies Partial<typeof Aceras.$inferInsert>)
+      .set(updateData)
       .where(eq(Aceras.id, parseInt(id)))
       .returning();
 

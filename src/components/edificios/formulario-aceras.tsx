@@ -4,10 +4,30 @@ import type { DatosFijos } from "~/utils/consts";
 import { createAceras } from "~/server/actions/components";
 import { toast } from "sonner";
 
+interface DatosAceras {
+  id?: number;
+  idConstruccion: number | null;
+  codigoEdificio: string;
+  nombre: string;
+  fechaConstruccion: number | null;
+  m2Construccion: number;
+  valorDolarPorM2: string;
+  valorColonPorM2: string;
+  edad: number;
+  vidaUtilHacienda: number;
+  vidaUtilExperto: number;
+  valorReposicion: string;
+  depreciacionLinealAnual: string;
+  valorActualRevaluado: string;
+  anoDeRevaluacion: number | null;
+  noFinca: number | null;
+  usoActual: number | null;
+}
+
 interface FormularioAcerasProps {
   codigoEdificio: string;
   datosFijos?: DatosFijos;
-  datosExistentes?: any;
+  datosExistentes?: DatosAceras;
 }
 
 export default function FormularioAceras({
@@ -15,7 +35,7 @@ export default function FormularioAceras({
   datosFijos,
   datosExistentes,
 }: FormularioAcerasProps) {
-  const [nombre, setNombre] = useState("");
+  const [_nombre] = useState("Aceras Perimetrales"); // Using _ prefix since it's read-only
   const [m2Construccion, setM2Construccion] = useState("");
   const [valorDolarM2, setValorDolarM2] = useState("");
   const [valorColonM2, setValorColonM2] = useState("");
@@ -38,7 +58,6 @@ export default function FormularioAceras({
       setVidaUtilHacienda(datosExistentes.vidaUtilHacienda?.toString() ?? "");
       setVidaUtilExperto(datosExistentes.vidaUtilExperto?.toString() ?? "");
       setAnoRevaluacion(datosExistentes.anoDeRevaluacion?.toString() ?? "");
-      // ...set other fields...
     }
   }, [datosExistentes]);
 
@@ -106,20 +125,20 @@ export default function FormularioAceras({
       return parseFloat(value.replace(/\./g, "").replace(",", "."));
     };
 
-    const data = {
+    const data: DatosAceras = {
       codigoEdificio,
       idConstruccion: datosFijos?.id ?? null,
       nombre: "Aceras Perimetrales",
       fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
       m2Construccion: formatNumber(m2Construccion) ?? 0,
-      valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
-      valorColonPorM2: formatNumber(valorColonM2) ?? "0",
+      valorDolarPorM2: formatNumber(valorDolarM2)?.toString() ?? "0",
+      valorColonPorM2: formatNumber(valorColonM2)?.toString() ?? "0",
       edad,
       vidaUtilHacienda: parseInt(vidaUtilHacienda),
       vidaUtilExperto: parseInt(vidaUtilExperto),
-      valorReposicion: parseFloat(valorReposicion.toString()),
-      depreciacionLinealAnual: parseFloat(depreciacionAnual.toString()),
-      valorActualRevaluado: parseFloat(valorRevaluado.toString()),
+      valorReposicion: valorReposicion.toString(),
+      depreciacionLinealAnual: depreciacionAnual.toString(),
+      valorActualRevaluado: valorRevaluado.toString(),
       anoDeRevaluacion: parseInt(anoRevaluacion),
       noFinca: datosFijos?.noFincaId ?? null,
       usoActual: datosFijos?.usoActualId ?? null,
@@ -179,7 +198,6 @@ export default function FormularioAceras({
         <input
           type="text"
           value={"Aceras Perimetrales"}
-          onChange={(e) => setNombre(e.target.value)}
           disabled
           className="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 p-2"
         />

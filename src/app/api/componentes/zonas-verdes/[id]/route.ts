@@ -36,11 +36,12 @@ function isValidZonasVerdesData(data: unknown): data is ZonasVerdesUpdateData {
   );
 }
 
-export async function PUT(request: Request) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
-    const url = new URL(request.url);
-    const id = url.pathname.split("/").pop(); 
-
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { error: "No se proporcionó id" },
@@ -56,12 +57,29 @@ export async function PUT(request: Request) {
       );
     }
 
+    const updateData = {
+      idConstruccion: body.idConstruccion,
+      codigoEdificio: body.codigoEdificio,
+      nombre: body.nombre,
+      fechaConstruccion: body.fechaConstruccion,
+      m2Construccion: body.m2Construccion,
+      valorDolarPorM2: body.valorDolarPorM2,
+      valorColonPorM2: body.valorColonPorM2,
+      edad: body.edad,
+      vidaUtilHacienda: body.vidaUtilHacienda,
+      vidaUtilExperto: body.vidaUtilExperto,
+      valorReposicion: body.valorReposicion,
+      depreciacionLinealAnual: body.depreciacionLinealAnual,
+      valorActualRevaluado: body.valorActualRevaluado,
+      anoDeRevaluacion: body.anoDeRevaluacion,
+      noFinca: body.noFinca,
+      usoActual: body.usoActual,
+      updatedAt: new Date(),
+    };
+
     const result = await db
       .update(ZonasVerdes)
-      .set({
-        ...(body as Omit<ZonasVerdesUpdateData, 'updatedAt'>),
-        updatedAt: new Date(),
-      } satisfies Partial<typeof ZonasVerdes.$inferInsert>)
+      .set(updateData)
       .where(eq(ZonasVerdes.id, parseInt(id)))
       .returning();
 

@@ -11,10 +11,10 @@ interface TerrenosUpdateData {
   m2Construccion: number;
   valorDolarPorM2: string;
   valorColonPorM2: string;
-  noFinca?: number | null;
-  usoActual?: number | null;
   valorPorcionTerreno?: string;
   anoDeRevaluacion?: number;
+  noFinca?: number | null;
+  usoActual?: number | null;
 }
 
 function isValidTerrenosData(data: unknown): data is TerrenosUpdateData {
@@ -29,11 +29,12 @@ function isValidTerrenosData(data: unknown): data is TerrenosUpdateData {
   );
 }
 
-export async function PUT(request: Request) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
-    const url = new URL(request.url);
-    const id = url.pathname.split("/").pop();
-
+    const {id} = await params;
     if (!id) {
       return NextResponse.json(
         { error: "No se proporcionó id" },
@@ -49,12 +50,24 @@ export async function PUT(request: Request) {
       );
     }
 
+    const updateData = {
+      idConstruccion: body.idConstruccion,
+      codigoEdificio: body.codigoEdificio,
+      nombre: body.nombre,
+      fechaConstruccion: body.fechaConstruccion,
+      m2Construccion: body.m2Construccion,
+      valorDolarPorM2: body.valorDolarPorM2,
+      valorColonPorM2: body.valorColonPorM2,
+      valorPorcionTerreno: body.valorPorcionTerreno,
+      anoDeRevaluacion: body.anoDeRevaluacion,
+      noFinca: body.noFinca,
+      usoActual: body.usoActual,
+      updatedAt: new Date(),
+    };
+
     const result = await db
       .update(Terrenos)
-      .set({
-        ...(body as Omit<TerrenosUpdateData, 'updatedAt'>),
-        updatedAt: new Date(),
-      } satisfies Partial<typeof Terrenos.$inferInsert>)
+      .set(updateData)
       .where(eq(Terrenos.id, parseInt(id)))
       .returning();
 

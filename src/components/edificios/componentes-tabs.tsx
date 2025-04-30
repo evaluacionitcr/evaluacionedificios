@@ -26,6 +26,7 @@ interface ComponentData {
   anoDeRevaluacion: number | null;
   usoActual: number | null;
   valorPorcionTerreno?: string | null;
+  noFinca?: string; // Added property to match DatosAceras
 }
 
 interface ComponentesTabsProps {
@@ -65,7 +66,23 @@ export default function ComponentesTabs({
           <FormularioAceras 
             codigoEdificio={codigoEdificio} 
             datosFijos={datosFijos} 
-            datosExistentes={componentesExistentes.aceras}
+            datosExistentes={
+              componentesExistentes.aceras
+                ? { 
+                    ...componentesExistentes.aceras, 
+                    m2Construccion: componentesExistentes.aceras.m2Construccion ?? 0,
+                    valorDolarPorM2: componentesExistentes.aceras.valorDolarPorM2 ?? "",
+                    valorColonPorM2: componentesExistentes.aceras.valorColonPorM2 ?? "",
+                    edad: componentesExistentes.aceras.edad ?? 0,
+                    vidaUtilHacienda: componentesExistentes.aceras.vidaUtilHacienda ?? 0,
+                    vidaUtilExperto: componentesExistentes.aceras.vidaUtilExperto ?? 0,
+                    valorReposicion: componentesExistentes.aceras.valorReposicion ?? "",
+                    depreciacionLinealAnual: componentesExistentes.aceras.depreciacionLinealAnual ?? "",
+                    valorActualRevaluado: componentesExistentes.aceras.valorActualRevaluado ?? "",
+                    noFinca: componentesExistentes.aceras.noFinca ? Number(componentesExistentes.aceras.noFinca) : null
+                  }
+                : undefined
+            }
           />
         </div>
       </TabsContent>
