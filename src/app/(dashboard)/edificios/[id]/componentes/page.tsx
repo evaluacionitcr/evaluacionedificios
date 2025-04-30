@@ -31,7 +31,7 @@ interface ComponenteDetalle {
   depreciacionLinealAnual: string | null;
   valorActualRevaluado: string | null;
   anoDeRevaluacion: number | null;
-  usoActual: string | null;
+  usoActual: number | null; // Changed from string to number
 }
 
 export default function ComponentesPage() {
