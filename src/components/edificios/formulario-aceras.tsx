@@ -24,6 +24,11 @@ interface DatosAceras {
   usoActual: number | null;
 }
 
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+}
+
 interface FormularioAcerasProps {
   codigoEdificio: string;
   datosFijos?: DatosFijos;
@@ -35,7 +40,6 @@ export default function FormularioAceras({
   datosFijos,
   datosExistentes,
 }: FormularioAcerasProps) {
-  const [_nombre] = useState("Aceras Perimetrales"); // Using _ prefix since it's read-only
   const [m2Construccion, setM2Construccion] = useState("");
   const [valorDolarM2, setValorDolarM2] = useState("");
   const [valorColonM2, setValorColonM2] = useState("");
@@ -145,7 +149,7 @@ export default function FormularioAceras({
     };
 
     try {
-      let result;
+      let result: ApiResponse;
       if (datosExistentes) {
         // Si existen datos, actualizar
         const response = await fetch(`/api/componentes/aceras/${datosExistentes.id}`, {
@@ -153,11 +157,11 @@ export default function FormularioAceras({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        const jsonResult = await response.json();
-        if (jsonResult.success) {
+        result = (await response.json()) as ApiResponse;
+        if (result.success) {
           toast.success("Acera actualizada exitosamente");
         } else {
-          toast.error("Error al actualizar acera");
+          toast.error(result.message ?? "Error al actualizar acera");
         }
       } else {
         // Si no existen datos, crear
@@ -165,7 +169,7 @@ export default function FormularioAceras({
         if (result.success) {
           toast.success("Acera guardada exitosamente");
         } else {
-          toast.error("Error al guardar acera");
+          toast.error(result.message ?? "Error al guardar acera");
         }
       }
     } catch (error) {

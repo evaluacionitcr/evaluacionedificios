@@ -95,7 +95,17 @@ export default function ComponentesTabs({
           <FormularioTerrenos 
             codigoEdificio={codigoEdificio} 
             datosFijos={datosFijos} 
-            datosExistentes={componentesExistentes.terrenos}
+            datosExistentes={componentesExistentes.terrenos
+              ? { 
+                id: componentesExistentes.terrenos.id,
+                m2Construccion: componentesExistentes.terrenos.m2Construccion ?? 0,
+                valorDolarPorM2: componentesExistentes.terrenos.valorDolarPorM2 ?? "",
+                valorColonPorM2: componentesExistentes.terrenos.valorColonPorM2 ?? "",
+                valorPorcionTerreno: componentesExistentes.terrenos.valorPorcionTerreno ?? "",
+                anoDeRevaluacion: componentesExistentes.terrenos.anoDeRevaluacion ?? 0
+              }
+            : undefined
+            }
           />
         </div>
       </TabsContent>
@@ -108,7 +118,21 @@ export default function ComponentesTabs({
           <FormularioZonasVerdes 
             codigoEdificio={codigoEdificio} 
             datosFijos={datosFijos} 
-            datosExistentes={componentesExistentes.zonasVerdes}
+            datosExistentes={componentesExistentes.zonasVerdes
+              ? { 
+                id: componentesExistentes.zonasVerdes.id,
+                m2Construccion: componentesExistentes.zonasVerdes.m2Construccion ?? 0,
+                valorDolarPorM2: componentesExistentes.zonasVerdes.valorDolarPorM2 ?? "",
+                valorColonPorM2: componentesExistentes.zonasVerdes.valorColonPorM2 ?? "",
+                vidaUtilHacienda: componentesExistentes.zonasVerdes.vidaUtilHacienda ?? 0,
+                vidaUtilExperto: componentesExistentes.zonasVerdes.vidaUtilExperto ?? 0,
+                valorReposicion: componentesExistentes.zonasVerdes.valorReposicion ?? "",
+                depreciacionLinealAnual: componentesExistentes.zonasVerdes.depreciacionLinealAnual ?? "",
+                valorActualRevaluado: componentesExistentes.zonasVerdes.valorActualRevaluado ?? "",
+                anoDeRevaluacion: componentesExistentes.zonasVerdes.anoDeRevaluacion ?? 0
+              }
+            : undefined
+            }
           />
         </div>
       </TabsContent>

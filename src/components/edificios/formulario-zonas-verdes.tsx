@@ -7,7 +7,18 @@ import { toast } from "sonner";
 interface FormularioZonasVerdesProps {
   codigoEdificio: string;
   datosFijos?: DatosFijos;
-  datosExistentes?: any; // Agregar prop
+  datosExistentes?: {
+    id: number;
+    m2Construccion: number | null;
+    valorDolarPorM2: string | null;
+    valorColonPorM2: string | null;
+    vidaUtilHacienda: number | null;
+    vidaUtilExperto: number | null;
+    valorReposicion: string | null;
+    depreciacionLinealAnual: string | null;
+    valorActualRevaluado: string | null;
+    anoDeRevaluacion: number | null;
+  };
 }
 
 export default function FormularioZonasVerdes({
@@ -15,7 +26,6 @@ export default function FormularioZonasVerdes({
   datosFijos,
   datosExistentes,
 }: FormularioZonasVerdesProps) {
-  const [nombre] = useState(""); // Removed unused setNombre
   const [m2Construccion, setM2Construccion] = useState("");
   const [valorDolarM2, setValorDolarM2] = useState("");
   const [valorColonM2, setValorColonM2] = useState("");

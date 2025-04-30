@@ -7,7 +7,14 @@ import { toast } from "sonner";
 interface FormularioTerrenosProps {
   codigoEdificio: string;
   datosFijos?: DatosFijos;
-  datosExistentes?: any; // Agregar prop
+  datosExistentes?: {
+    id: number;
+    m2Construccion: number;
+    valorDolarPorM2: string;
+    valorColonPorM2: string;
+    valorPorcionTerreno: string;
+    anoDeRevaluacion: number;
+  };
 }
 
 export default function FormularioTerrenos({
@@ -15,13 +22,11 @@ export default function FormularioTerrenos({
   datosFijos,
   datosExistentes,
 }: FormularioTerrenosProps) {
-  const [nombre] = useState("");
   const [m2Construccion, setM2Construccion] = useState("");
   const [valorDolarM2, setValorDolarM2] = useState("");
   const [valorColonM2, setValorColonM2] = useState("");
   const [edad, setEdad] = useState(0);
   const [anioCalculoEdad, setAnioCalculoEdad] = useState("");
-
   const [valorTerreno, setValorTerreno] = useState("");
   const [anoRevaluacion, setAnoRevaluacion] = useState("");
   const [tipoCambio, setTipoCambio] = useState("");
@@ -33,7 +38,6 @@ export default function FormularioTerrenos({
     setEdad(!isNaN(anio) && !isNaN(anioBase) ? anioBase - anio : 0);
   }, [datosFijos?.fechaConstruccion, anioCalculoEdad]);
 
-  // Añadir efecto para cargar datos existentes
   useEffect(() => {
     if (datosExistentes) {
       setM2Construccion(datosExistentes.m2Construccion?.toString() ?? "");
@@ -58,7 +62,6 @@ export default function FormularioTerrenos({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Formatear números para la base de datos
     const formatNumber = (value: string) => {
       if (!value) return null;
       return parseFloat(value.replace(/\./g, "").replace(",", "."));
@@ -83,7 +86,6 @@ export default function FormularioTerrenos({
     try {
       let result;
       if (datosExistentes) {
-        // Si existen datos, actualizar
         result = await fetch(`/api/componentes/terrenos/${datosExistentes.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -96,7 +98,6 @@ export default function FormularioTerrenos({
           toast.error("Error al actualizar terreno");
         }
       } else {
-        // Si no existen datos, crear
         result = await createTerrenos(data);
         if (result.success) {
           toast.success("Terreno guardado exitosamente");
