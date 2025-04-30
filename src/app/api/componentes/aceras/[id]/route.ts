@@ -5,10 +5,11 @@ import { Aceras } from "~/server/db/schema";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    if (!params.id) {
+    const {id} = await params;
+    if (!id) {
       return NextResponse.json(
         { error: "No se proporcionó id" },
         { status: 400 }
@@ -22,7 +23,7 @@ export async function PUT(
         ...data,
         updatedAt: new Date(),
       })
-      .where(eq(Aceras.id, parseInt(params.id)))
+      .where(eq(Aceras.id, parseInt(id)))
       .returning();
 
     if (!result.length) {
