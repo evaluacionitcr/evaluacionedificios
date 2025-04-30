@@ -48,16 +48,14 @@ export async function PUT(
         { status: 400 }
       );
     }
-
-    const rawBody = await request.json();
-    if (!isValidAcerasData(rawBody)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const body = await request.json();
+    if (!isValidAcerasData(body)) {
       return NextResponse.json(
         { error: "Datos de acera inválidos" },
         { status: 400 }
       );
     }
-    
-    const body: AcerasUpdateData = rawBody;
 
     const updateData = {
       idConstruccion: body.idConstruccion,
