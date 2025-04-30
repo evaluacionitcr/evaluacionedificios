@@ -3,6 +3,39 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { Aceras } from "~/server/db/schema";
 
+interface AcerasUpdateData {
+  idConstruccion?: number | null;
+  codigoEdificio: string;
+  nombre: string;
+  fechaConstruccion?: number | null;
+  m2Construccion: number;
+  valorDolarPorM2: string;
+  valorColonPorM2: string;
+  edad?: number | null;
+  vidaUtilHacienda: number;
+  vidaUtilExperto: number;
+  valorReposicion?: string;
+  depreciacionLinealAnual?: string;
+  valorActualRevaluado?: string;
+  anoDeRevaluacion?: number;
+  noFinca?: number | null;
+  usoActual?: number | null;
+}
+
+function isValidAcerasData(data: unknown): data is AcerasUpdateData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'codigoEdificio' in data &&
+    'nombre' in data &&
+    'm2Construccion' in data &&
+    'valorDolarPorM2' in data &&
+    'valorColonPorM2' in data &&
+    'vidaUtilHacienda' in data &&
+    'vidaUtilExperto' in data
+  );
+}
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -16,11 +49,18 @@ export async function PUT(
       );
     }
 
-    const data = await request.json();
+    const body = await request.json();
+    if (!isValidAcerasData(body)) {
+      return NextResponse.json(
+        { error: "Datos de acera inválidos" },
+        { status: 400 }
+      );
+    }
+
     const result = await db
       .update(Aceras)
       .set({
-        ...data,
+        ...body,
         updatedAt: new Date(),
       })
       .where(eq(Aceras.id, parseInt(id)))

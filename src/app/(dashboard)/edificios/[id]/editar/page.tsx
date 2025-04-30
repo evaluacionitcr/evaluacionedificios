@@ -43,7 +43,33 @@ interface ValidationErrors {
   tipoCambio?: string;
 }
 
-async function getEdificioData(id: string) {
+interface EdificioData {
+  id: number;
+  codigoEdificio: string;
+  sede: number | null;
+  nombre: string;
+  fechaConstruccion: number | null;
+  noFinca: number | null;
+  m2Construccion: number | null;
+  valorDolarPorM2: string | null;
+  valorColonPorM2: string | null;
+  edadAl2021: number | null;
+  vidaUtilHacienda: number | null;
+  vidaUtilExperto: number | null;
+  valorEdificioIR: string | null;
+  depreciacionLinealAnual: string | null;
+  valorActualRevaluado: string | null;
+  anoDeRevaluacion: number | null;
+  usoActual: number | null;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+}
+
+async function getEdificioData(id: string): Promise<ApiResponse<EdificioData[]>> {
   const response = await fetch(`/api/edificios/${id}`);
   return response.json();
 }
@@ -78,27 +104,37 @@ export default function EditarEdificioPage({ params }: { params: Promise<{ id: s
   useEffect(() => {
     const fetchEdificioData = async () => {
       try {
-        const result = await getEdificioData(resolvedParams.id);
+        const response = await fetch(`/api/edificios/${resolvedParams.id}`);
+        const datosJson = await response.json();
 
-        if (result.success && result.data.length > 0) {
-          const edificio = result.data[0];
-          console.log("Datos del edificio recibidos:", edificio);
-          setNombreEdificio(edificio.nombre);
-          setSedeId(edificio.sede?.toString() ?? "");
-          setMetrosCuadrados(edificio.m2Construccion?.toString() ?? "");
-          setValorDolarM2(edificio.valorDolarPorM2 ?? "");
-          setValorColonM2(edificio.valorColonPorM2 ?? "");
-          setVidaUtilHacienda(edificio.vidaUtilHacienda?.toString() ?? "");
-          setVidaUtilExperto(edificio.vidaUtilExperto?.toString() ?? "");
-          setAnioConstruccion(edificio.fechaConstruccion?.toString() ?? "");
-          setFincaSeleccionada(edificio.noFinca?.toString() ?? "");
-          setUsoActual(edificio.usoActual?.toString() ?? "");
-          setAnioRevaluacion(edificio.anoDeRevaluacion?.toString() ?? "");
-          setValorEdificioIR(parseFloat(edificio.valorEdificioIR ?? "0"));
-          setDepreciacionAnual(parseFloat(edificio.depreciacionLinealAnual ?? "0"));
-          setValorRevaluado(parseFloat(edificio.valorActualRevaluado ?? "0"));
-          setEdad(edificio.edadAl2021 ?? 0);
+        // Type validation for API response
+        if (!isValidEdificioResponse(datosJson)) {
+          throw new Error('Respuesta de API inválida');
         }
+
+        const edificio = datosJson.data[0];
+        if (!edificio) {
+          throw new Error('No se encontró el edificio');
+        }
+
+        console.log("Datos del edificio recibidos:", edificio);
+
+        // Set form values with proper null checks and type coercion
+        setNombreEdificio(edificio.nombre ?? "");
+        setSedeId(edificio.sede?.toString() ?? "");
+        setMetrosCuadrados(edificio.m2Construccion?.toString() ?? "");
+        setValorDolarM2(edificio.valorDolarPorM2 ?? "");
+        setValorColonM2(edificio.valorColonPorM2 ?? "");
+        setVidaUtilHacienda(edificio.vidaUtilHacienda?.toString() ?? "");
+        setVidaUtilExperto(edificio.vidaUtilExperto?.toString() ?? "");
+        setAnioConstruccion(edificio.fechaConstruccion?.toString() ?? "");
+        setFincaSeleccionada(edificio.noFinca?.toString() ?? "");
+        setUsoActual(edificio.usoActual?.toString() ?? "");
+        setAnioRevaluacion(edificio.anoDeRevaluacion?.toString() ?? "");
+        setValorEdificioIR(edificio.valorEdificioIR ? parseFloat(edificio.valorEdificioIR) : 0);
+        setDepreciacionAnual(edificio.depreciacionLinealAnual ? parseFloat(edificio.depreciacionLinealAnual) : 0);
+        setValorRevaluado(edificio.valorActualRevaluado ? parseFloat(edificio.valorActualRevaluado) : 0);
+        setEdad(edificio.edadAl2021 ?? 0);
       } catch (error) {
         console.error("Error al cargar datos del edificio:", error);
         toast.error("Error al cargar los datos del edificio");
@@ -107,6 +143,17 @@ export default function EditarEdificioPage({ params }: { params: Promise<{ id: s
 
     void fetchEdificioData();
   }, [resolvedParams.id]);
+
+  // Type guard for API response
+  function isValidEdificioResponse(data: unknown): data is ApiResponse<EdificioData[]> {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'success' in data &&
+      'data' in data &&
+      Array.isArray((data as ApiResponse<EdificioData[]>).data)
+    );
+  }
 
   // Cargar datos auxiliares (sedes, fincas, usos)
   useEffect(() => {

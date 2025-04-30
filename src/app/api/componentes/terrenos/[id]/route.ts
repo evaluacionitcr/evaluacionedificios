@@ -3,10 +3,36 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { Terrenos } from "~/server/db/schema";
 
+interface TerrenosUpdateData {
+  idConstruccion?: number | null;
+  codigoEdificio: string;
+  nombre: string;
+  fechaConstruccion?: number | null;
+  m2Construccion: number;
+  valorDolarPorM2: string;
+  valorColonPorM2: string;
+  noFinca?: number | null;
+  usoActual?: number | null;
+  valorPorcionTerreno?: string;
+  anoDeRevaluacion?: number;
+}
+
+function isValidTerrenosData(data: unknown): data is TerrenosUpdateData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'codigoEdificio' in data &&
+    'nombre' in data &&
+    'm2Construccion' in data &&
+    'valorDolarPorM2' in data &&
+    'valorColonPorM2' in data
+  );
+}
+
 export async function PUT(request: Request) {
   try {
     const url = new URL(request.url);
-    const id = url.pathname.split("/").pop(); // extraemos el id de la URL
+    const id = url.pathname.split("/").pop();
 
     if (!id) {
       return NextResponse.json(
@@ -15,11 +41,18 @@ export async function PUT(request: Request) {
       );
     }
 
-    const data = await request.json();
+    const body = await request.json();
+    if (!isValidTerrenosData(body)) {
+      return NextResponse.json(
+        { error: "Datos de terreno inválidos" },
+        { status: 400 }
+      );
+    }
+
     const result = await db
       .update(Terrenos)
       .set({
-        ...data,
+        ...body,
         updatedAt: new Date(),
       })
       .where(eq(Terrenos.id, parseInt(id)))

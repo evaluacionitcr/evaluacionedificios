@@ -58,23 +58,32 @@ export default function ComponentesPage() {
           fetch(`/api/componentes/${id.toString()}`),
         ]);
 
-        const datos: DatosFijos = await datosResponse.json();
-        const componentes: ComponentesResponse = await componentesResponse.json();
-
-        console.log("Datos del edificio:", datos);
-        console.log("Componentes encontrados:", componentes);
-
-        if (datosResponse.ok) {
-          setDatosFijos(datos);
+        if (!datosResponse.ok || !componentesResponse.ok) {
+          throw new Error('Error en la respuesta del servidor');
         }
 
-        if (componentesResponse.ok) {
-          setComponentesExistentes({
-            aceras: componentes.aceras ?? null,
-            terrenos: componentes.terrenos ?? null,
-            zonasVerdes: componentes.zonasVerdes ?? null,
-          });
+        const datosJson = await datosResponse.json();
+        const componentesJson = await componentesResponse.json();
+
+        // Type validation for datos
+        if (!isDatosFijos(datosJson)) {
+          throw new Error('Datos del edificio en formato inválido');
         }
+
+        // Type validation for componentes
+        if (!isComponentesResponse(componentesJson)) {
+          throw new Error('Componentes en formato inválido');
+        }
+
+        console.log("Datos del edificio:", datosJson);
+        console.log("Componentes encontrados:", componentesJson);
+
+        setDatosFijos(datosJson);
+        setComponentesExistentes({
+          aceras: componentesJson.aceras ?? null,
+          terrenos: componentesJson.terrenos ?? null,
+          zonasVerdes: componentesJson.zonasVerdes ?? null,
+        });
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -82,6 +91,44 @@ export default function ComponentesPage() {
 
     void fetchData();
   }, [params?.id]);
+
+  // Type guards
+  function isDatosFijos(data: unknown): data is DatosFijos {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'id' in data &&
+      'codigoEdificio' in data &&
+      'usoActualId' in data &&
+      'usoActualDescripcion' in data &&
+      'noFinca' in data &&
+      'noFincaId' in data &&
+      'fechaConstruccion' in data
+    );
+  }
+
+  function isComponenteDetalle(data: unknown): data is ComponenteDetalle {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'id' in data &&
+      'codigoEdificio' in data &&
+      'nombre' in data
+    );
+  }
+
+  function isComponentesResponse(data: unknown): data is ComponentesResponse {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'aceras' in data &&
+      'terrenos' in data &&
+      'zonasVerdes' in data &&
+      (data.aceras === null || isComponenteDetalle(data.aceras)) &&
+      (data.terrenos === null || isComponenteDetalle(data.terrenos)) &&
+      (data.zonasVerdes === null || isComponenteDetalle(data.zonasVerdes))
+    );
+  }
 
   if (!params) {
     return <div>Error: Parámetros no disponibles</div>;

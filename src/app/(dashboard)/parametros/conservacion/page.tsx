@@ -22,9 +22,41 @@ interface EstadoConservacion {
   coef_depreciacion: number;
 }
 
+interface EstadoConservacionResponse {
+  success: boolean;
+  data: {
+    id: number;
+    estado_conservacion: string;
+    condiciones_fisicas: string;
+    clasificacion: string;
+    coef_depreciacion: string;
+  }[];
+  error?: string;
+}
+
 export default function Page() {
   const [tableData, setTableData] = useState<EstadoConservacion[]>([]);
   const [editRowIndex, setEditRowIndex] = useState<number | null>(null);
+
+  // Type guard for API response
+  function isValidEstadoConservacionResponse(data: unknown): data is EstadoConservacionResponse {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'success' in data &&
+      'data' in data &&
+      Array.isArray((data as EstadoConservacionResponse).data) &&
+      (data as EstadoConservacionResponse).data.every(item => 
+        typeof item === 'object' &&
+        item !== null &&
+        'id' in item &&
+        'estado_conservacion' in item &&
+        'condiciones_fisicas' in item &&
+        'clasificacion' in item &&
+        'coef_depreciacion' in item
+      )
+    );
+  }
 
   const handleEditClick = (index: number) => {
     setEditRowIndex(index);
@@ -128,13 +160,17 @@ export default function Page() {
     const loadEstadoConservacion = async () => {
         try {
             const response = await getEstadoConservacion();
+            if (!isValidEstadoConservacionResponse(response)) {
+              throw new Error('Invalid API response format');
+            }
+
             if (response.success && response.data) {
-                const convertedData : EstadoConservacion[] = response.data.map((item: any) => ({
+                const convertedData : EstadoConservacion[] = response.data.map((item) => ({
                     id: item.id,
                     estado_conservacion: item.estado_conservacion,
                     condiciones_fisicas: item.condiciones_fisicas,
                     clasificacion: item.clasificacion,
-                    coef_depreciacion: item.coef_depreciacion,
+                    coef_depreciacion: parseFloat(item.coef_depreciacion),
                 }));
                 setTableData(convertedData);
             }
@@ -142,7 +178,7 @@ export default function Page() {
             console.error("Error al cargar el estado de conservación:", error);
         }
       };
-    loadEstadoConservacion();
+    void loadEstadoConservacion();
   }, []); // Se ejecuta solo una vez cuando el componente se monta
 
   return (
