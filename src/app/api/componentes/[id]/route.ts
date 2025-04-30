@@ -7,7 +7,7 @@ import { type NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const id = url.pathname.split("/").pop(); // extraemos el id de la URL
+    const id = url.pathname.split("/").pop()?.toUpperCase(); // extraemos el id de la URL
 
     if (!id) {
       return NextResponse.json(
