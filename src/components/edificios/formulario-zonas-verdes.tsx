@@ -122,23 +122,24 @@ export default function FormularioZonasVerdes({
         value = value.toString();
       }
       if (!value) return null;
-      return value.replace(/\./g, "").replace(",", ".");
+      const numStr = value.replace(/\./g, "").replace(",", ".");
+      return parseFloat(numStr);
     };
 
     const data = {
       idConstruccion: datosFijos?.id ?? null,
       codigoEdificio,
       nombre: "Porción de Zonas verdes",
-      m2Construccion: formatNumber(m2Construccion) ?? "0",
+      m2Construccion: Number(formatNumber(m2Construccion) ?? 0),
       fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
-      valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
-      valorColonPorM2: formatNumber(valorColonM2) ?? "0",
+      valorDolarPorM2: (formatNumber(valorDolarM2) ?? 0).toString(),
+      valorColonPorM2: (formatNumber(valorColonM2) ?? 0).toString(),
       edad: edad || null,
       vidaUtilHacienda: parseInt(vidaUtilHacienda) || 0,
       vidaUtilExperto: parseInt(vidaUtilExperto) || 0,
-      valorReposicion: formatNumber(valorReposicion.toString()) ?? "0",
-      depreciacionLinealAnual: formatNumber(depreciacionAnual.toString()) ?? "0",
-      valorActualRevaluado: formatNumber(valorRevaluado.toString()) ?? "0",
+      valorReposicion: (formatNumber(valorReposicion.toString()) ?? 0).toString(),
+      depreciacionLinealAnual: (formatNumber(depreciacionAnual.toString()) ?? 0).toString(),
+      valorActualRevaluado: (formatNumber(valorRevaluado.toString()) ?? 0).toString(),
       anoDeRevaluacion: parseInt(anoRevaluacion) || null,
       noFinca: datosFijos?.noFincaId ?? null,
       usoActual: datosFijos?.usoActualId ?? null,

@@ -1,8 +1,8 @@
 "use server";
 import { db } from "~/server/db";
 import { Aceras, ZonasVerdes, Terrenos } from "../db/schema";
-import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
+import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 
 export interface ComponentData {
   idConstruccion?: number | null;
@@ -10,36 +10,38 @@ export interface ComponentData {
   nombre: string;
   fechaConstruccion?: number | null;
   m2Construccion: number;
-  valorDolarPorM2: string | number;
-  valorColonPorM2?: string | number;
-  edad?: number;
+  valorDolarPorM2: string;
+  valorColonPorM2: string;
+  edad?: number | null;
   vidaUtilHacienda: number;
   vidaUtilExperto: number;
-  valorReposicion?: number;
-  depreciacionLinealAnual?: number;
-  valorActualRevaluado?: number;
-  anoDeRevaluacion?: number;
+  valorReposicion: string;
+  depreciacionLinealAnual: string;
+  valorActualRevaluado: string;
+  anoDeRevaluacion?: number | null;
   noFinca?: number | null;
   usoActual?: number | null;
-  valorPorcionTerreno?: number;
+  valorPorcionTerreno?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-// Función auxiliar para verificar componente existente
-async function checkExistingComponent(codigoEdificio: string, table: any) {
+// Helper function to check existing component with proper typing
+async function checkExistingComponent(
+  codigoEdificio: string,
+  table: PgTableWithColumns<any>
+) {
   return await db
     .select()
     .from(table)
-    .where(eq(table.codigoEdificio, codigoEdificio))
-    .execute();
+    .where(eq(table.codigoEdificio, codigoEdificio));
 }
 
-export async function createAceras(data: any) {
+export async function createAceras(data: ComponentData) {
   try {
-    // Verificar si ya existe una acera para este edificio
     const existing = await checkExistingComponent(data.codigoEdificio, Aceras);
     
     if (existing.length > 0) {
-      // Si existe, actualizar en lugar de crear
       const result = await db
         .update(Aceras)
         .set({
@@ -51,7 +53,6 @@ export async function createAceras(data: any) {
       return { success: true, data: result[0] };
     }
 
-    // Si no existe, crear nuevo
     const result = await db.insert(Aceras).values({
       ...data,
       createdAt: new Date(),
@@ -64,8 +65,7 @@ export async function createAceras(data: any) {
   }
 }
 
-// Aplicar la misma lógica para terrenos y zonas verdes
-export async function createTerrenos(data: any) {
+export async function createTerrenos(data: ComponentData) {
   try {
     const existing = await checkExistingComponent(data.codigoEdificio, Terrenos);
     
@@ -93,7 +93,7 @@ export async function createTerrenos(data: any) {
   }
 }
 
-export async function createZonasVerdes(data: any) {
+export async function createZonasVerdes(data: ComponentData) {
   try {
     const existing = await checkExistingComponent(data.codigoEdificio, ZonasVerdes);
     
@@ -140,7 +140,7 @@ export async function createComponents(
     zonasVerdes?: Omit<ComponentData, "codigoEdificio">;
     terrenos?: Omit<ComponentData, "codigoEdificio">;
   },
-) {
+): Promise<ComponentResult> {
   const results: ComponentResult = {
     aceras: null,
     zonasVerdes: null,

@@ -85,14 +85,17 @@ export default function FormularioTerrenos({
       nombre: "Terreno (Huella)",
       fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
       m2Construccion: formatNumber(m2Construccion) ?? 0,
-      valorDolarPorM2: formatNumber(valorDolarM2) ?? 0,
-      valorColonPorM2: formatNumber(valorColonM2) ?? 0,
-      valorPorcionTerreno: formatNumber(valorTerreno) ?? 0,
-      anoDeRevaluacion: parseInt(anoRevaluacion),
+      valorDolarPorM2: formatNumber(valorDolarM2)?.toString() ?? "0",
+      valorColonPorM2: formatNumber(valorColonM2)?.toString() ?? "0",
+      valorPorcionTerreno: formatNumber(valorTerreno)?.toString() ?? "0",
+      anoDeRevaluacion: parseInt(anoRevaluacion) || null,
       noFinca: datosFijos?.noFincaId ?? null,
       usoActual: datosFijos?.usoActualId ?? null,
       vidaUtilHacienda: 0,
       vidaUtilExperto: 0,
+      valorReposicion: "0",
+      depreciacionLinealAnual: "0",
+      valorActualRevaluado: "0"
     };
 
     try {
@@ -103,14 +106,19 @@ export default function FormularioTerrenos({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        result = await response.json();
+        result = await response.json() as TerrenosResponse;
         if (result.success) {
           toast.success("Terreno actualizado exitosamente");
         } else {
           toast.error(result.error ?? "Error al actualizar terreno");
         }
       } else {
-        result = await createTerrenos(data);
+        const createResult = await createTerrenos(data);
+        result = {
+          success: createResult.success,
+          error: createResult.error,
+          data: createResult.data as TerrenosResponse['data']
+        };
         if (result.success) {
           toast.success("Terreno guardado exitosamente");
         } else {
