@@ -123,6 +123,7 @@ export async function getDetallesEdificio(
       .orderBy(sql`${Construcciones.id} DESC`)
       .limit(1);
 
+
     if (idsRecientes.length === 0) {
       console.log("No se encontraron registros para el código:", codigoEdificio);
       return [];
@@ -155,7 +156,7 @@ export async function getDetallesEdificio(
       .leftJoin(Sedes, eq(Construcciones.sede, Sedes.id))
       .leftJoin(NumeroFincas, eq(Construcciones.noFinca, NumeroFincas.id))
       .leftJoin(UsosActuales, eq(Construcciones.usoActual, UsosActuales.id))
-      .where(eq(Construcciones.id, idsRecientes[0].id));
+      .where(eq(Construcciones.id, idsRecientes[0]?.id ?? 0));
 
     console.log("Resultados encontrados:", edificios.length);
     console.log("Datos del edificio:", edificios[0]);
