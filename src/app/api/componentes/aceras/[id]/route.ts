@@ -49,13 +49,15 @@ export async function PUT(
       );
     }
 
-    const body = await request.json();
-    if (!isValidAcerasData(body)) {
+    const rawBody = await request.json();
+    if (!isValidAcerasData(rawBody)) {
       return NextResponse.json(
         { error: "Datos de acera inválidos" },
         { status: 400 }
       );
     }
+    
+    const body: AcerasUpdateData = rawBody;
 
     const updateData = {
       idConstruccion: body.idConstruccion,

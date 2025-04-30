@@ -29,7 +29,7 @@ export interface ComponentData {
 // Helper function to check existing component with proper typing
 async function checkExistingComponent(
   codigoEdificio: string,
-  table: PgTableWithColumns<any>
+  table: typeof Aceras | typeof ZonasVerdes | typeof Terrenos
 ) {
   return await db
     .select()

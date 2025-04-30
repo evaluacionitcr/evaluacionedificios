@@ -153,7 +153,12 @@ export default function FormularioZonasVerdes({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        result = await response.json();
+        const jsonData = await response.json();
+        result = {
+          success: jsonData.success,
+          error: jsonData.error,
+          data: jsonData.data as ZonasVerdesResponse['data']
+        };
         if (result.success) {
           toast.success("Zona verde actualizada exitosamente");
         } else {
