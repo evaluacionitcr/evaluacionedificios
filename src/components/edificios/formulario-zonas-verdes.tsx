@@ -28,6 +28,12 @@ interface ZonasVerdesResponse {
   };
 }
 
+interface ApiResponse {
+  success: boolean;
+  error?: string;
+  data?: ZonasVerdesResponse['data'];
+}
+
 interface FormularioZonasVerdesProps {
   codigoEdificio: string;
   datosFijos?: DatosFijos;
@@ -153,28 +159,48 @@ export default function FormularioZonasVerdes({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        const jsonData = await response.json();
-        result = {
-          success: jsonData.success,
-          error: jsonData.error,
-          data: jsonData.data as ZonasVerdesResponse['data']
-        };
-        if (result.success) {
-          toast.success("Zona verde actualizada exitosamente");
+        const jsonData = (await response.json()) as ApiResponse;
+        
+        // Validate the response structure
+        if (
+          typeof jsonData === 'object' &&
+          jsonData !== null &&
+          'success' in jsonData &&
+          typeof jsonData.success === 'boolean'
+        ) {
+          result = {
+            success: jsonData.success,
+            error: jsonData.error,
+            data: jsonData.data
+          };
+          if (result.success) {
+            toast.success("Zona verde actualizada exitosamente");
+          } else {
+            toast.error(result.error ?? "Error al actualizar zona verde");
+          }
         } else {
-          toast.error(result.error ?? "Error al actualizar zona verde");
+          throw new Error('Invalid response format');
         }
       } else {
         const createResult = await createZonasVerdes(data);
-        result = {
-          success: createResult.success,
-          error: createResult.error,
-          data: createResult.data as ZonasVerdesResponse['data']
-        };
-        if (result.success) {
-          toast.success("Zona verde guardada exitosamente");
+        if (
+          typeof createResult === 'object' &&
+          createResult !== null &&
+          'success' in createResult &&
+          typeof createResult.success === 'boolean'
+        ) {
+          result = {
+            success: createResult.success,
+            error: createResult.error,
+            data: createResult.data as ZonasVerdesResponse['data']
+          };
+          if (result.success) {
+            toast.success("Zona verde guardada exitosamente");
+          } else {
+            toast.error(result.error ?? "Error al guardar zona verde");
+          }
         } else {
-          toast.error(result.error ?? "Error al guardar zona verde");
+          throw new Error('Invalid create response format');
         }
       }
     } catch (error) {

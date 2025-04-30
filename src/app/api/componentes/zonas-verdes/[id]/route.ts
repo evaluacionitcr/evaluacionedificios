@@ -48,7 +48,7 @@ export async function PUT(
         { status: 400 }
       );
     }
-
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const body = await request.json();
     if (!isValidZonasVerdesData(body)) {
       return NextResponse.json(
