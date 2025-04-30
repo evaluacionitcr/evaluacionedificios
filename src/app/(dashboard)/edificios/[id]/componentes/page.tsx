@@ -62,8 +62,8 @@ export default function ComponentesPage() {
           throw new Error('Error en la respuesta del servidor');
         }
 
-        const datosJson = await datosResponse.json();
-        const componentesJson = await componentesResponse.json();
+        const datosJson = (await datosResponse.json()) as unknown;
+        const componentesJson = (await componentesResponse.json()) as unknown;
 
         // Type validation for datos
         if (!isDatosFijos(datosJson)) {
