@@ -2,23 +2,36 @@ import { NumericFormat } from "react-number-format";
 import { useState, useEffect } from "react";
 import type { DatosFijos } from "~/utils/consts";
 import { createZonasVerdes } from "~/server/actions/components";
-import { toast } from "sonner";         
+import { toast } from "sonner";
 
-interface FormularioZonasVerdesProps {
-  codigoEdificio: string;
-  datosFijos?: DatosFijos;
-  datosExistentes?: {
+interface ZonasVerdesResponse {
+  success: boolean;
+  error?: string;
+  data?: {
     id: number;
+    idConstruccion: number | null;
+    codigoEdificio: string;
+    nombre: string;
+    fechaConstruccion: number | null;
     m2Construccion: number | null;
     valorDolarPorM2: string | null;
     valorColonPorM2: string | null;
+    edad: number | null;
     vidaUtilHacienda: number | null;
     vidaUtilExperto: number | null;
     valorReposicion: string | null;
     depreciacionLinealAnual: string | null;
     valorActualRevaluado: string | null;
     anoDeRevaluacion: number | null;
+    noFinca: number | null;
+    usoActual: number | null;
   };
+}
+
+interface FormularioZonasVerdesProps {
+  codigoEdificio: string;
+  datosFijos?: DatosFijos;
+  datosExistentes?: ZonasVerdesResponse["data"];
 }
 
 export default function FormularioZonasVerdes({
@@ -46,7 +59,6 @@ export default function FormularioZonasVerdes({
     setEdad(!isNaN(anio) && !isNaN(anioBase) ? anioBase - anio : 0);
   }, [datosFijos?.fechaConstruccion, anioCalculoEdad]);
 
-  // Añadir efecto para cargar datos existentes
   useEffect(() => {
     if (datosExistentes) {
       setM2Construccion(datosExistentes.m2Construccion?.toString() ?? "");
@@ -55,7 +67,7 @@ export default function FormularioZonasVerdes({
       setVidaUtilHacienda(datosExistentes.vidaUtilHacienda?.toString() ?? "");
       setVidaUtilExperto(datosExistentes.vidaUtilExperto?.toString() ?? "");
       setAnoRevaluacion(datosExistentes.anoDeRevaluacion?.toString() ?? "");
-      setTipoCambio(""); // Esto no se guarda, hay que ingresarlo de nuevo
+      setTipoCambio("");
     }
   }, [datosExistentes]);
 
@@ -105,53 +117,58 @@ export default function FormularioZonasVerdes({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Formatear números para la base de datos
-    const formatNumber = (value: string) => {
+    const formatNumber = (value: string | number) => {
+      if (typeof value === "number") {
+        value = value.toString();
+      }
       if (!value) return null;
-      return parseFloat(value.replace(/\./g, "").replace(",", "."));
+      return value.replace(/\./g, "").replace(",", ".");
     };
 
     const data = {
       idConstruccion: datosFijos?.id ?? null,
       codigoEdificio,
       nombre: "Porción de Zonas verdes",
-      m2Construccion: formatNumber(m2Construccion) ?? 0,
+      m2Construccion: formatNumber(m2Construccion) ?? "0",
       fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
       valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
       valorColonPorM2: formatNumber(valorColonM2) ?? "0",
-      edad,
-      vidaUtilHacienda: parseInt(vidaUtilHacienda),
-      vidaUtilExperto: parseInt(vidaUtilExperto),
-      valorReposicion: parseFloat(valorReposicion.toString()),
-      depreciacionLinealAnual: parseFloat(depreciacionAnual.toString()),
-      valorActualRevaluado: parseFloat(valorRevaluado.toString()),
-      anoDeRevaluacion: parseInt(anoRevaluacion),
+      edad: edad || null,
+      vidaUtilHacienda: parseInt(vidaUtilHacienda) || 0,
+      vidaUtilExperto: parseInt(vidaUtilExperto) || 0,
+      valorReposicion: formatNumber(valorReposicion.toString()) ?? "0",
+      depreciacionLinealAnual: formatNumber(depreciacionAnual.toString()) ?? "0",
+      valorActualRevaluado: formatNumber(valorRevaluado.toString()) ?? "0",
+      anoDeRevaluacion: parseInt(anoRevaluacion) || null,
       noFinca: datosFijos?.noFincaId ?? null,
       usoActual: datosFijos?.usoActualId ?? null,
     };
 
     try {
-      let result;
+      let result: ZonasVerdesResponse;
       if (datosExistentes) {
-        // Si existen datos, actualizar
-        result = await fetch(`/api/componentes/zonas-verdes/${datosExistentes.id}`, {
+        const response = await fetch(`/api/componentes/zonas-verdes/${datosExistentes.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        const jsonResult = await result.json();
-        if (jsonResult.success) {
+        result = await response.json();
+        if (result.success) {
           toast.success("Zona verde actualizada exitosamente");
         } else {
-          toast.error("Error al actualizar zona verde");
+          toast.error(result.error ?? "Error al actualizar zona verde");
         }
       } else {
-        // Si no existen datos, crear
-        result = await createZonasVerdes(data);
+        const createResult = await createZonasVerdes(data);
+        result = {
+          success: createResult.success,
+          error: createResult.error,
+          data: createResult.data as ZonasVerdesResponse['data']
+        };
         if (result.success) {
           toast.success("Zona verde guardada exitosamente");
         } else {
-          toast.error("Error al guardar zona verde");
+          toast.error(result.error ?? "Error al guardar zona verde");
         }
       }
     } catch (error) {

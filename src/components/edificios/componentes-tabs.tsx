@@ -98,6 +98,8 @@ export default function ComponentesTabs({
             datosExistentes={componentesExistentes.terrenos
               ? { 
                 id: componentesExistentes.terrenos.id,
+                codigoEdificio: componentesExistentes.terrenos.codigoEdificio,
+                nombre: componentesExistentes.terrenos.nombre,
                 m2Construccion: componentesExistentes.terrenos.m2Construccion ?? 0,
                 valorDolarPorM2: componentesExistentes.terrenos.valorDolarPorM2 ?? "",
                 valorColonPorM2: componentesExistentes.terrenos.valorColonPorM2 ?? "",
@@ -121,6 +123,10 @@ export default function ComponentesTabs({
             datosExistentes={componentesExistentes.zonasVerdes
               ? { 
                 id: componentesExistentes.zonasVerdes.id,
+                idConstruccion: componentesExistentes.zonasVerdes.idConstruccion,
+                codigoEdificio: componentesExistentes.zonasVerdes.codigoEdificio,
+                nombre: componentesExistentes.zonasVerdes.nombre,
+                fechaConstruccion: componentesExistentes.zonasVerdes.fechaConstruccion,
                 m2Construccion: componentesExistentes.zonasVerdes.m2Construccion ?? 0,
                 valorDolarPorM2: componentesExistentes.zonasVerdes.valorDolarPorM2 ?? "",
                 valorColonPorM2: componentesExistentes.zonasVerdes.valorColonPorM2 ?? "",
@@ -129,7 +135,10 @@ export default function ComponentesTabs({
                 valorReposicion: componentesExistentes.zonasVerdes.valorReposicion ?? "",
                 depreciacionLinealAnual: componentesExistentes.zonasVerdes.depreciacionLinealAnual ?? "",
                 valorActualRevaluado: componentesExistentes.zonasVerdes.valorActualRevaluado ?? "",
-                anoDeRevaluacion: componentesExistentes.zonasVerdes.anoDeRevaluacion ?? 0
+                anoDeRevaluacion: componentesExistentes.zonasVerdes.anoDeRevaluacion ?? 0,
+                usoActual: componentesExistentes.zonasVerdes.usoActual,
+                edad: componentesExistentes.zonasVerdes.edad ?? null,
+                noFinca: componentesExistentes.zonasVerdes.noFinca ? Number(componentesExistentes.zonasVerdes.noFinca) : null
               }
             : undefined
             }

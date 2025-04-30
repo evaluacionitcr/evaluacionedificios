@@ -4,17 +4,29 @@ import type { DatosFijos } from "~/utils/consts";
 import { createTerrenos } from "~/server/actions/components";
 import { toast } from "sonner";
 
+interface TerrenosResponse {
+  success: boolean;
+  error?: string;
+  data?: {
+    id: number;
+    codigoEdificio: string;
+    nombre: string;
+    m2Construccion: number | null;
+    valorDolarPorM2: string | null;
+    valorColonPorM2: string | null;
+    valorPorcionTerreno?: string | null;
+    anoDeRevaluacion?: number | null;
+    fechaConstruccion?: number | null;
+    noFinca?: number | null;
+    usoActual?: number | null;
+    idConstruccion?: number | null;
+  };
+}
+
 interface FormularioTerrenosProps {
   codigoEdificio: string;
   datosFijos?: DatosFijos;
-  datosExistentes?: {
-    id: number;
-    m2Construccion: number;
-    valorDolarPorM2: string;
-    valorColonPorM2: string;
-    valorPorcionTerreno: string;
-    anoDeRevaluacion: number;
-  };
+  datosExistentes?: TerrenosResponse['data'];
 }
 
 export default function FormularioTerrenos({
@@ -84,25 +96,25 @@ export default function FormularioTerrenos({
     };
 
     try {
-      let result;
+      let result: TerrenosResponse;
       if (datosExistentes) {
-        result = await fetch(`/api/componentes/terrenos/${datosExistentes.id}`, {
+        const response = await fetch(`/api/componentes/terrenos/${datosExistentes.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        const jsonResult = await result.json();
-        if (jsonResult.success) {
+        result = await response.json();
+        if (result.success) {
           toast.success("Terreno actualizado exitosamente");
         } else {
-          toast.error("Error al actualizar terreno");
+          toast.error(result.error ?? "Error al actualizar terreno");
         }
       } else {
         result = await createTerrenos(data);
         if (result.success) {
           toast.success("Terreno guardado exitosamente");
         } else {
-          toast.error("Error al guardar terreno");
+          toast.error(result.error ?? "Error al guardar terreno");
         }
       }
     } catch (error) {
