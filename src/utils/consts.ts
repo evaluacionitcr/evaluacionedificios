@@ -7,3 +7,4 @@ export interface DatosFijos {
   noFincaId: number;
   fechaConstruccion: number;
 }
+

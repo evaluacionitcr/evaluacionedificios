@@ -729,7 +729,7 @@ export default function Page(): JSX.Element {
               <TableRow>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[2%]">
                   Registro Fotográfico
-                </TableCell>
+                </TableCell>1
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
                   <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
                 </TableCell>
