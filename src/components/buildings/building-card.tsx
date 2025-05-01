@@ -38,11 +38,9 @@ export default function BuildingCard({ building }: BuildingCardProps) {
             Ver Detalles
           </Button>
         </Link>
-        <Link href={`/evaluacion?edificio=${buildingId}`} className="w-full">
           <Button variant="default" className="w-full">
             Evaluar edificio
           </Button>
-        </Link>
       </CardFooter>
     </Card>
   );
