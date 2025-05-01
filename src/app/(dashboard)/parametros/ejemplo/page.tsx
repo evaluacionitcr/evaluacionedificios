@@ -49,6 +49,45 @@ interface Normativa {
 }
 
 export default function Page(): JSX.Element {
+  const [edificioData, setEdificioData] = useState<{
+    codigoEdificio?: string;
+    nombre?: string;
+    usoActualDescripcion?: string;
+    m2Construccion?: number;
+    sedeNombre?: string;
+    edad?: number;
+    vidaUtilExperto?: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchEdificioData = async () => {
+      // Get the URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const codigo = urlParams.get('codigo');
+      
+      if (codigo) {
+        try {
+          const response = await fetch(`/api/datosEdificio/${codigo}`);
+          if (response.ok) {
+            const data = await response.json();
+            setEdificioData(data);
+            // Asegurar que los valores sean strings válidos
+            if (data.edad !== undefined && data.edad !== null) {
+              setEdadEdificio(data.edad.toString());
+            }
+            if (data.vidaUtilExperto !== undefined && data.vidaUtilExperto !== null) {
+              setVidaUtil(data.vidaUtilExperto.toString());
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching building data:', error);
+        }
+      }
+    };
+
+    fetchEdificioData();
+  }, []);
+
   const [componentes, setComponentes] = useState<Componente[]>([]);
   const [totalPeso, setTotalPeso] = useState<number>(0);
   const [estadosConservacion, setEstadoConservacion] = useState<EstadoConservacion[]>([]);
@@ -217,7 +256,7 @@ export default function Page(): JSX.Element {
   
     if (funcionalidad && normativa) {
       console.log(funcionalidad, normativa);
-      const puntajeTotal = parseFloat(funcionalidad.Puntuacion) + parseFloat(normativa.Puntuacion);
+      const puntajeTotal = funcionalidad.Puntuacion + normativa.Puntuacion;
       setPuntajeSeviciabilidad(puntajeTotal);
     } else {
       setPuntajeSeviciabilidad(0);
@@ -239,8 +278,9 @@ export default function Page(): JSX.Element {
             <input
               id="edificio"
               placeholder="Ej: Edificio U-11"
-              defaultValue="Edificio U-11"
-              className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={edificioData?.nombre || ""}
+              readOnly
+              className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
             />
           </div>
 
@@ -248,8 +288,9 @@ export default function Page(): JSX.Element {
             <label htmlFor="codigo" className="text-base font-medium text-gray-700">Código</label>
             <input
               id="codigo"
-              placeholder="Ingrese el código"
-              className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={edificioData?.codigoEdificio || ""}
+              readOnly
+              className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
             />
           </div>
         </div>
@@ -258,8 +299,9 @@ export default function Page(): JSX.Element {
           <label htmlFor="campus" className="text-base font-medium text-gray-700">Campus Tecnológico / Centro Académico</label>
           <input
             id="campus"
-            placeholder="Ingrese el campus o centro académico"
-            className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={edificioData?.sedeNombre || ""}
+            readOnly
+            className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
         </div>
 
@@ -268,9 +310,9 @@ export default function Page(): JSX.Element {
             <label htmlFor="area" className="text-base font-medium text-gray-700">Área (m²)</label>
             <input
               id="area"
-              placeholder="Ingrese el área"
-              type="number"
-              className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={edificioData?.m2Construccion || ""}
+              readOnly
+              className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
             />
           </div>
 
@@ -278,8 +320,9 @@ export default function Page(): JSX.Element {
             <label htmlFor="uso" className="text-base font-medium text-gray-700">Uso</label>
             <input
               id="uso"
-              placeholder="Ingrese el uso del edificio"
-              className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={edificioData?.usoActualDescripcion || ""}
+              readOnly
+              className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
             />
           </div>
         </div>
