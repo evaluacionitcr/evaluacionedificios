@@ -1,11 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
-import { getComponentes, getEstadoConservacion } from "./actions";
+import { getComponentes, getEstadoConservacion, getFuncionalidades, getNormativas } from "./actions";
+import { set } from "zod";
 
 interface Componente {
   id: number;
@@ -29,10 +30,31 @@ interface EstadoConservacion {
   updatedAt?: Date;
 }
 
+interface Funcionalidad {
+  id: number;
+  Estado: string;
+  Puntuacion: number;
+  Descripcion: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+interface Normativa {
+  id: number;
+  Estado: string;
+  Puntuacion: number;
+  Descripcion: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export default function Page(): JSX.Element {
   const [componentes, setComponentes] = useState<Componente[]>([]);
   const [totalPeso, setTotalPeso] = useState<number>(0);
   const [estadosConservacion, setEstadoConservacion] = useState<EstadoConservacion[]>([]);
+  const [funcionalidades, setFuncionalidades] = useState<Funcionalidad[]>([]);
+  const [normativas, setNormativas] = useState<Normativa[]>([]);
+
 
   // Edificación Principal
   const [edadEdificio, setEdadEdificio] = useState<string>("");
@@ -46,6 +68,10 @@ export default function Page(): JSX.Element {
   const [estadoSeleccionadoRemodelacion, setEstadoSeleccionadoRemodelacion] = useState<number>(0);
   const [porcentajeRemodelacion, setPorcentajeRemodelacion] = useState<number>(0);
   const [escalaDepreciacionRemodelacion, setEscalaDepreciacionRemodelacion] = useState<number>(0);
+
+  // Puntaje Serviciabilidad
+  const [funcionalidadSeleccionada, setFuncionalidadSeleccionada] = useState<string>("");
+  const [normativaSeleccionada, setNormativaSeleccionada] = useState<string>("");
 
   const [puntajeDepreciacionTotal, setPuntajeDepreciacionTotal] = useState<number>(0);
   const [puntajeComponentes, setPuntajeComponentes] = useState<number>(0);
@@ -79,6 +105,34 @@ export default function Page(): JSX.Element {
     };
 
     fetchEstadoConservacion();
+  }, []);
+
+  useEffect(() => {
+    const fetchFuncionalidades = async (): Promise<void> => {
+      const response = await getFuncionalidades();
+      const funcionalidadesActualizadas = (response.data ?? []).map((item: any) => ({
+        ...item,
+        puntuacion: parseFloat(item.Puntuacion),
+      }));
+      setFuncionalidades(funcionalidadesActualizadas);
+      console.log(funcionalidadesActualizadas);
+    };
+
+    fetchFuncionalidades();
+  }, []);
+
+  useEffect(() => {
+    const fetchNormativas = async (): Promise<void> => {
+      const response = await getNormativas();
+      const normativasActualizadas = (response.data ?? []).map((item: any) => ({
+        ...item,
+        puntuacion: parseFloat(item.Puntuacion),
+      }));
+      setNormativas(normativasActualizadas);
+      console.log(normativasActualizadas);
+    };
+
+    fetchNormativas();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
@@ -129,7 +183,7 @@ export default function Page(): JSX.Element {
     componente.puntaje = parseFloat(puntaje);
     return puntaje;
   };
-
+  
   useEffect(() => {
     if (edadEdificio && vidaUtil) {
       const escalaDepreciacion = (1 - (((100 - estadoSeleccionado) / 100) * (1 - (0.5 * ((parseInt(edadEdificio) / parseInt(vidaUtil)) + ((parseInt(edadEdificio) ** 2) / (parseInt(vidaUtil) ** 2))))))).toFixed(2);
@@ -150,6 +204,30 @@ export default function Page(): JSX.Element {
       setPuntajeDepreciacionTotal(parseFloat(puntajeTotal));
     }
   }, [escalaDepreciacion, escalaDepreciacionRemodelacion, porcentajeRemodelacion]);
+
+  useEffect(() => {
+    const totalPuntajeComponentes = componentes.reduce((total, componente) => total + (componente.puntaje || 0), 0);
+    console.log("Total Puntaje Componentes:", totalPuntajeComponentes);
+    setPuntajeComponentes(parseFloat(totalPuntajeComponentes.toFixed(3)));
+  }, [componentes]);
+
+  useEffect(() => {
+    const funcionalidad = funcionalidades.find(f => f.id === parseInt(funcionalidadSeleccionada));
+    const normativa = normativas.find(n => n.id === parseInt(normativaSeleccionada));
+  
+    if (funcionalidad && normativa) {
+      console.log(funcionalidad, normativa);
+      const puntajeTotal = parseFloat(funcionalidad.Puntuacion) + parseFloat(normativa.Puntuacion);
+      setPuntajeSeviciabilidad(puntajeTotal);
+    } else {
+      setPuntajeSeviciabilidad(0);
+    }
+  }, [funcionalidadSeleccionada, normativaSeleccionada, funcionalidades, normativas]);
+
+  useEffect(() => {
+    const puntajeTotal = puntajeDepreciacionTotal + puntajeComponentes + puntajeSeviciabilidad;
+    setPuntajeTotalEdificios(puntajeTotal);
+  }, [puntajeDepreciacionTotal, puntajeComponentes, puntajeSeviciabilidad]);
 
   return (
     <div className="container mx-auto py-6 border border-gray-300 rounded-xl">
@@ -211,7 +289,7 @@ export default function Page(): JSX.Element {
           <textarea
             id="descripcion"
             placeholder="Ingrese la descripción detallada del edificio"
-            className="w-full min-h-[200px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full min-h-[200px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
         </div>
 
@@ -424,7 +502,7 @@ export default function Page(): JSX.Element {
                     </div>
                   </TableCell>
                   <TableCell className="text-sm">
-                    <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ingrese los elementos a valorar"></textarea>
+                    <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
                   </TableCell>
                   <TableCell colSpan={3} className="text-center">
                     <div className="relative flex items-center justify-center">
@@ -452,12 +530,171 @@ export default function Page(): JSX.Element {
                 </TableCell>
                 <TableCell colSpan={4}></TableCell>
                 <TableCell className="font-bold text-center bg-yellow-100">
-                  {componentes.reduce((total, componente) => total + (componente.puntaje || 0), 0).toFixed(3)}
+                  {puntajeComponentes}
                 </TableCell>
               </TableRow>
             </tfoot>
           </Table>
         </div>
+
+        <h1 className="text-2xl font-bold text-center mb-8">Puntaje por serviacibilidad</h1>
+
+        <div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[12%]">
+                  Funcionalidad
+                </TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[12%]">
+                  Normativa
+                </TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[12%]">
+                  Puntaje Total
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="text-center">
+                <select
+                  value={funcionalidadSeleccionada}
+                  onChange={(e) => setFuncionalidadSeleccionada(e.target.value)}
+                  className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {funcionalidades.map((funcionalidad, index) => (
+                    <option key={funcionalidad.id} value={funcionalidad.id}>
+                      {funcionalidad.Estado}
+                    </option>
+                  ))}
+                </select>
+                </TableCell>
+                <TableCell className="text-center">
+                  <select
+                    value={normativaSeleccionada}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      console.log('Normativa seleccionada:', value);
+                      setNormativaSeleccionada(value);
+                    }}
+                    className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {normativas.map((normativa, index) => (
+                      <option key={normativa.id} value={normativa.id}>
+                        {normativa.Estado}
+                      </option>
+                    ))}
+                  </select>
+                </TableCell>
+                <TableCell className="text-center font-bold bg-yellow-100">
+                  {puntajeSeviciabilidad.toFixed(2)}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
+        <h1 className="text-2xl font-bold text-center mb-8">Total del Edificio</h1>
+        <div>
+          <Table>
+          <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[12%]">
+                  Rubro
+                </TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[12%]">
+                  Puntaje Priorizacion Relativo
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="text-center">
+                  Puntaje por depreciación del edificio 
+                </TableCell>
+                <TableCell className="text-center font-bold bg-yellow-100">
+                  {puntajeDepreciacionTotal}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="text-center">
+                  Puntaje por estado de los componentes y sistemas del edificio
+                </TableCell>
+                <TableCell className="text-center font-bold bg-yellow-100">
+                  {puntajeComponentes}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="text-center">
+                  Puntaje por Serviciabilidad
+                </TableCell>
+                <TableCell className="text-center font-bold bg-yellow-100">
+                  {puntajeSeviciabilidad}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="text-center font-bold">
+                  PUNTAJE TOTAL DEL EDIFICIO
+                </TableCell>
+                <TableCell className="text-center font-bold bg-yellow-100">
+                  {puntajeTotalEdificio}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
+        <h1 className="text-2xl font-bold text-center mb-8">Comentarios:</h1>
+        
+        <div>
+          <Table>
+          <TableBody>
+              <TableRow>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[2%]">
+                  Funcionalidad 
+                </TableCell>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
+                <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[2%]">
+                  Normativa 
+                </TableCell>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
+                <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[2%]">
+                  Componentes Criticos 
+                </TableCell>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
+                <textarea 
+                  className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
+                  placeholder="Ingrese los elementos a valorar"></textarea>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[2%]">
+                  Mejoras Requeridas
+                </TableCell>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
+                  <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[2%]">
+                  Registro Fotográfico
+                </TableCell>
+                <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
+                  <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
 
         <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline" type="reset" className="px-6 text-gray-700 border-gray-300 hover:bg-gray-100">Limpiar</Button>

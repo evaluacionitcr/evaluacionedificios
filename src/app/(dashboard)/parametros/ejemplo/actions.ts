@@ -2,7 +2,7 @@
 
 import { db } from "~/server/db";
 import { sql } from "drizzle-orm";
-import { Componentes, EstadosConservacion } from "~/server/db/schema";
+import { Componentes, EstadosConservacion, Funcionalidades, Normativas } from "~/server/db/schema";
 import { revalidatePath } from "next/cache";
 
 export async function getComponentes() {
@@ -25,3 +25,25 @@ export async function getEstadoConservacion() {
         return { success: false, error: "No se pudo cargar el estado de conservación" };
     }
 }
+
+export async function getFuncionalidades() {
+    try {
+      const funcionalidades = await db.select().from(Funcionalidades);
+      return { success: true, data: funcionalidades };
+    }
+    catch (error) {
+      console.error("Error al obtener las funcionalidades:", error);
+      return { success: false, error: "No se pudieron cargar las funcionalidades" };
+    }
+  }
+
+export async function getNormativas() {
+    try {
+      const normativas = await db.select().from(Normativas);
+      return { success: true, data: normativas };
+    }
+    catch (error) {
+      console.error("Error al obtener las funcionalidades:", error);
+      return { success: false, error: "No se pudieron cargar las funcionalidades" };
+    }
+  }
