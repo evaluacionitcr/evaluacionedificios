@@ -1,11 +1,160 @@
+"use client";
+import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { getComponentes, getEstadoConservacion } from "./actions";
 
-export default function Page() {
+interface Componente {
+  id: number;
+  componente: string;
+  peso: number;
+  necesidadIntervencion: number;
+  existencia: string;
+  pesoEvaluado?: number;
+  puntaje?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+interface EstadoConservacion {
+  id: number;
+  estado_conservacion: string;
+  condiciones_fisicas: string;
+  clasificacion: string;
+  coef_depreciacion: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export default function Page(): JSX.Element {
+  const [componentes, setComponentes] = useState<Componente[]>([]);
+  const [totalPeso, setTotalPeso] = useState<number>(0);
+  const [estadosConservacion, setEstadoConservacion] = useState<EstadoConservacion[]>([]);
+
+  // Edificación Principal
+  const [edadEdificio, setEdadEdificio] = useState<string>("");
+  const [vidaUtil, setVidaUtil] = useState<string>("");
+  const [estadoSeleccionado, setEstadoSeleccionado] = useState<number>(0);
+  const [escalaDepreciacion, setEscalaDepreciacion] = useState<number>(0);
+
+  // Edificación Remodelación
+  const [edadEdificioRemodelacion, setEdadEdificioRemodelacion] = useState<string>("");
+  const [vidaUtilRemodelacion, setVidaUtilRemodelacion] = useState<string>("");
+  const [estadoSeleccionadoRemodelacion, setEstadoSeleccionadoRemodelacion] = useState<number>(0);
+  const [porcentajeRemodelacion, setPorcentajeRemodelacion] = useState<number>(0);
+  const [escalaDepreciacionRemodelacion, setEscalaDepreciacionRemodelacion] = useState<number>(0);
+
+  const [puntajeDepreciacionTotal, setPuntajeDepreciacionTotal] = useState<number>(0);
+  const [puntajeComponentes, setPuntajeComponentes] = useState<number>(0);
+  const [puntajeSeviciabilidad, setPuntajeSeviciabilidad] = useState<number>(0);
+  const [puntajeTotalEdificio, setPuntajeTotalEdificios] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchComponentes = async (): Promise<void> => {
+      const response = await getComponentes();
+      const componentesActualizados = (response.data ?? []).map((item: any) => ({
+        ...item,
+        peso: parseFloat(item.peso),
+        necesidadIntervencion: 0,
+        existencia: "si",
+      }));
+      setComponentes(componentesActualizados);
+      calcularPesoTotal(componentesActualizados);
+    };
+
+    fetchComponentes();
+  }, []);
+
+  useEffect(() => {
+    const fetchEstadoConservacion = async (): Promise<void> => {
+      const response = await getEstadoConservacion();
+      const estadoConservacionActualizado = (response.data ?? []).map((item: any) => ({
+        ...item,
+        coef_depreciacion: parseFloat(item.coef_depreciacion),
+      }));
+      setEstadoConservacion(estadoConservacionActualizado);
+    };
+
+    fetchEstadoConservacion();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
+    const value = parseFloat(e.target.value);
+    const newComponentes = [...componentes];
+    if (newComponentes[index]) {
+      newComponentes[index].necesidadIntervencion = value;
+    }
+    setComponentes(newComponentes);
+  };
+
+  const handleExistenciaChange = (index: number, value: string): void => {
+    const newComponentes = [...componentes];
+    if (newComponentes[index]) {
+      newComponentes[index].existencia = value;
+      calcularPesoTotal(newComponentes);
+    }
+    setComponentes(newComponentes);
+  };
+
+  const getInputColor = (value: number): string => {
+    if (value >= 66) return 'bg-red-200';
+    if (value >= 33) return 'bg-yellow-200';
+    return 'bg-green-200';
+  };
+
+  const calcularPesoTotal = (componentes: Componente[]): void => {
+    const pesoTotal = componentes
+      .filter((componente: Componente) => componente.existencia === "si")
+      .reduce((total: number, componente: Componente) => total + componente.peso, 0);
+
+    if (pesoTotal !== totalPeso) {
+      setTotalPeso(pesoTotal);
+    }
+  };
+
+  const calcularPesoEvaluacion = (componente: Componente): string => {
+    let pesoEvaluado = "0";
+    if (componente.existencia === "si") {
+      pesoEvaluado = ((componente.peso * (1 + ((1 - totalPeso) / totalPeso))) * 100).toFixed(2);
+      componente.pesoEvaluado = parseFloat(pesoEvaluado);
+    }
+    return pesoEvaluado;
+  };
+
+  const calcularPuntajeComponentes = (componente: Componente): string => {
+    const puntaje = ((componente.pesoEvaluado ?? 0) / 100 * (componente.necesidadIntervencion) / 100).toFixed(3);
+    componente.puntaje = parseFloat(puntaje);
+    return puntaje;
+  };
+
+  useEffect(() => {
+    if (edadEdificio && vidaUtil) {
+      const escalaDepreciacion = (1 - (((100 - estadoSeleccionado) / 100) * (1 - (0.5 * ((parseInt(edadEdificio) / parseInt(vidaUtil)) + ((parseInt(edadEdificio) ** 2) / (parseInt(vidaUtil) ** 2))))))).toFixed(2);
+      setEscalaDepreciacion(parseFloat(escalaDepreciacion));
+    }
+  }, [edadEdificio, vidaUtil, estadoSeleccionado]);
+
+  useEffect(() => {
+    if (edadEdificioRemodelacion && vidaUtilRemodelacion) {
+      const escalaDepreciacionRemodelacion = (1 - (((100 - estadoSeleccionadoRemodelacion) / 100) * (1 - (0.5 * ((parseInt(edadEdificioRemodelacion) / parseInt(vidaUtilRemodelacion)) + ((parseInt(edadEdificioRemodelacion) ** 2) / (parseInt(vidaUtilRemodelacion) ** 2))))))).toFixed(4);
+      setEscalaDepreciacionRemodelacion(parseFloat(escalaDepreciacionRemodelacion));
+    }
+  }, [edadEdificioRemodelacion, vidaUtilRemodelacion, estadoSeleccionadoRemodelacion]);
+
+  useEffect(() => {
+    if (escalaDepreciacion && escalaDepreciacionRemodelacion && porcentajeRemodelacion) {
+      const puntajeTotal = ((escalaDepreciacion * (1 - porcentajeRemodelacion / 100)) + (escalaDepreciacionRemodelacion * escalaDepreciacion)).toFixed(2);
+      setPuntajeDepreciacionTotal(parseFloat(puntajeTotal));
+    }
+  }, [escalaDepreciacion, escalaDepreciacionRemodelacion, porcentajeRemodelacion]);
+
   return (
     <div className="container mx-auto py-6 border border-gray-300 rounded-xl">
       <h1 className="text-2xl font-bold text-center mb-8">Evaluación de Edificaciones</h1>
       <form className="space-y-6">
-        {/* Fila de Edificio y Código */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label htmlFor="edificio" className="text-base font-medium text-gray-700">Edificio</label>
@@ -27,7 +176,6 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Fila de Campus Tecnológico y Área */}
         <div className="space-y-2">
           <label htmlFor="campus" className="text-base font-medium text-gray-700">Campus Tecnológico / Centro Académico</label>
           <input
@@ -58,7 +206,6 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Descripción */}
         <div className="space-y-2">
           <label htmlFor="descripcion" className="text-base font-medium text-gray-700">Descripción</label>
           <textarea
@@ -71,89 +218,247 @@ export default function Page() {
         <h1 className="text-2xl font-bold text-center mb-8">Puntaje por depreciación del edificio</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-          {/* Encabezados de columnas */}
           <div className="bg-[#00205B] text-white text-center py-3 font-semibold">Edificación Principal</div>
           <div className="bg-[#00205B] text-white text-center py-3 font-semibold">Remodelación</div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-          {/* Columna Edificación Principal */}
           <div className="border-r border-gray-200 p-4 space-y-4">
             <div className="space-y-2">
               <label htmlFor="edad-edificio" className="text-base font-medium">Edad de Edificio</label>
-              <input id="edad-edificio" defaultValue="45" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                id="edad-edificio"
+                type="number"
+                value={edadEdificio}
+                onChange={(e) => setEdadEdificio(e.target.value)}
+                placeholder="Cargar la edad del edificio"
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="vida-util-principal" className="text-base font-medium">Vida Útil Esperada</label>
-              <input id="vida-util-principal" defaultValue="75" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                id="vida-util-principal"
+                value={vidaUtil}
+                onChange={(e) => setVidaUtil(e.target.value)}
+                placeholder="Cargar la vida útil esperada"
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="estado-conservacion-principal" className="text-base font-medium">Estado de Conservación</label>
-              <select defaultValue="regular" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="optimo">Óptimo (O)</option>
-                <option value="bueno">Bueno (B)</option>
-                <option value="regular">Regular (R)</option>
-                <option value="malo">Malo (M)</option>
+              <select
+                value={estadoSeleccionado}
+                onChange={(e) => setEstadoSeleccionado(parseFloat(e.target.value))}
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {estadosConservacion.map((estado, index) => (
+                  <option key={index} value={estado.coef_depreciacion}>
+                    {estado.clasificacion}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="escala-depreciacion-principal" className="text-base font-medium">Escala de depreciación</label>
-              <input id="escala-depreciacion-principal" defaultValue="0.57" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                id="escala-depreciacion-principal"
+                value={escalaDepreciacion}
+                readOnly
+                placeholder="Cargar la escala de depreciación"
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
 
-          {/* Columna Remodelación */}
           <div className="p-4 space-y-4">
             <div className="space-y-2">
               <label htmlFor="edad-remodela" className="text-base font-medium">Edad de Remodelación</label>
-              <input id="edad-remodela" defaultValue="1" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                id="edad-remodela"
+                type="number"
+                value={edadEdificioRemodelacion}
+                onChange={(e) => setEdadEdificioRemodelacion(e.target.value)}
+                placeholder="Cargar la edad de la remodelación"
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="vida-util-remodela" className="text-base font-medium">Vida Útil Esperada</label>
-              <input id="vida-util-remodela" defaultValue="55" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                id="vida-util-remodela"
+                value={vidaUtilRemodelacion}
+                onChange={(e) => setVidaUtilRemodelacion(e.target.value)}
+                placeholder="Cargar la vida útil esperada"
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="estado-conservacion-remodela" className="text-base font-medium">Estado de Conservación</label>
-              <select defaultValue="optimo" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="optimo">Óptimo (O)</option>
-                <option value="bueno">Bueno (B)</option>
-                <option value="regular">Regular (R)</option>
-                <option value="malo">Malo (M)</option>
+              <select
+                value={estadoSeleccionadoRemodelacion}
+                onChange={(e) => setEstadoSeleccionadoRemodelacion(parseFloat(e.target.value))}
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {estadosConservacion.map((estado, index) => (
+                  <option key={index} value={estado.coef_depreciacion}>
+                    {estado.clasificacion}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="porcentaje-remodelacion" className="text-base font-medium">Porcentaje de Remodelación/Ampliación</label>
               <div className="relative">
-                <input id="porcentaje-remodelacion" defaultValue="10" className="w-full h-11 px-4 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input
+                  id="porcentaje-remodelacion"
+                  value={porcentajeRemodelacion}
+                  onChange={(e) => setPorcentajeRemodelacion(parseFloat(e.target.value))}
+                  type="number"
+                  className="w-full h-11 px-4 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2">%</span>
               </div>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="escala-depreciacion-remodela" className="text-base font-medium">Escala de depreciación Remodelación/Ampliación</label>
-              <input id="escala-depreciacion-remodela" defaultValue="0.0033" className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                id="escala-depreciacion-principal"
+                value={escalaDepreciacionRemodelacion}
+                readOnly
+                placeholder="Cargar la escala de depreciación"
+                className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
         </div>
 
-        {/* Puntaje Total */}
         <div className="p-4 bg-yellow-100 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <label htmlFor="puntaje-total" className="text-base font-bold">PUNTAJE DE DEPRECIACIÓN TOTAL</label>
-            <input id="puntaje-total" defaultValue="0.52" className="w-full md:max-w-[200px] h-11 font-bold text-center" />
+            <input
+              id="puntaje-total"
+              value={puntajeDepreciacionTotal}
+              readOnly
+              className="w-full md:max-w-[200px] h-11 font-bold text-center"
+            />
           </div>
         </div>
 
         <h1 className="text-2xl font-bold text-center mb-8">Puntaje del estado de los componentes y sistemas del edificio</h1>
-        
 
-        {/* Botones de acción */}
+        <div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[12%]">
+                  Componente o Sistema
+                </TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[8%]">
+                  Existencia
+                </TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white">
+                  Peso [P]
+                </TableHead>
+                <TableHead className="font-semibold text-center bg-[#00205B] text-white w-[40%]">
+                  Elementos a valorar del componente o sistema
+                </TableHead>
+                <TableHead
+                  className="font-semibold text-center whitespace-nowrap bg-[#00205B] text-white w-[24%]"
+                  colSpan={3}
+                >
+                  Necesidad de intervención (N)
+                </TableHead>
+                <TableHead className="font-semibold text-center bg-yellow-100 whitespace-nowrap w-[8%]">
+                  Puntaje
+                </TableHead>
+              </TableRow>
+              <TableRow>
+                <TableHead className="bg-gray-100"></TableHead>
+                <TableHead className="bg-gray-100"></TableHead>
+                <TableHead className="bg-gray-100"></TableHead>
+                <TableHead className="bg-gray-100"></TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-green-100">
+                  Bajo (0-33)%
+                </TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-yellow-100">
+                  Medio (33-66)%
+                </TableHead>
+                <TableHead className="font-semibold text-center whitespace-nowrap bg-red-100">
+                  Alto (66-100)%
+                </TableHead>
+                <TableHead className="bg-yellow-100"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {componentes.map((componente, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{componente.componente}</TableCell>
+                  <TableCell className="text-center">
+                    <RadioGroup
+                      value={componente.existencia}
+                      onValueChange={(value) => handleExistenciaChange(index, value)}
+                      className="flex justify-center space-x-2"
+                    >
+                      <div className="flex items-center space-x-1">
+                        <RadioGroupItem id={`${componente.componente}-si`} value="si" />
+                        <Label htmlFor={`${componente.componente}-si`}>Sí</Label>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <RadioGroupItem id={`${componente.componente}-no`} value="no" />
+                        <Label htmlFor={`${componente.componente}-no`}>No</Label>
+                      </div>
+                    </RadioGroup>
+                  </TableCell>
+                  <TableCell>
+                    <div className="relative flex items-center">
+                      <Input value={calcularPesoEvaluacion(componente)} readOnly className="text-right w-20 mx-auto pr-8" />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ingrese los elementos a valorar"></textarea>
+                  </TableCell>
+                  <TableCell colSpan={3} className="text-center">
+                    <div className="relative flex items-center justify-center">
+                      <Input
+                        type="number"
+                        value={componente.necesidadIntervencion}
+                        onChange={(e) => handleChange(e, index)}
+                        disabled={componente.existencia === "no"}
+                        className={`mx-auto pr-2 ${getInputColor(componente.necesidadIntervencion)}`}
+                      />
+                      <span className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center font-bold bg-yellow-100">
+                    {calcularPuntajeComponentes(componente)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+            <tfoot>
+              <TableRow>
+                <TableCell className="font-bold text-center" colSpan={2}>Total</TableCell>
+                <TableCell className="font-bold text-center">
+                  {componentes.reduce((total, componente) => total + componente.peso, 0).toFixed(2)}%
+                </TableCell>
+                <TableCell colSpan={4}></TableCell>
+                <TableCell className="font-bold text-center bg-yellow-100">
+                  {componentes.reduce((total, componente) => total + (componente.puntaje || 0), 0).toFixed(3)}
+                </TableCell>
+              </TableRow>
+            </tfoot>
+          </Table>
+        </div>
+
         <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline" type="reset" className="px-6 text-gray-700 border-gray-300 hover:bg-gray-100">Limpiar</Button>
           <Button type="submit" className="px-6 bg-[#00205B] hover:bg-[#003080] text-white">Guardar</Button>
