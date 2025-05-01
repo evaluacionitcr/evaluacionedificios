@@ -273,8 +273,8 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
       const response = await createRemodelacion(edificioData);
 
       if (response.success) {
-        // Redirigir a la página de detalles del edificio
-        router.push(`/edificios/${buildingId}`);
+        // Redirigir al usuario a editar aceras, zonas verdes y terrenos
+        router.push(`/edificios/${buildingId}/componentes`);
       } else {
         setError(response.error ?? "Error al crear la remodelación");
       }
