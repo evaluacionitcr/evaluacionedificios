@@ -55,8 +55,6 @@ export default function Page(): JSX.Element {
     usoActualDescripcion?: string;
     m2Construccion?: number;
     sedeNombre?: string;
-    edad?: number;
-    vidaUtilExperto?: number;
   } | null>(null);
 
   useEffect(() => {
@@ -71,13 +69,9 @@ export default function Page(): JSX.Element {
           if (response.ok) {
             const data = await response.json();
             setEdificioData(data);
-            // Asegurar que los valores sean strings válidos
-            if (data.edad !== undefined && data.edad !== null) {
-              setEdadEdificio(data.edad.toString());
-            }
-            if (data.vidaUtilExperto !== undefined && data.vidaUtilExperto !== null) {
-              setVidaUtil(data.vidaUtilExperto.toString());
-            }
+            // Set edad and vidaUtil from the API response, handling null/undefined values
+            setEdadEdificio(data.edad?.toString() || "");
+            setVidaUtil(data.vidaUtilExperto?.toString() || "");
           }
         } catch (error) {
           console.error('Error fetching building data:', error);
@@ -729,7 +723,7 @@ export default function Page(): JSX.Element {
               <TableRow>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[2%]">
                   Registro Fotográfico
-                </TableCell>1
+                </TableCell>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
                   <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
                 </TableCell>
