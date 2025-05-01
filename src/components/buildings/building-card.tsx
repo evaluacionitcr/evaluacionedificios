@@ -31,11 +31,16 @@ export default function BuildingCard({ building }: BuildingCardProps) {
       <CardContent>
         {/* Contenido del card eliminado según la solicitud */}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex gap-2">
         <Link href={`/edificios/${buildingId}`} className="w-full">
           <Button variant="outline" className="w-full">
             <Eye className="mr-2 h-4 w-4" />
             Ver Detalles
+          </Button>
+        </Link>
+        <Link href={`/evaluacion?edificio=${buildingId}`} className="w-full">
+          <Button variant="default" className="w-full">
+            Evaluar edificio
           </Button>
         </Link>
       </CardFooter>
