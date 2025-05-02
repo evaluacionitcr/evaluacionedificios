@@ -63,11 +63,11 @@ function BuildingList({ sedesConEdificios }: { sedesConEdificios: Sede[] }) {
       return sede.edificios;
     }
     
-    return sede.edificios.filter(
-      (edificio) => 
-        edificio.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ??
-        edificio.codigo?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return sede.edificios.filter((edificio) => {
+      const nombreMatch = edificio.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      const codigoMatch = edificio.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      return nombreMatch || codigoMatch;
+    });
   };
 
   return (

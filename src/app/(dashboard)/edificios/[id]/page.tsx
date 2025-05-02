@@ -38,6 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { formatMoney } from "~/lib/utils";
 import {
   eliminarRegistroEdificio,
   obtenerDetallesEdificio,
@@ -528,15 +529,11 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                         <TableCell>{e.numeroFinca ?? "N/A"}</TableCell>
                         <TableCell>{e.m2Construccion ?? "N/A"}</TableCell>
                         <TableCell>{e.usoActual ?? "N/A"}</TableCell>
-                        <TableCell>${e.valorDolarPorM2 ?? "0.00"}</TableCell>
-                        <TableCell>₡{e.valorColonPorM2 ?? "0.00"}</TableCell>
-                        <TableCell>₡{e.valorReposicion ?? "0.00"}</TableCell>
-                        <TableCell>
-                          ₡{e.valorActualRevaluado ?? "0.00"}
-                        </TableCell>
-                        <TableCell>
-                          ₡{e.depreciacionLinealAnual ?? "0.00"}
-                        </TableCell>
+                        <TableCell>{formatMoney(e.valorDolarPorM2, "$")}</TableCell>
+                        <TableCell>{formatMoney(e.valorColonPorM2)}</TableCell>
+                        <TableCell>{formatMoney(e.valorReposicion)}</TableCell>
+                        <TableCell>{formatMoney(e.valorActualRevaluado)}</TableCell>
+                        <TableCell>{formatMoney(e.depreciacionLinealAnual)}</TableCell>
                         <TableCell>{e.anoDeRevaluacion ?? "N/A"}</TableCell>
                         <TableCell>{e.edad ?? 0} años</TableCell>
                         <TableCell>{e.vidaUtilHacienda ?? 0} años</TableCell>
@@ -582,19 +579,19 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                                   {acera.usoActual ?? "N/A"}
                                 </TableCell>
                                 <TableCell>
-                                  ${acera.valorDolarPorM2 ?? "0.00"}
+                                  {formatMoney(acera.valorDolarPorM2, "$")}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{acera.valorColonPorM2 ?? "0.00"}
+                                  {formatMoney(acera.valorColonPorM2)}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{acera.valorReposicion ?? "0.00"}
+                                  {formatMoney(acera.valorReposicion)}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{acera.valorActualRevaluado ?? "0.00"}
+                                  {formatMoney(acera.valorActualRevaluado)}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{acera.depreciacionLinealAnual ?? "0.00"}
+                                  {formatMoney(acera.depreciacionLinealAnual)}
                                 </TableCell>
                                 <TableCell>
                                   {acera.anoDeRevaluacion ?? "N/A"}
@@ -637,20 +634,19 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                                   {zonasVerde.usoActual ?? "N/A"}
                                 </TableCell>
                                 <TableCell>
-                                  ${zonasVerde.valorDolarPorM2 ?? "0.00"}
+                                  {formatMoney(zonasVerde.valorDolarPorM2, "$")}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{zonasVerde.valorColonPorM2 ?? "0.00"}
+                                  {formatMoney(zonasVerde.valorColonPorM2)}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{zonasVerde.valorReposicion ?? "0.00"}
+                                  {formatMoney(zonasVerde.valorReposicion)}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{zonasVerde.valorActualRevaluado ?? "0.00"}
+                                  {formatMoney(zonasVerde.valorActualRevaluado)}
                                 </TableCell>
                                 <TableCell>
-                                  ₡
-                                  {zonasVerde.depreciacionLinealAnual ?? "0.00"}
+                                  {formatMoney(zonasVerde.depreciacionLinealAnual)}
                                 </TableCell>
                                 <TableCell>
                                   {zonasVerde.anoDeRevaluacion ?? "N/A"}
@@ -695,13 +691,36 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                                   {terreno.usoActual ?? "N/A"}
                                 </TableCell>
                                 <TableCell>
-                                  ${terreno.valorDolarPorM2 ?? "0.00"}
+                                  {formatMoney(terreno.valorDolarPorM2, "$")}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{terreno.valorColonPorM2 ?? "0.00"}
+                                  {formatMoney(terreno.valorColonPorM2)}
                                 </TableCell>
                                 <TableCell>
-                                  ₡{terreno.valorPorcionTerreno ?? "0.00"}
+                                  {formatMoney(terreno.valorPorcionTerreno)}
+                                </TableCell>
+                                <TableCell>
+                                  {/* No tiene valor actual equivalente */}
+                                  N/A
+                                </TableCell>
+                                <TableCell>
+                                  {/* No tiene depreciación equivalente */}
+                                  N/A
+                                </TableCell>
+                                <TableCell>
+                                  {terreno.anoDeRevaluacion ?? "N/A"}
+                                </TableCell>
+                                <TableCell>
+                                  {/* No tiene edad equivalente */}
+                                  N/A
+                                </TableCell>
+                                <TableCell>
+                                  {/* No tiene vida útil hacienda equivalente */}
+                                  N/A
+                                </TableCell>
+                                <TableCell>
+                                  {/* No tiene vida útil experto equivalente */}
+                                  N/A
                                 </TableCell>
                                 <TableCell>
                                   {terreno.esRenovacion ? "Sí" : "No"}
