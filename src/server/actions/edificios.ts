@@ -46,6 +46,7 @@ export async function getConstruccionesPorSede() {
         id: min(Construcciones.id),
       })
       .from(Construcciones)
+      .where(eq(Construcciones.activo, true))
       .groupBy(Construcciones.codigoEdificio);
 
     // Luego obtenemos los edificios con información de sede solo para esos IDs
@@ -171,7 +172,8 @@ export async function getDetallesEdificio(
 export async function eliminarRegistroEdificio(id: number) {
   try {
     const resultado = await db
-      .delete(Construcciones)
+      .update(Construcciones)
+      .set({ activo: false })
       .where(eq(Construcciones.id, id))
       .returning({ id: Construcciones.id });
     // Añadir esta línea para revalidar la página de edificios
@@ -195,7 +197,8 @@ export async function eliminarRegistroEdificio(id: number) {
 export async function eliminarEdificioCompleto(codigoEdificio: string) {
   try {
     const resultado = await db
-      .delete(Construcciones)
+      .update(Construcciones)
+      .set({ activo: false })
       .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
       .returning({ id: Construcciones.id });
     // Añadir esta línea para revalidar la página de edificios
