@@ -16,6 +16,7 @@ interface Componente {
   existencia: string;
   pesoEvaluado?: number;
   puntaje?: number;
+  elementosValorar?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -46,6 +47,14 @@ interface Normativa {
   Descripcion: string;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+interface Comentarios {
+  funcionalidad: string;
+  normativa: string;
+  componentesCriticos: string;
+  mejorasRequeridas: string;
+  registroFotografico: string;
 }
 
 export default function Page(): JSX.Element {
@@ -88,6 +97,9 @@ export default function Page(): JSX.Element {
   const [funcionalidades, setFuncionalidades] = useState<Funcionalidad[]>([]);
   const [normativas, setNormativas] = useState<Normativa[]>([]);
 
+  // Componentes
+  const [elementosValorar, setElementosValorar] = useState<string>("");
+
 
   // Edificación Principal
   const [edadEdificio, setEdadEdificio] = useState<string>("");
@@ -110,6 +122,21 @@ export default function Page(): JSX.Element {
   const [puntajeComponentes, setPuntajeComponentes] = useState<number>(0);
   const [puntajeSeviciabilidad, setPuntajeSeviciabilidad] = useState<number>(0);
   const [puntajeTotalEdificio, setPuntajeTotalEdificios] = useState<number>(0);
+
+  const [comentarios, setComentarios] = useState<Comentarios>({
+    funcionalidad: '',
+    normativa: '',
+    componentesCriticos: '',
+    mejorasRequeridas: '',
+    registroFotografico: ''
+  });
+
+  const handleComentarioChange = (field: keyof Comentarios, value: string) => {
+    setComentarios(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   useEffect(() => {
     const fetchComponentes = async (): Promise<void> => {
@@ -208,6 +235,10 @@ export default function Page(): JSX.Element {
       pesoEvaluado = ((componente.peso * (1 + ((1 - totalPeso) / totalPeso))) * 100).toFixed(2);
       componente.pesoEvaluado = parseFloat(pesoEvaluado);
     }
+    else{
+      componente.pesoEvaluado = 0;
+
+    }
     return pesoEvaluado;
   };
 
@@ -245,13 +276,13 @@ export default function Page(): JSX.Element {
   }, [componentes]);
 
   useEffect(() => {
-    const funcionalidad = funcionalidades.find(f => f.id === parseInt(funcionalidadSeleccionada));
-    const normativa = normativas.find(n => n.id === parseInt(normativaSeleccionada));
+    const funcionalidad = funcionalidades.find(f => f.id === parseFloat(funcionalidadSeleccionada));
+    const normativa = normativas.find(n => n.id === parseFloat(normativaSeleccionada));
   
     if (funcionalidad && normativa) {
       console.log(funcionalidad, normativa);
-      const puntajeTotal = funcionalidad.Puntuacion + normativa.Puntuacion;
-      setPuntajeSeviciabilidad(puntajeTotal);
+      const puntajeTotal = parseFloat(funcionalidad.Puntuacion.toString()) + parseFloat(normativa.Puntuacion.toString());
+      setPuntajeSeviciabilidad(parseFloat(puntajeTotal.toFixed(2)));
     } else {
       setPuntajeSeviciabilidad(0);
     }
@@ -262,10 +293,60 @@ export default function Page(): JSX.Element {
     setPuntajeTotalEdificios(puntajeTotal);
   }, [puntajeDepreciacionTotal, puntajeComponentes, puntajeSeviciabilidad]);
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const evaluacion = {
+      edificio: {
+        codigo: edificioData?.codigoEdificio || '',
+        nombre: edificioData?.nombre || '',
+        campus: edificioData?.sedeNombre || '',
+        usoActual: edificioData?.usoActualDescripcion || '',
+        area: edificioData?.m2Construccion || 0,
+        descripcion: (e.currentTarget.querySelector('#descripcion') as HTMLTextAreaElement).value
+      },
+      depreciacion: {
+        principal: {
+          edad: parseInt(edadEdificio) || 0,
+          vidaUtil: parseInt(vidaUtil) || 0,
+          estadoConservacionCoef: estadoSeleccionado,
+          escalaDepreciacion: escalaDepreciacion
+        },
+        remodelacion: {
+          edad: parseInt(edadEdificioRemodelacion) || 0,
+          vidaUtil: parseInt(vidaUtilRemodelacion) || 0,
+          estadoConservacionCoef: estadoSeleccionadoRemodelacion,
+          porcentaje: porcentajeRemodelacion,
+          escalaDepreciacion: escalaDepreciacionRemodelacion
+        },
+        puntajeDepreciacionTotal: puntajeDepreciacionTotal
+      },
+      componentes: componentes.map(comp => ({
+        id: comp.id,
+        componente: comp.componente,
+        peso: comp.peso,
+        existencia: comp.existencia,
+        necesidadIntervencion: comp.necesidadIntervencion,
+        pesoEvaluado: comp.pesoEvaluado,
+        puntaje: comp.puntaje
+      })),
+      puntajeComponentes: puntajeComponentes,
+      serviciabilidad: {
+        funcionalidadId: funcionalidadSeleccionada,
+        normativaId: normativaSeleccionada,
+        puntajeServiciabilidad: puntajeSeviciabilidad
+      },
+      puntajeTotalEdificio: puntajeTotalEdificio,
+      comentarios
+    };
+
+    console.log(JSON.stringify(evaluacion, null, 2));
+  };
+
   return (
     <div className="container mx-auto py-6 border border-gray-300 rounded-xl">
       <h1 className="text-2xl font-bold text-center mb-8">Evaluación de Edificaciones</h1>
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label htmlFor="edificio" className="text-base font-medium text-gray-700">Edificio</label>
@@ -539,7 +620,8 @@ export default function Page(): JSX.Element {
                     </div>
                   </TableCell>
                   <TableCell className="text-sm">
-                    <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                    <textarea onChange={(e) => componente.elementosValorar= e.target.value} className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+
                   </TableCell>
                   <TableCell colSpan={3} className="text-center">
                     <div className="relative flex items-center justify-center">
@@ -624,7 +706,7 @@ export default function Page(): JSX.Element {
                   </select>
                 </TableCell>
                 <TableCell className="text-center font-bold bg-yellow-100">
-                  {puntajeSeviciabilidad.toFixed(2)}
+                  {puntajeSeviciabilidad}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -691,7 +773,11 @@ export default function Page(): JSX.Element {
                   Funcionalidad 
                 </TableCell>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
-                <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                <textarea 
+                  value={comentarios.funcionalidad}
+                  onChange={(e) => handleComentarioChange('funcionalidad', e.target.value)}
+                  className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
+                  placeholder="Ingrese los elementos a valorar"></textarea>
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -699,7 +785,11 @@ export default function Page(): JSX.Element {
                   Normativa 
                 </TableCell>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
-                <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                <textarea 
+                  value={comentarios.normativa}
+                  onChange={(e) => handleComentarioChange('normativa', e.target.value)}
+                  className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
+                  placeholder="Ingrese los elementos a valorar"></textarea>
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -708,6 +798,8 @@ export default function Page(): JSX.Element {
                 </TableCell>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
                 <textarea 
+                  value={comentarios.componentesCriticos}
+                  onChange={(e) => handleComentarioChange('componentesCriticos', e.target.value)}
                   className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
                   placeholder="Ingrese los elementos a valorar"></textarea>
                 </TableCell>
@@ -717,7 +809,11 @@ export default function Page(): JSX.Element {
                   Mejoras Requeridas
                 </TableCell>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
-                  <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                  <textarea 
+                    value={comentarios.mejorasRequeridas}
+                    onChange={(e) => handleComentarioChange('mejorasRequeridas', e.target.value)}
+                    className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
+                    placeholder="Ingrese los elementos a valorar"></textarea>
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -725,7 +821,11 @@ export default function Page(): JSX.Element {
                   Registro Fotográfico
                 </TableCell>
                 <TableCell className="font-semibold text-center whitespace-nowrap text-black w-[50%]">
-                  <textarea className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Ingrese los elementos a valorar"></textarea>
+                    <textarea 
+                      value={comentarios.registroFotografico}
+                      onChange={(e) => handleComentarioChange('registroFotografico', e.target.value)}
+                      className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
+                      placeholder="Ingrese los elementos a valorar"></textarea>
                 </TableCell>
               </TableRow>
             </TableBody>
