@@ -17,7 +17,7 @@ export default async function BuildingsView() {
 
       <div className="container mx-auto py-6">
         <h2 className="mb-6 text-xl font-semibold sm:text-2xl">
-          Edificios por Sede
+          Edificios por Campus/Centro Académico
         </h2>
         <BuildingListContainer sedesConEdificios={sedesConEdificios} />
       </div>

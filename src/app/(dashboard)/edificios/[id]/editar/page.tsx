@@ -237,7 +237,7 @@ export default function EditarEdificioPage({ params }: { params: Promise<{ id: s
 
     if (!nombreEdificio.trim())
       newErrors.nombreEdificio = "El nombre del edificio es obligatorio";
-    if (!sedeId) newErrors.sedeId = "Debe seleccionar una sede";
+    if (!sedeId) newErrors.sedeId = "Debe seleccionar un campus/centro académico";
     if (!fincaSeleccionada)
       newErrors.fincaSeleccionada = "Debe seleccionar una finca";
     if (!usoActual) newErrors.usoActual = "Debe seleccionar un uso actual";
@@ -343,7 +343,7 @@ export default function EditarEdificioPage({ params }: { params: Promise<{ id: s
             {/* Sede */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Sede*
+                Campus/Centro Académico*
               </label>
               <select
                 value={sedeId}
@@ -351,7 +351,7 @@ export default function EditarEdificioPage({ params }: { params: Promise<{ id: s
                 className={`mt-1 w-full rounded-md border ${errors.sedeId ? "border-red-500" : "border-gray-300"} p-2`}
               >
                 <option value="" disabled>
-                  Seleccione una sede
+                  Seleccione un campus/centro académico
                 </option>
                 {sedes.map((sede) => (
                   <option key={sede.id} value={sede.id.toString()}>

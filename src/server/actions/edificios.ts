@@ -99,7 +99,7 @@ export async function getConstruccionesPorSede() {
       }))
       .sort((a: Sede, b: Sede) => a.nombre.localeCompare(b.nombre));
   } catch (error) {
-    console.error("Error obteniendo Construcciones por sede:", error);
+    console.error("Error obteniendo Construcciones por campus/centro académico:", error);
     return []; // Devuelve un array vacío en caso de error
   }
 }

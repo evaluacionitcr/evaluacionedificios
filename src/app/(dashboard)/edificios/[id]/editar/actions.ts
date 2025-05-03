@@ -10,8 +10,8 @@ export async function fetchSedes() {
     const sedes = await db.select().from(Sedes);
     return { success: true, data: sedes };
   } catch (error) {
-    console.error("Error al obtener las sedes:", error);
-    return { success: false, error: "No se pudieron cargar las sedes" };
+    console.error("Error al obtener los campus/centros académicos:", error);
+    return { success: false, error: "No se pudieron cargar los campus/centros académicos" };
   }
 }
 

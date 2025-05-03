@@ -105,7 +105,7 @@ function BuildingList({ sedesConEdificios }: { sedesConEdificios: Sede[] }) {
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                   <Input 
                     type="search"
-                    placeholder="Buscar edificios en esta sede..."
+                    placeholder="Buscar edificios en este campus/centro académico..."
                     className="pl-10"
                     value={localSearches[sede.id] ?? ""}
                     onClick={(e) => e.stopPropagation()}
@@ -123,7 +123,7 @@ function BuildingList({ sedesConEdificios }: { sedesConEdificios: Sede[] }) {
                   <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
                     <h3 className="mb-2 text-lg font-medium">No se encontraron edificios</h3>
                     <p className="text-sm text-muted-foreground">
-                      No hay edificios que coincidan con tu búsqueda en esta sede.
+                      No hay edificios que coincidan con tu búsqueda en este campus/centro académico.
                     </p>
                   </div>
                 )}
