@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { getComponentes, getEstadoConservacion, getFuncionalidades, getNormativas } from "./actions";
+import { getComponentes, getEstadoConservacion, getFuncionalidades, getNormativas, guardarEvaluacion } from "./actions";
 import BuildingInfoSection from "./components/BuildingInfoSection";
 import DepreciationSection from "./components/DepreciationSection";
 import ComponentsTable from "./components/ComponentsTable";
 import ServiceabilitySection from "./components/ServiceabilitySection";
 import TotalScoreTable from "./components/TotalScoreTable";
 import CommentsSection from "./components/CommentsSection";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Componente {
   id: number;
@@ -95,6 +97,8 @@ export default function Page(): JSX.Element {
     mejorasRequeridas: '',
     registroFotografico: ''
   });
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchEdificioData = async () => {
@@ -254,6 +258,9 @@ export default function Page(): JSX.Element {
       pesoEvaluado = ((componente.peso * (1 + ((1 - totalPeso) / totalPeso))) * 100).toFixed(2);
       componente.pesoEvaluado = parseFloat(pesoEvaluado);
     }
+    else{
+      componente.pesoEvaluado = 0;
+    }
     return pesoEvaluado;
   };
 
@@ -270,7 +277,7 @@ export default function Page(): JSX.Element {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     const evaluacion = {
@@ -309,17 +316,28 @@ export default function Page(): JSX.Element {
       })),
       puntajeComponentes: puntajeComponentes,
       serviciabilidad: {
-        funcionalidadId: funcionalidadSeleccionada,
-        normativaId: normativaSeleccionada,
+        funcionalidadId: parseInt(funcionalidadSeleccionada),
+        normativaId: parseInt(normativaSeleccionada),
         puntajeServiciabilidad: puntajeSeviciabilidad
       },
       puntajeTotalEdificio: puntajeTotalEdificio,
       comentarios
     };
 
-     
+    try {
+      const result = await guardarEvaluacion(evaluacion);
 
-    console.log(JSON.stringify(evaluacion, null, 2));
+      if (result.success) {
+        toast.success(result.message);
+        
+        router.push('/evaluaciones');
+      } else {
+        toast.error(result.message || "Error al guardar la evaluación");
+      }
+    } catch (error) {
+      console.error("Error al guardar la evaluación:", error);
+      toast.error("Error al guardar la evaluación");
+    }
   };
 
   return (
