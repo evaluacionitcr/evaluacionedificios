@@ -91,6 +91,7 @@ export const Construcciones = createTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),
     ),
+    activo: boolean("activo").default(true),
   },
   (construcciones) => ({
     codigoEdificioIndex: index("codigo_edificio_idx").on(
