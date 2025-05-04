@@ -155,6 +155,8 @@ const DepreciationSection: React.FC<DepreciationProps> = ({
               <input
                 id="porcentaje-remodelacion"
                 value={porcentajeRemodelacion}
+                min={0}
+                max={100}
                 onChange={(e) => setPorcentajeRemodelacion(parseFloat(e.target.value))}
                 type="number"
                 className="w-full h-11 px-4 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

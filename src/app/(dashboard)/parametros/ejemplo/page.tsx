@@ -239,7 +239,8 @@ export default function Page(): JSX.Element {
     setComponentes(newComponentes);
   };
 
-  const getInputColor = (value: number): string => {
+  const getInputColor = (value: number, existencia: string): string => {
+    if (existencia === "no") return '';
     if (value >= 66) return 'bg-red-200';
     if (value >= 33) return 'bg-yellow-200';
     return 'bg-green-200';

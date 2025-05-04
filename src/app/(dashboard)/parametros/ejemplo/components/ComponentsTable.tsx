@@ -23,7 +23,7 @@ interface ComponentsTableProps {
   handleExistenciaChange: (index: number, value: string) => void;
   calcularPesoEvaluacion: (componente: Componente) => string;
   calcularPuntajeComponentes: (componente: Componente) => string;
-  getInputColor: (value: number) => string;
+  getInputColor: (value: number, existencia: string) => string;
 }
 
 const ComponentsTable: React.FC<ComponentsTableProps> = ({
@@ -111,6 +111,7 @@ const ComponentsTable: React.FC<ComponentsTableProps> = ({
               <TableCell className="text-sm">
                 <textarea 
                   onChange={(e) => componente.elementosValorar = e.target.value} 
+                  disabled={componente.existencia === "no"}
                   className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
                   placeholder="Ingrese los elementos a valorar"
                 ></textarea>
@@ -119,10 +120,12 @@ const ComponentsTable: React.FC<ComponentsTableProps> = ({
                 <div className="relative flex items-center justify-center">
                   <Input
                     type="number"
+                    min={0}
+                    max={100}
                     value={componente.necesidadIntervencion}
                     onChange={(e) => handleChange(e, index)}
                     disabled={componente.existencia === "no"}
-                    className={`mx-auto pr-2 ${getInputColor(componente.necesidadIntervencion)}`}
+                    className={`mx-auto pr-2 ${getInputColor(componente.necesidadIntervencion, componente.existencia)}`}
                   />
                   <span className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500">%</span>
                 </div>
