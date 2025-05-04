@@ -76,6 +76,8 @@ export default function CreateEdificioPage() {
 
   const [loading, setLoading] = useState(false); // Estado para manejar el estado de carga
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [sedeEsNueva, setSedeEsNueva] = useState(false); // Estado para controlar si se seleccionó "Nueva Sede..."
+  const [fincaEsNueva, setFincaEsNueva] = useState(false); // Estado para controlar si se seleccionó "Nueva Finca..."
 
   const formatNumber = (value: string) => {
     if (!value) return null;
@@ -200,9 +202,10 @@ export default function CreateEdificioPage() {
       newErrors.codigoEdificio = "El código del edificio es obligatorio";
     if (!nombreEdificio.trim())
       newErrors.nombreEdificio = "El nombre del edificio es obligatorio";
-    if (!sedeId) newErrors.sedeId = "Debe seleccionar una sede";
-    if (!fincaSeleccionada)
-      newErrors.fincaSeleccionada = "Debe seleccionar una finca";
+    if (!sedeId && !sedeEsNueva) newErrors.sedeId = "Debe seleccionar una sede";
+    if (!nuevaSede && sedeEsNueva) newErrors.sedeId = "Debe ingresar el nombre de la nueva sede";
+    if (!fincaSeleccionada && !fincaEsNueva) newErrors.fincaSeleccionada = "Debe seleccionar una finca";
+    if (!nuevaFinca && fincaEsNueva) newErrors.fincaSeleccionada = "Debe ingresar el número de la nueva finca";
     if (!usoActual) newErrors.usoActual = "Debe seleccionar un uso actual";
 
     // Validación de campos numéricos
@@ -232,7 +235,7 @@ export default function CreateEdificioPage() {
 
     // Validar formulario antes de enviar
     if (!validateForm()) {
-      alert("Por favor complete todos los campos obligatorios.");
+      toast.error("Por favor complete todos los campos obligatorios.");
       return;
     }
 
@@ -259,11 +262,13 @@ export default function CreateEdificioPage() {
 
       const data = {
         codigoEdificio: codigoEdificio,
-        sede: Number(sedeId),
+        sede: sedeEsNueva ? null : Number(sedeId), 
+        nuevaSede: sedeEsNueva ? nuevaSede : null, // Enviamos el nombre de la nueva sede si aplica
         esRenovacion: esRemodelacion, // Aquí marcamos si es remodelación
         nombre: nombreEdificio,
         fechaConstruccion: parseInt(anioConstruccion),
-        noFinca: Number(fincaSeleccionada),
+        noFinca: fincaEsNueva ? null : Number(fincaSeleccionada),
+        nuevaFinca: fincaEsNueva ? nuevaFinca : null, // Enviamos el número de la nueva finca si aplica
         m2Construccion: parseFloat(formatNumber(metrosCuadrados) ?? "0"),
         valorDolarPorM2: formatNumber(valorDolarM2) ?? "0",
         valorColonPorM2: formatNumber(valorColonM2) ?? "0",
@@ -329,14 +334,16 @@ export default function CreateEdificioPage() {
               Sede*
             </label>
             <select
-              value={sedeId}
+              value={sedeEsNueva ? "nueva" : sedeId}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === "nueva") {
                   setMostrarNuevaSede(true);
+                  setSedeEsNueva(true);
                   setSedeId("");
                 } else {
                   setMostrarNuevaSede(false);
+                  setSedeEsNueva(false);
                   setSedeId(value);
                 }
               }}
@@ -409,14 +416,16 @@ export default function CreateEdificioPage() {
               No./Finca*
             </label>
             <select
-              value={fincaSeleccionada}
+              value={fincaEsNueva ? "nueva" : fincaSeleccionada}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === "nueva") {
                   setMostrarNuevaFinca(true);
+                  setFincaEsNueva(true);
                   setFincaSeleccionada("");
                 } else {
                   setMostrarNuevaFinca(false);
+                  setFincaEsNueva(false);
                   setFincaSeleccionada(value);
                 }
               }}

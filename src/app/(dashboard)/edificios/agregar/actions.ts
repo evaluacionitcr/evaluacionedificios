@@ -38,13 +38,41 @@ export async function fetchUsosActuales() {
 
 import { revalidatePath } from "next/cache";
 
+export async function createSede(nombre: string) {
+  try {
+    const sede = await db.insert(Sedes).values({
+      nombre: nombre
+    }).returning();
+    
+    return { success: true, data: sede[0] };
+  } catch (error) {
+    console.error("Error al crear sede:", error);
+    return { success: false, error: "No se pudo crear la sede." };
+  }
+}
+
+export async function createFinca(numero: string) {
+  try {
+    const finca = await db.insert(NumeroFincas).values({
+      numero: numero
+    }).returning();
+    
+    return { success: true, data: finca[0] };
+  } catch (error) {
+    console.error("Error al crear finca:", error);
+    return { success: false, error: "No se pudo crear la finca." };
+  }
+}
+
 export async function createEdificio(data: {
   codigoEdificio: string;
-  sede: number;
+  sede: number | null;
+  nuevaSede?: string | null;
   esRenovacion: boolean;
   nombre: string;
   fechaConstruccion: number;
-  noFinca: number;
+  noFinca: number | null;
+  nuevaFinca?: string | null;
   m2Construccion: number;
   valorDolarPorM2: string;
   valorColonPorM2: string;
@@ -60,7 +88,44 @@ export async function createEdificio(data: {
   updatedAt: Date;
 }) {
   try {
-    const edificio = await db.insert(Construcciones).values(data).returning();
+    // Crear sede si es necesario
+    let sedeId = data.sede;
+    if (!sedeId && data.nuevaSede) {
+      console.log("Creando nueva sede:", data.nuevaSede);
+      const nuevaSede = await createSede(data.nuevaSede);
+      if (!nuevaSede.success || !nuevaSede.data) {
+        throw new Error("No se pudo crear la nueva sede: " + nuevaSede.error);
+      }
+      sedeId = nuevaSede.data.id;
+      console.log("Nueva sede creada con ID:", sedeId);
+    }
+
+    // Crear finca si es necesario
+    let fincaId = data.noFinca;
+    if (!fincaId && data.nuevaFinca) {
+      console.log("Creando nueva finca:", data.nuevaFinca);
+      const nuevaFinca = await createFinca(data.nuevaFinca);
+      if (!nuevaFinca.success || !nuevaFinca.data) {
+        throw new Error("No se pudo crear la nueva finca: " + nuevaFinca.error);
+      }
+      fincaId = nuevaFinca.data.id;
+      console.log("Nueva finca creada con ID:", fincaId);
+    }
+
+    // Datos del edificio sin las propiedades adicionales
+    const edificioData = {
+      ...data,
+      sede: sedeId,
+      noFinca: fincaId
+    };
+
+    // Eliminamos las propiedades adicionales
+    delete edificioData.nuevaSede;
+    delete edificioData.nuevaFinca;
+    
+    console.log("Datos del edificio a crear:", JSON.stringify(edificioData));
+    
+    const edificio = await db.insert(Construcciones).values(edificioData).returning();
 
     // Añadir esta línea para revalidar la página de edificios
     revalidatePath("/edificios");
@@ -68,7 +133,7 @@ export async function createEdificio(data: {
     return { success: true, data: edificio };
   } catch (error) {
     console.error("Error al crear edificio:", error);
-    return { success: false, error: "No se pudo crear el edificio." };
+    return { success: false, error: error instanceof Error ? error.message : "No se pudo crear el edificio." };
   }
 }
 
