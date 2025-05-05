@@ -331,7 +331,7 @@ export default function CreateEdificioPage() {
           {/* Sede */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Sede*
+              Campus/Centro Académico*
             </label>
             <select
               value={sedeEsNueva ? "nueva" : sedeId}
@@ -350,14 +350,14 @@ export default function CreateEdificioPage() {
               className={`mt-1 w-full rounded-md border ${errors.sedeId ? "border-red-500" : "border-gray-300"} p-2`}
             >
               <option value="" disabled>
-                Seleccione una sede
+                Seleccione un Campus/Centro Académico
               </option>
               {sedes.map((sede) => (
                 <option key={sede.id} value={sede.id.toString()}>
                   {sede.nombre}
                 </option>
               ))}
-              <option value="nueva">+ Nueva Sede...</option>
+              <option value="nueva">+ Nuevo Campus/Centro Académico...</option>
             </select>
             {errors.sedeId && (
               <p className="mt-1 text-sm text-red-500">{errors.sedeId}</p>
@@ -365,7 +365,7 @@ export default function CreateEdificioPage() {
             {mostrarNuevaSede && (
               <input
                 type="text"
-                placeholder="Nombre de la nueva sede"
+                placeholder="Nombre del nuevo Campus/Centro Académico"
                 value={nuevaSede}
                 onChange={(e) => setNuevaSede(e.target.value)}
                 className="mt-2 w-full rounded-md border border-gray-300 p-2"

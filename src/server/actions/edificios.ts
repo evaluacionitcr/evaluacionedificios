@@ -114,22 +114,7 @@ export async function getDetallesEdificio(
 
     console.log("Buscando edificio con código:", codigoEdificio);
 
-    // Primero, obtenemos los IDs más recientes para este código de edificio
-    const idsRecientes = await db
-      .select({
-        id: Construcciones.id,
-      })
-      .from(Construcciones)
-      .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
-      .orderBy(sql`${Construcciones.id} DESC`)
-      .limit(1);
-
-
-    if (idsRecientes.length === 0) {
-      console.log("No se encontraron registros para el código:", codigoEdificio);
-      return [];
-    }
-
+    // Eliminar la búsqueda del ID más reciente y obtener directamente todos los registros con el mismo código
     const edificios = await db
       .select({
         id: Construcciones.id,
@@ -157,10 +142,13 @@ export async function getDetallesEdificio(
       .leftJoin(Sedes, eq(Construcciones.sede, Sedes.id))
       .leftJoin(NumeroFincas, eq(Construcciones.noFinca, NumeroFincas.id))
       .leftJoin(UsosActuales, eq(Construcciones.usoActual, UsosActuales.id))
-      .where(eq(Construcciones.id, idsRecientes[0]?.id ?? 0));
+      .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
+      .orderBy(sql`${Construcciones.id} ASC`); // Mantener el orden descendente para que los más recientes aparezcan primero
 
     console.log("Resultados encontrados:", edificios.length);
-    console.log("Datos del edificio:", edificios[0]);
+    if (edificios.length > 0) {
+      console.log("Datos del primer edificio:", edificios[0]);
+    }
     return edificios;
   } catch (error) {
     console.error("Error obteniendo detalles del edificio:", error);

@@ -451,7 +451,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
             className="bg-primary text-white hover:bg-primary/90"
           >
             <Building className="mr-2 h-4 w-4" />
-            Agregar Remodelación
+            Agregar Renovación
           </Button>
           <Button
             variant="destructive"

@@ -26,7 +26,9 @@ export async function GET(
         fechaConstruccion: Construcciones.fechaConstruccion,
         m2Construccion: Construcciones.m2Construccion,
         usoActualDescripcion: UsosActuales.descripcion,
+        usoActualId: Construcciones.usoActual, // Añadido: ID del uso actual
         noFinca: NumeroFincas.numero,
+        noFincaId: Construcciones.noFinca, // Añadido: ID de la finca
         valorDolarPorM2: Construcciones.valorDolarPorM2,
         valorColonPorM2: Construcciones.valorColonPorM2,
         edad: Construcciones.edad,
@@ -51,6 +53,7 @@ export async function GET(
       );
     }
 
+    console.log("Datos del edificio enviados:", resultado[0]);
     return NextResponse.json(resultado[0]);
   } catch (error) {
     console.error("Error al obtener los datos del edificio:", error);
