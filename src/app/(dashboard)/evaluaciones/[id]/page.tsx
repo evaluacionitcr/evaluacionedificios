@@ -125,10 +125,18 @@ export default function EvaluacionesDeEdificio() {
                 {evaluaciones.length > 0 ? (
                     evaluaciones.map((evaluacion) => (
                     <TableRow key={evaluacion._id}>
-                        <TableCell>{new Date(evaluacion.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell>{evaluacion.puntajeTotalEdificio}</TableCell>
-                        <TableCell>{evaluacion.edificio.descripcion}</TableCell>
-                        <TableCell>{evaluacion.estado}</TableCell>
+                        <TableCell>
+                          {evaluacion.createdAt ? new Date(evaluacion.createdAt).toLocaleDateString() : "No disponible"}
+                        </TableCell>
+                        <TableCell>
+                          {evaluacion.puntajeTotalEdificio !== undefined ? evaluacion.puntajeTotalEdificio : "No disponible"}
+                        </TableCell>
+                        <TableCell>
+                          {evaluacion.edificio.descripcion || "No disponible"}
+                        </TableCell>
+                        <TableCell>
+                          {evaluacion.estado || "No disponible"}
+                        </TableCell>
                         <TableCell>
                         <Link href={`/evaluaciones/${encodeURIComponent(evaluacion.edificio.codigo.toLowerCase())}/ejemplo`}  passHref>
                         <Button

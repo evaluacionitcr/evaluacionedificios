@@ -47,7 +47,7 @@ export default function EvaluatedBuildingCard({
         {/* Mostrar la cantidad de evaluaciones solo si es mayor que 0 */}
         {cantidadEvaluaciones > 0 ? (
           <p className="mt-2 text-sm text-gray-700">
-            Evalauciones: {cantidadEvaluaciones}{cantidadEvaluaciones !== 1 ? "es" : ""}
+            Evalauciones: {cantidadEvaluaciones}
           </p>
         ) : (
           <p className="mt-2 text-sm text-gray-700">No hay evaluaciones.</p>
