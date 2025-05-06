@@ -1,20 +1,21 @@
 import { Button } from "~/components/ui/button";
-import EvaluationTabs from "~/components/evaluations/evaluation-tabs";
 import Link from "next/link";
+import { getConstruccionesPorSede } from "~/server/actions/edificios";  
+import EvaluatedBuildingsContainer from "~/components/evaluations/evaluation-list";
 
-export default function EvaluationsView() {
+export default async function EvaluationsView() {
+  const sedesConEdificios = await getConstruccionesPorSede();
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold">Evaluaciones</h1>
-        <Link href="/evaluacion">
-          <Button>Nueva Evaluación</Button>
-        </Link>
-      </div>
+      <h1 className="text-2xl font-bold">Evaluaciones</h1>
+          <div className="container mx-auto py-6">
+          
 
-      <div className="overflow-x-auto">
-        <EvaluationTabs />
-      </div>
+          <h2 className="mb-6 text-xl font-semibold sm:text-2xl">
+            Evaluaciones por Campus/Centro Académico
+          </h2>
+          <EvaluatedBuildingsContainer sedesConEdificios={sedesConEdificios} />
+        </div>
     </div>
   );
 }
