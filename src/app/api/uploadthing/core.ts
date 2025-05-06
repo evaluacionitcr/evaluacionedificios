@@ -1,8 +1,28 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { auth } from "@clerk/nextjs/server";
-import { db } from "~/server/db";
-import { images } from "~/server/db/schema";
 import { z } from "zod";
+import { MongoClient } from "mongodb";
+
+// Create a cached connection variable
+let cachedClient: MongoClient | null = null;
+
+async function connectToDatabase() {
+  if (cachedClient) {
+    return cachedClient;
+  }
+
+  const uri = process.env.MONGODB_URI || '';
+  const client = new MongoClient(uri);
+  
+  try {
+    await client.connect();
+    cachedClient = client;
+    return client;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
+  }
+}
 
 const f = createUploadthing();
 
@@ -15,7 +35,7 @@ export const ourFileRouter = {
   })
     .input(
       z.object({
-        evaluationId: z.number().optional(),
+        evaluationId: z.string().optional(),
         description: z.string().optional(),
       }),
     )
@@ -34,7 +54,11 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       try {
-        await db.insert(images).values({
+        const client = await connectToDatabase();
+        const db = client.db("evaluacionedificiositcr");
+        const collection = db.collection("imagenes");
+        
+        const documentoEvaluacion = {
           name: file.name,
           url: file.url,
           description: metadata.description,
@@ -42,9 +66,15 @@ export const ourFileRouter = {
           userId: metadata.userId,
           createdAt: new Date(),
           updatedAt: new Date(),
-        });
+        }
 
-        console.log(`Successfully inserted image: ${file.name}`);
+        const result = await collection.insertOne(documentoEvaluacion);
+
+        if (!result.acknowledged) {
+          throw new Error("Failed to insert document");
+        }
+        console.log("Document inserted successfully:", result.insertedId);
+
         return { success: true };
       } catch (error) {
         console.error("Failed to insert image:", error);

@@ -1,10 +1,10 @@
 "use server";
 
+import { MongoClient } from "mongodb";
 import { db } from "~/server/db";
 import { sql } from "drizzle-orm";
 import { Componentes, EstadosConservacion, Funcionalidades, Normativas } from "~/server/db/schema";
 import { revalidatePath } from "next/cache";
-import { MongoClient } from "mongodb";
 import { NextResponse } from "next/server"; 
 
 interface Componente {
@@ -65,15 +65,30 @@ interface Comentarios {
   normativa: string;
   componentesCriticos: string;
   mejorasRequeridas: string;
-  registroFotografico: string;
 }
 
 const uri = process.env.MONGODB_URI || '';
-const client = new MongoClient(uri);
-const dbName ="evaluacionedificiositcr";
-const collectionName ="evaluaciones";
-const mongo = client.db(dbName);
-const collection = mongo.collection(collectionName);
+const dbName = "evaluacionedificiositcr";
+const collectionName = "evaluaciones";
+
+// Cache the database connection
+let cachedClient: MongoClient | null = null;
+
+async function connectToDatabase() {
+  if (cachedClient) {
+    return cachedClient;
+  }
+
+  try {
+    const client = new MongoClient(uri);
+    await client.connect();
+    cachedClient = client;
+    return client;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
+  }
+}
 
 export async function getComponentes() {
   try {
@@ -120,7 +135,9 @@ export async function getNormativas() {
 
 export async function guardarEvaluacion(evaluacion: Evaluacion) {
   try {
-    await client.connect();
+    const client = await connectToDatabase();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
     
     const documentoEvaluacion = {
       ...evaluacion,
@@ -135,7 +152,7 @@ export async function guardarEvaluacion(evaluacion: Evaluacion) {
     return { 
       success: true,
       message: "Evaluación guardada exitosamente",
-      insertedId: result.insertedId
+      insertedId: result.insertedId.toString() // Convert ObjectId to string
     };
 
   } catch (error) {
@@ -145,7 +162,5 @@ export async function guardarEvaluacion(evaluacion: Evaluacion) {
       message: "Error al guardar la evaluación",
       error: error instanceof Error ? error.message : "Error desconocido"
     };
-  } finally {
-    await client.close();
   }
 }
