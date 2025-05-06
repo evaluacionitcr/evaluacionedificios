@@ -131,10 +131,12 @@ export default function EvaluacionesDeEdificio() {
                         <TableCell>{evaluacion.estado}</TableCell>
                         <TableCell>
                         <Link href={`/evaluaciones/${encodeURIComponent(evaluacion.edificio.codigo.toLowerCase())}/ejemplo`}  passHref>
-                
-                            <Button variant="link" size="sm" className="text-blue-600 hover:text-blue-800">
+                        <Button
+                            variant="default"
+                            className="w-50"
+                        >
                             Ver evaluaciones <Eye size={16} className="inline-block ml-1" />
-                            </Button>
+                        </Button>
                         </Link>
                         </TableCell>
                     </TableRow>
