@@ -103,7 +103,7 @@ export default function EvaluacionesDeEdificio() {
   return (
     <div className="space-y-4">
         <div className="flex items-center gap-4">
-            <Link href="/edificios">
+            <Link href="/evaluaciones">
                 <Button variant="ghost" size="icon">
                     <ArrowLeft className="h-5 w-5 text-primary" />
                 </Button>
