@@ -6,6 +6,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~
 import { Button } from "~/components/ui/button";
 import Link from "next/link";
 import { Eye } from "lucide-react";
+import {
+    ArrowLeft,
+    Building,
+    Calendar,
+    Trash2,
+    ChevronDown,
+    ChevronUp,
+    Pencil,
+  } from "lucide-react";
 
 interface Evaluacion {
     _id: string;
@@ -91,13 +100,16 @@ export default function EvaluacionesDeEdificio() {
     fetchEvaluaciones();
   }, [codigo]);
 
-  const handleVerDetallesEvaluacion = (evaluacionId: string) => {
-    window.location.href = `/evaluacion-detalle/${evaluacionId}`;
-  };
-
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Evaluaciones del Edificio {(typeof codigo === "string" ? codigo.toUpperCase() : "desconocido")}</h1>
+        <div className="flex items-center gap-4">
+            <Link href="/edificios">
+                <Button variant="ghost" size="icon">
+                    <ArrowLeft className="h-5 w-5 text-primary" />
+                </Button>
+            </Link>
+            <h1 className="text-2xl font-bold">Evaluaciones del Edificio {(typeof codigo === "string" ? codigo.toUpperCase() : "desconocido")}</h1>
+        </div>
         <div className="flex justify-end mb-4 bg-white p-4 rounded-lg shadow-sm">
             <Table>
                 <TableHeader>
