@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
-import { getEvaluacionPorId } from "~/server/actions/evaluaciones";
-
 
 const uri = process.env.MONGODB_URI || '';
 const client = new MongoClient(uri);

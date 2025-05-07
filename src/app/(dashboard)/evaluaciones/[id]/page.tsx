@@ -138,7 +138,7 @@ export default function EvaluacionesDeEdificio() {
                           {evaluacion.estado || "No disponible"}
                         </TableCell>
                         <TableCell>
-                        <Link href={`/evaluaciones/${encodeURIComponent(evaluacion.edificio.codigo.toLowerCase())}/ejemplo`}  passHref>
+                        <Link href={`/evaluaciones/${evaluacion.edificio.codigo.toLowerCase()}/evaluacion?codigo=${encodeURIComponent(evaluacion._id)}`}  passHref>
                         <Button
                             variant="default"
                             className="w-50"
