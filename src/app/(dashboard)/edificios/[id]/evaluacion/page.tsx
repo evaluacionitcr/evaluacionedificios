@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 type Componente = {
   id: number;
@@ -28,7 +29,9 @@ type ServiceabilityData = {
   puntajeServiciabilidad: number;
 };
 
-const EvaluacionComponent: React.FC<{ codigo: string }> = ({ codigo }) => {
+export default function EvaluacionPage(): JSX.Element {
+  const searchParams = useSearchParams();
+  const codigo = searchParams?.get("codigo");
   const [edificioData, setEdificioData] = useState<EdificioData | null>(null);
   const [componentes, setComponentes] = useState<Componente[]>([]);
   const [depreciacionData, setDepreciacionData] = useState<DepreciacionData | null>(null);
@@ -83,15 +86,13 @@ const EvaluacionComponent: React.FC<{ codigo: string }> = ({ codigo }) => {
       }
     };
 
-    fetchEvaluacionData();
+    void fetchEvaluacionData();
   }, [codigo]);
 
   return (
     <div>
       <h1>Evaluación del Edificio</h1>
-      {/* Render data here */}
+      {/* Rest of the component rendering */}
     </div>
   );
-};
-
-export default EvaluacionComponent;
+}
