@@ -106,6 +106,7 @@ export default function EvaluacionesDeEdificio() {
         }
         
         const responseData = await response.json() as EvaluacionResponse;
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         const evaluacionesFiltradas = responseData.data.filter((evaluacion) => {
           const codigoEvaluacion = Array.isArray(evaluacion.edificio.codigo)
             ? evaluacion.edificio.codigo[0]

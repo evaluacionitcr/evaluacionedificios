@@ -90,6 +90,38 @@ interface ApiResponse<T> {
   message?: string;
 }
 
+interface EstadoConservacionResponse {
+  data: {
+    id: number;
+    estado_conservacion: string;
+    condiciones_fisicas: string;
+    clasificacion: string;
+    coef_depreciacion: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
+}
+
+interface FuncionalidadResponse {
+  data: {
+    id: number;
+    Estado: string;
+    Puntuacion: string;
+    Descripcion: string;
+  }[];
+}
+
+interface NormativaResponse {
+  data: {
+    id: number;
+    Estado: string;
+    Puntuacion: string;
+    Descripcion: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
+}
+
 import { LoadingSpinnerSVG } from "~/components/ui/svg";
 
 export default function Page(): JSX.Element {
@@ -245,41 +277,56 @@ export default function Page(): JSX.Element {
 
   useEffect(() => {
     const fetchEstadoConservacion = async (): Promise<void> => {
-      const response = await getEstadoConservacion();
-      const estadoConservacionActualizado = (response.data ?? []).map((item: any) => ({
-        ...item,
-        coef_depreciacion: parseFloat(item.coef_depreciacion),
-      }));
-      setEstadoConservacion(estadoConservacionActualizado);
+      try {
+        const response = await getEstadoConservacion();
+        const apiResponse = (response as unknown) as EstadoConservacionResponse;
+        const estadoConservacionActualizado = (apiResponse.data ?? []).map((item) => ({
+          ...item,
+          coef_depreciacion: parseFloat(item.coef_depreciacion),
+        }));
+        setEstadoConservacion(estadoConservacionActualizado);
+      } catch (error) {
+        console.error('Error fetching estado conservacion:', error);
+      }
     };
 
-    fetchEstadoConservacion();
+    void fetchEstadoConservacion();
   }, []);
 
   useEffect(() => {
     const fetchFuncionalidades = async (): Promise<void> => {
-      const response = await getFuncionalidades();
-      const funcionalidadesActualizadas = (response.data ?? []).map((item: any) => ({
-        ...item,
-        puntuacion: parseFloat(item.Puntuacion),
-      }));
-      setFuncionalidades(funcionalidadesActualizadas);
+      try {
+        const response = await getFuncionalidades();
+        const apiResponse = (response as unknown) as FuncionalidadResponse;
+        const funcionalidadesActualizadas = (apiResponse.data ?? []).map((item) => ({
+          ...item,
+          Puntuacion: parseFloat(item.Puntuacion),
+        }));
+        setFuncionalidades(funcionalidadesActualizadas);
+      } catch (error) {
+        console.error('Error fetching funcionalidades:', error);
+      }
     };
 
-    fetchFuncionalidades();
+    void fetchFuncionalidades();
   }, []);
 
   useEffect(() => {
     const fetchNormativas = async (): Promise<void> => {
-      const response = await getNormativas();
-      const normativasActualizadas = (response.data ?? []).map((item: any) => ({
-        ...item,
-        puntuacion: parseFloat(item.Puntuacion),
-      }));
-      setNormativas(normativasActualizadas);
+      try {
+        const response = await getNormativas();
+        const apiResponse = (response as unknown) as NormativaResponse;
+        const normativasActualizadas = (apiResponse.data ?? []).map((item) => ({
+          ...item,
+          Puntuacion: parseFloat(item.Puntuacion),
+        }));
+        setNormativas(normativasActualizadas);
+      } catch (error) {
+        console.error('Error fetching normativas:', error);
+      }
     };
 
-    fetchNormativas();
+    void fetchNormativas();
   }, []);
 
   useEffect(() => {
@@ -392,7 +439,7 @@ export default function Page(): JSX.Element {
         campus: edificioData?.sedeNombre ??'',
         usoActual: edificioData?.usoActualDescripcion ??'',
         area: edificioData?.m2Construccion ??0,
-        descripcion: (e.currentTarget.querySelector('#descripcion') as HTMLTextAreaElement).value
+        descripcion: (e.currentTarget.querySelector('#descripcion')! as HTMLTextAreaElement).value
       },
       depreciacion: {
         principal: {

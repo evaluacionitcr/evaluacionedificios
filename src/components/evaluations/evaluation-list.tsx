@@ -111,9 +111,9 @@ export default function EvaluatedBuildingsContainer({
     }
 
     return sede.edificios.filter((edificio) => {
-      const nombreMatch = edificio.nombre?.includes(searchTerm) || false;
-      const codigoMatch = edificio.codigo?.includes(searchTerm) || false;
-      return nombreMatch || codigoMatch;
+      const nombreMatch = edificio.nombre?.includes(searchTerm) ??false;
+      const codigoMatch = edificio.codigo?.includes(searchTerm) ??false;
+      return nombreMatch ??codigoMatch;
     });
   };
 
@@ -150,7 +150,7 @@ export default function EvaluatedBuildingsContainer({
   }, []);
 
   const getEvaluacionesForEdificio = (codigo: string) => {
-    return evaluacionesPorCodigo[codigo] || [];
+    return evaluacionesPorCodigo[codigo] ??[];
   };
 
   // Mapeo de códigos de edificios
@@ -262,9 +262,9 @@ function EvaluationList({ sedesConEvaluaciones }: { sedesConEvaluaciones: Sede[]
     }
 
     return sede.edificios.filter((edificio) => {
-      const nombreMatch = edificio.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-      const codigoMatch = edificio.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-      return nombreMatch || codigoMatch;
+      const nombreMatch = edificio.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ??false;
+      const codigoMatch = edificio.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) ??false;
+      return nombreMatch ??codigoMatch;
     });
   };
 
