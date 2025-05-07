@@ -72,7 +72,7 @@ import { LoadingSpinnerSVG } from "~/components/ui/svg";
 
 export default function Page(): JSX.Element {
   const searchParams = useSearchParams();
-  const codigo = searchParams.get("codigo"); // Obtener el parámetro 'codigo' de la URL
+  const codigo = searchParams?.get("codigo"); // Add optional chaining
   const [edificioData, setEdificioData] = useState<{
     codigoEdificio?: string;
     nombre?: string;
@@ -206,16 +206,32 @@ export default function Page(): JSX.Element {
         try {
           const response = await fetch(`/api/datosEvaluacion/${codigo}`);
           if (response.ok) {
-            const data = await response.json();
-            setEdificioData(data.data.edificio || null);
-            setComponentes(data.data.componentes || []);
-            setDepreciacionData(data.data.depreciacion || null);
-            setServiceabilityData(data.data.serviciabilidad || null);
-            setComentarios(data.data.comentarios || null);
-            setPuntajeDepreciacionTotal(data.data.depreciacion.puntajeDepreciacionTotal);
-            setPuntajeComponentes(data.data.puntajeComponentes);
-            setPuntajeTotalEdificios(data.data.puntajeTotalEdificio);
-            setPuntajeSeviciabilidad(data.data.serviciabilidad.puntajeServiciabilidad);
+            const data = await response.json() as {
+              data: {
+                edificio: typeof edificioData;
+                componentes: Componente[];
+                depreciacion: typeof depreciacionData;
+                serviciabilidad: typeof serviceabilityData & { puntajeServiciabilidad: number };
+                comentarios: Comentarios;
+                puntajeComponentes: number;
+                puntajeTotalEdificio: number;
+              };
+            };
+            
+            setEdificioData(data.data.edificio ?? null);
+            setComponentes(data.data.componentes ?? []);
+            setDepreciacionData(data.data.depreciacion ?? null);
+            setServiceabilityData(data.data.serviciabilidad ?? null);
+            setComentarios(data.data.comentarios ?? {
+              funcionalidad: '',
+              normativa: '',
+              componentesCriticos: '',
+              mejorasRequeridas: ''
+            });
+            setPuntajeDepreciacionTotal(data.data.depreciacion?.puntajeDepreciacionTotal ?? 0);
+            setPuntajeComponentes(data.data.puntajeComponentes ?? 0);
+            setPuntajeTotalEdificios(data.data.puntajeTotalEdificio ?? 0);
+            setPuntajeSeviciabilidad(data.data.serviciabilidad?.puntajeServiciabilidad ?? 0);
           }
         } catch (error) {
           console.error('Error fetching evaluation data:', error);
@@ -248,12 +264,17 @@ export default function Page(): JSX.Element {
   useEffect(() => {
     const fetchComponentes = async (): Promise<void> => {
       const response = await getComponentes();
-      const componentesActualizados = (response.data ?? []).map((item: any) => ({
-        ...item,
-        peso: parseFloat(item.peso),
-        necesidadIntervencion: 0,
-        existencia: "si",
-      }));
+      const componentesActualizados = (response.data ?? []).map((item: { id: number; componente: string; peso: string; elementos: string }) => ({
+              id: item.id,
+              componente: item.componente,
+              peso: parseFloat(item.peso),
+              elementos: item.elementos,
+              necesidadIntervencion: 0,
+              existencia: "si",
+              pesoEvaluado: 0,
+              puntaje: 0,
+              elementosValorar: ""
+            } as Componente));
       setComponentes(componentesActualizados);
       calcularPesoTotal(componentesActualizados);
     };
@@ -264,10 +285,15 @@ export default function Page(): JSX.Element {
   useEffect(() => {
     const fetchEstadoConservacion = async (): Promise<void> => {
       const response = await getEstadoConservacion();
-      const estadoConservacionActualizado = (response.data ?? []).map((item: any) => ({
-        ...item,
+      const estadoConservacionActualizado = (response.data ?? []).map((item) => ({
+        id: item.id,
+        estado_conservacion: item.estado_conservacion,
+        condiciones_fisicas: item.condiciones_fisicas,
+        clasificacion: item.clasificacion,
         coef_depreciacion: parseFloat(item.coef_depreciacion),
-      }));
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt
+      } as EstadoConservacion));
       setEstadoConservacion(estadoConservacionActualizado);
     };
 
@@ -277,10 +303,12 @@ export default function Page(): JSX.Element {
   useEffect(() => {
     const fetchFuncionalidades = async (): Promise<void> => {
       const response = await getFuncionalidades();
-      const funcionalidadesActualizadas = (response.data ?? []).map((item: any) => ({
-        ...item,
-        puntuacion: parseFloat(item.Puntuacion),
-      }));
+      const funcionalidadesActualizadas = (response.data ?? []).map((item) => ({
+        id: item.id,
+        Estado: item.Estado,
+        Puntuacion: parseFloat(item.Puntuacion),
+        Descripcion: item.Descripcion
+      } as Funcionalidad));
       setFuncionalidades(funcionalidadesActualizadas);
     };
 
@@ -290,10 +318,14 @@ export default function Page(): JSX.Element {
   useEffect(() => {
     const fetchNormativas = async (): Promise<void> => {
       const response = await getNormativas();
-      const normativasActualizadas = (response.data ?? []).map((item: any) => ({
-        ...item,
-        puntuacion: parseFloat(item.Puntuacion),
-      }));
+      const normativasActualizadas = (response.data ?? []).map((item) => ({
+        id: item.id,
+        Estado: item.Estado,
+        Puntuacion: parseFloat(item.Puntuacion),
+        Descripcion: item.Descripcion,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt
+      } as Normativa));
       setNormativas(normativasActualizadas);
     };
 
