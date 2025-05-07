@@ -67,7 +67,7 @@ interface Comentarios {
   mejorasRequeridas: string;
 }
 
-const uri = process.env.MONGODB_URI || '';
+const uri = process.env.MONGODB_URI ?? '';
 const dbName = "evaluacionedificiositcr";
 const collectionName = "evaluaciones";
 

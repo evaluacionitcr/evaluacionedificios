@@ -20,7 +20,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <input
             id="edificio"
             placeholder="Ej: Edificio U-11"
-            value={edificioData?.nombre || ""}
+            value={edificioData?.nombre ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
@@ -29,7 +29,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <label htmlFor="codigo" className="text-base font-medium text-gray-700">Código</label>
           <input
             id="codigo"
-            value={edificioData?.codigo || ""}
+            value={edificioData?.codigo ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
@@ -40,7 +40,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
         <label htmlFor="campus" className="text-base font-medium text-gray-700">Campus Tecnológico / Centro Académico</label>
         <input
           id="campus"
-          value={edificioData?.campus || ""}
+          value={edificioData?.campus ??""}
           readOnly
           className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
         />
@@ -51,7 +51,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <label htmlFor="area" className="text-base font-medium text-gray-700">Área (m²)</label>
           <input
             id="area"
-            value={edificioData?.area || ""}
+            value={edificioData?.area ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
@@ -60,7 +60,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <label htmlFor="uso" className="text-base font-medium text-gray-700">Uso</label>
           <input
             id="uso"
-            value={edificioData?.usoActual || ""}
+            value={edificioData?.usoActual ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
@@ -72,7 +72,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
         <textarea
           id="descripcion"
           placeholder="Ingrese la descripción detallada del edificio"
-          value={edificioData?.descripcion || ""}
+          value={edificioData?.descripcion ??""}
           readOnly
           className="w-full min-h-[200px] px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
         />
