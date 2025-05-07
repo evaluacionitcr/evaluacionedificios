@@ -73,8 +73,10 @@ interface Evaluacion {
     evaluador?: { id: string; firstName: string; lastName: string } | null;
 }
 
-interface EvaluacionResponse {
+interface ResponseData {
   data: Evaluacion[];
+  message: string;
+  status: string;
 }
 
 interface UserData {
@@ -105,9 +107,8 @@ export default function EvaluacionesDeEdificio() {
           throw new Error("Error al obtener evaluaciones");
         }
         
-        const responseData = await response.json() as EvaluacionResponse;
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        const evaluacionesFiltradas = responseData.data.filter((evaluacion) => {
+        const responseJson = await response.json() as ResponseData;
+        const evaluacionesFiltradas = responseJson.data.filter((evaluacion) => {
           const codigoEvaluacion = Array.isArray(evaluacion.edificio.codigo)
             ? evaluacion.edificio.codigo[0]
             : evaluacion.edificio.codigo;

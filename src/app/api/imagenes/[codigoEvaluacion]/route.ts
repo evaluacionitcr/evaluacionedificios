@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { MongoClient, ObjectId } from "mongodb";
 
-const uri = process.env.MONGODB_URI ??"";
+interface ImagenDoc {
+  url: string;
+  evaluationId: string;
+}
+
+const uri = process.env.MONGODB_URI ?? "";
 const client = new MongoClient(uri);
-const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
+const dbName = process.env.DB_NAME ?? "evaluacionedificiositcr";
 const collectionName = "imagenes";
 
 export async function GET(
@@ -29,7 +34,7 @@ export async function GET(
   
       await client.connect();
       const db = client.db(dbName);
-      const collection = db.collection(collectionName);
+      const collection = db.collection<ImagenDoc>(collectionName);
   
       const imagenes = await collection.find({ evaluationId: codigoEvaluacion }).toArray();
   
@@ -43,8 +48,7 @@ export async function GET(
         );
       }
   
-      // 🔽 Extraer solo las URLs
-      const urls = imagenes.map((img) => img.url).filter(Boolean);
+      const urls: string[] = imagenes.map((img) => img.url).filter((url): url is string => Boolean(url));
   
       return NextResponse.json(urls);
     } catch (error) {

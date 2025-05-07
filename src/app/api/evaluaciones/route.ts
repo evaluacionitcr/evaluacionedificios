@@ -97,7 +97,7 @@ export async function GET() {
         await client.connect();
         
         // Get all documents from the collection
-        const documents = await collection.find({}).toArray();
+        const documents = await collection.find({}).toArray() as unknown as Evaluacion[];
         await client.close();
         
         return NextResponse.json({ 

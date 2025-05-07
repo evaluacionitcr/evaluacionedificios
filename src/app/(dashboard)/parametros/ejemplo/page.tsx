@@ -434,12 +434,12 @@ export default function Page(): JSX.Element {
     
     const evaluacion = {
       edificio: {
-        codigo: edificioData?.codigoEdificio ??'',
-        nombre: edificioData?.nombre ??'',
-        campus: edificioData?.sedeNombre ??'',
-        usoActual: edificioData?.usoActualDescripcion ??'',
-        area: edificioData?.m2Construccion ??0,
-        descripcion: (e.currentTarget.querySelector('#descripcion')! as HTMLTextAreaElement).value
+        codigo: edificioData?.codigoEdificio ?? '',
+        nombre: edificioData?.nombre ?? '',
+        campus: edificioData?.sedeNombre ?? '',
+        usoActual: edificioData?.usoActualDescripcion ?? '',
+        area: edificioData?.m2Construccion ?? 0,
+        descripcion: (document.querySelector('#descripcion') as HTMLTextAreaElement)?.value ?? ''
       },
       depreciacion: {
         principal: {
