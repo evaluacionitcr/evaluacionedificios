@@ -2,7 +2,7 @@
 import { MongoClient, ObjectId } from "mongodb";
 
 interface Evaluacion {
-  _id: string;
+  _id: ObjectId;
   edificio: {
     codigo: string;
     nombre: string;
@@ -11,50 +11,10 @@ interface Evaluacion {
     area: number;
     descripcion: string;
   };
-  depreciacion: {
-    principal: {
-      edad: number;
-      vidaUtil: number;
-      estadoConservacionCoef: number;
-      escalaDepreciacion: number;
-    };
-    remodelacion: {
-      edad: number;
-      vidaUtil: number;
-      estadoConservacionCoef: number;
-      porcentaje: number;
-      escalaDepreciacion: number;
-    };
-    puntajeDepreciacionTotal: number;
-  };
-  componentes: {
-    id: number;
-    componente: string;
-    peso: number;
-    existencia: string;
-    necesidadIntervencion: number;
-    pesoEvaluado: number;
-    puntaje: number;
-  }[];
-  puntajeComponentes: number;
-  serviciabilidad: {
-    funcionalidadId: number;
-    normativaId: number;
-    puntajeServiciabilidad: number;
-  };
-  puntajeTotalEdificio: number;
-  comentarios: {
-    funcionalidad: string;
-    normativa: string;
-    componentesCriticos: string;
-    mejorasRequeridas: string;
-    registroFotografico: string;
-  };
-  createdAt: string; 
+  codigoEdificio?: string;
+  createdAt: Date;
   estado: string;
-  revisado: boolean;
 }
-
 
 const uri = process.env.MONGODB_URI ?? '';
 const dbName = process.env.DB_NAME ?? "evaluacionedificiositcr";
