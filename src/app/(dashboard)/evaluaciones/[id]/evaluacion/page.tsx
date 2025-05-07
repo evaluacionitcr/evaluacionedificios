@@ -369,11 +369,34 @@ export default function Page(): JSX.Element {
   useEffect(() => {
     const funcionalidad = funcionalidades.find(f => f.id === parseFloat(funcionalidadSeleccionada));
     const normativa = normativas.find(n => n.id === parseFloat(normativaSeleccionada));
+    
+    if (funcionalidad && normativa) {
+      const nuevoPuntaje = (funcionalidad.Puntuacion + normativa.Puntuacion) / 2;
+      setPuntajeSeviciabilidad(nuevoPuntaje);
+    }
   }, [funcionalidadSeleccionada, normativaSeleccionada, funcionalidades, normativas]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {};
+  const handleChange = (_e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
+    const updatedComponentes = [...componentes];
+    const componente = updatedComponentes[index];
+    if (componente) {
+      const value = parseFloat(_e.target.value);
+      if (!isNaN(value) && value >= 0 && value <= 100) {
+        componente.necesidadIntervencion = value;
+        setComponentes(updatedComponentes);
+      }
+    }
+  };
 
-  const handleExistenciaChange = (index: number, value: string): void => {};
+  const handleExistenciaChange = (index: number, value: string): void => {
+    const updatedComponentes = [...componentes];
+    const componente = updatedComponentes[index];
+    if (componente) {
+      componente.existencia = value;
+      setComponentes(updatedComponentes);
+      calcularPesoTotal(updatedComponentes);
+    }
+  };
 
   const getInputColor = (value: number, existencia: string): string => {
     if (existencia === "no") return '';
@@ -407,10 +430,16 @@ export default function Page(): JSX.Element {
     return puntaje;
   };
 
-  const handleComentarioChange = (field: keyof Comentarios, value: string) => {};
+  const handleComentarioChange = (field: keyof Comentarios, value: string): void => {
+    setComentarios(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // Add your submit logic here
   };
 
   useEffect(() => {
@@ -419,7 +448,7 @@ export default function Page(): JSX.Element {
         URL.revokeObjectURL(file.preview);
       });
     };
-  }, []);
+  }, [stagedFiles]);
 
   return (
     <div className="container mx-auto py-6 border border-gray-300 rounded-xl">
@@ -433,17 +462,18 @@ export default function Page(): JSX.Element {
           componentes={componentes}
           totalPeso={totalPeso}
           puntajeComponentes={puntajeComponentes}
-          handleChange={() => {}}
-          handleExistenciaChange={() => {}}
+          handleChange={handleChange}
+          handleExistenciaChange={handleExistenciaChange}
           calcularPesoEvaluacion={calcularPesoEvaluacion}
           calcularPuntajeComponentes={calcularPuntajeComponentes}
           getInputColor={getInputColor}
         />
 
         <ServiceabilitySection 
-        funcionalidades={funcionalidades}
-        normativas={normativas}
-        serviceabilityData={serviceabilityData}/>
+          funcionalidades={funcionalidades}
+          normativas={normativas}
+          serviceabilityData={serviceabilityData}
+        />
 
         <TotalScoreTable
           puntajeDepreciacionTotal={puntajeDepreciacionTotal}
@@ -454,6 +484,7 @@ export default function Page(): JSX.Element {
 
         <CommentsSection
           comentarios={comentarios}
+          handleComentarioChange={handleComentarioChange}
         />
 
       <div className="mt-6 border-t pt-6">
@@ -462,27 +493,27 @@ export default function Page(): JSX.Element {
         </h2>
         <div> 
           {/* Imágenes existentes desde arrayImagenes */}
-            {arrayImagenes.length > 0 && (
-              <div className="mt-8">
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                  {arrayImagenes.length > 0 ? (
-                  arrayImagenes.map((url, index) => (
-                    <div key={index} className="group relative overflow-hidden rounded-md border">
-                    <div className="relative aspect-square">
-                      <img
-                      src={url}
-                      alt={`Imagen ${index + 1}`}
-                      className="h-full w-full object-cover"
-                      />
-                    </div>
-                    </div>
-                  ))
-                  ) : (
-                  <p className="text-center text-gray-500">No hay imágenes disponibles para esta evaluación.</p>
-                  )}
-                </div>
-              </div>
-            )}
+        {arrayImagenes.length > 0 && (
+          <div className="mt-8">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {arrayImagenes.length > 0 ? (
+          arrayImagenes.map((url, index) => (
+            <div key={index} className="group relative overflow-hidden rounded-md border">
+            <div className="relative aspect-square">
+              <img
+              src={url}
+              alt={`Imagen ${index + 1}`}
+              className="h-full w-full object-cover"
+              />
+            </div>
+            </div>
+          ))
+          ) : (
+          <p className="text-center text-gray-500">No hay imágenes disponibles para esta evaluación.</p>
+          )}
+            </div>
+          </div>
+        )}
           </div>
         </div>
       </form>

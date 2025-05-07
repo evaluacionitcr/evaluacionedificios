@@ -10,6 +10,7 @@ interface Comentarios {
 
 interface CommentsSectionProps {
   comentarios: Comentarios;
+  handleComentarioChange: (field: keyof Comentarios, value: string) => void;
 }
 
 const CommentsSection: React.FC<CommentsSectionProps> = ({comentarios}) => {
