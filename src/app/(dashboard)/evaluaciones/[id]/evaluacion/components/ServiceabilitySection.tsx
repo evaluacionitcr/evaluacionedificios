@@ -40,9 +40,6 @@ const ServiceabilitySection: React.FC<ServiceabilityProps> = ({
       }
     }, [serviceabilityData]);
 
-    console.log("funcionalidades", serviceabilityData?.funcionalidadId );
-    console.log("normativas", normativas);
-
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-center mb-8">Puntaje por serviciabilidad</h1>

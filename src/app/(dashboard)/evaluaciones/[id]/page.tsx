@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { getUserData } from "~/server/actions/users";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
 import { Button } from "~/components/ui/button";
 import Link from "next/link";
@@ -15,6 +16,7 @@ import {
     ChevronUp,
     Pencil,
   } from "lucide-react";
+import { set } from "zod";
 
 interface Evaluacion {
     _id: string;
@@ -65,13 +67,16 @@ interface Evaluacion {
       mejorasRequeridas: string;
       registroFotografico: string;
     };
+    idEvaluador: string;
     createdAt: string; // o Date si lo parseas
     estado: string;
     revisado: boolean;
+    evaluador?: { id: string; firstName: string; lastName: string } | null;
   }
 
 export default function EvaluacionesDeEdificio() {
   const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
+  const [userData, setUserData] = useState<{ id: string; firstName: string; lastName: string } | null>(null);
   const { id: codigo } = useParams();
 
   useEffect(() => {
@@ -88,10 +93,23 @@ export default function EvaluacionesDeEdificio() {
           const codigoEvaluacion = Array.isArray(evaluacion.edificio.codigo)
             ? evaluacion.edificio.codigo[0]
             : evaluacion.edificio.codigo;
-
+          
           return codigoEvaluacion?.toLowerCase() === (typeof codigo === "string" ? (codigo as string): "");
         });
-        setEvaluaciones(evaluacionesFiltradas);
+
+        // Obtener datos de los evaluadores
+        const evaluadoresPromises = evaluacionesFiltradas.map(async (evaluacion: { idEvaluador: string; }) => {
+          try {
+            const userData = await getUserData(evaluacion.idEvaluador);
+            return { ...evaluacion, evaluador: userData };
+          } catch (error) {
+            console.error(`Error al obtener datos del evaluador ${evaluacion.idEvaluador}:`, error);
+            return { ...evaluacion, evaluador: null };
+          }
+        });
+
+        const evaluacionesConEvaluadores = await Promise.all(evaluadoresPromises);
+        setEvaluaciones(evaluacionesConEvaluadores);
       } else {
         console.error("Error al obtener evaluaciones.");
       }
@@ -118,6 +136,7 @@ export default function EvaluacionesDeEdificio() {
                     <TableHead>Puntaje Total</TableHead>
                     <TableHead>Descripción</TableHead>
                     <TableHead>Estado</TableHead>
+                    <TableHead>Evaluador</TableHead>
                     <TableHead>Acción</TableHead>
                 </TableRow>
                 </TableHeader>
@@ -136,6 +155,9 @@ export default function EvaluacionesDeEdificio() {
                         </TableCell>
                         <TableCell>
                           {evaluacion.estado || "No disponible"}
+                        </TableCell>
+                        <TableCell>
+                          {evaluacion.evaluador ? `${evaluacion.evaluador.firstName} ${evaluacion.evaluador.lastName}` : "No disponible"}
                         </TableCell>
                         <TableCell>
                         <Link href={`/evaluaciones/${evaluacion.edificio.codigo.toLowerCase()}/evaluacion?codigo=${encodeURIComponent(evaluacion._id)}`}  passHref>

@@ -24,15 +24,11 @@ export default function EvaluatedBuildingCard({
   evaluaciones,
 }: {
   edificio: Edificio;
-  evaluaciones: any[]; // Podrías definir una tipificación más precisa para las evaluaciones
+  evaluaciones: any[]; 
 }) {
-  // Definir la "bandera" como la cantidad de evaluaciones
-  const cantidadEvaluaciones = evaluaciones.length;
-
-  // Usar useEffect para llamar el console.log cuando las evaluaciones cambien
+  const cantidadEvaluaciones = evaluaciones.length;  
   useEffect(() => {
-    console.log(`Cantidad de evaluaciones: ${cantidadEvaluaciones}`);
-  }, [cantidadEvaluaciones]); // Dependencia: ejecuta el log cuando 'cantidadEvaluaciones' cambie
+  }, [cantidadEvaluaciones]); 
 
   return (
     <Card className="rounded-lg border p-4 shadow-sm bg-white">

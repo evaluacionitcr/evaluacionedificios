@@ -62,7 +62,7 @@ interface Evaluacion {
     mejorasRequeridas: string;
     registroFotografico: string;
   };
-  createdAt: string; // o Date si lo parseas
+  createdAt: string; 
   estado: string;
   revisado: boolean;
 }
@@ -83,8 +83,6 @@ export default function EvaluatedBuildingsContainer({
   const [evaluacionesPorCodigo, setEvaluacionesPorCodigo] = useState<Record<string, Evaluacion[]>>({});
   const [expandedSedes, setExpandedSedes] = useState<Record<number, boolean>>({});
   const [localSearches, setLocalSearches] = useState<Record<number, string>>({});
-// Imprimir en consola los edificios y sus evalauaciones
-console.log("Edificios y sus evaluaciones:", evaluacionesPorCodigo);
   const toggleSede = (sedeId: number) => {
     setExpandedSedes((prev) => ({
       ...prev,
@@ -118,7 +116,6 @@ console.log("Edificios y sus evaluaciones:", evaluacionesPorCodigo);
       const response = await fetch("/api/evaluaciones");
       if (response.ok) {
         const data = await response.json();
-        console.log("Evaluaciones obtenidas: ", data.data);
   
         // Agrupar evaluaciones por código de edificio
         const agrupadasPorCodigo: Record<string, Evaluacion[]> = {};

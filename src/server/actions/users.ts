@@ -52,15 +52,14 @@ export async function getUserData(userId: string) {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
 
-    // Serializa solo lo que necesitas
     return {
       id: user.id,
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? "",
     };
   } catch (error) {
-    console.error("Error fetching user:", error);
-    throw new Error("No se pudo obtener la información del usuario");
+    console.error(`Error fetching user with ID ${userId}:`, error);
+    return null; 
   }
 }
 

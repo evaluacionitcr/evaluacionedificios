@@ -207,7 +207,6 @@ export default function Page(): JSX.Element {
           const response = await fetch(`/api/datosEvaluacion/${codigo}`);
           if (response.ok) {
             const data = await response.json();
-            console.log("Datos de la evaluación:", data.data);
             setEdificioData(data.data.edificio || null);
             setComponentes(data.data.componentes || []);
             setDepreciacionData(data.data.depreciacion || null);
