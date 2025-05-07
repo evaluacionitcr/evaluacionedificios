@@ -242,94 +242,114 @@ export default function Page(): JSX.Element {
     fetchEvaluacionData();
   }, [codigo]);
 
- useEffect(() => {
-  const fetchImagenes = async () => {
+  useEffect(() => {
+    const fetchImagenes = async () => {
       if (codigo) {
         try {
           const response = await fetch(`/api/imagenes/${codigo}`);
           if (response.ok) {
-            const data = await response.json();
+            const data = await response.json() as string[];
             setArrayImagenes(data);
-           
           }
         } catch (error) {
           console.error('Error fetching images:', error);
+          toast.error('Error al cargar las imágenes');
         }
       }
     };
 
-    fetchImagenes();
+    void fetchImagenes();
   }, [codigo]);
 
   useEffect(() => {
     const fetchComponentes = async (): Promise<void> => {
-      const response = await getComponentes();
-      const componentesActualizados = (response.data ?? []).map((item: { id: number; componente: string; peso: string; elementos: string }) => ({
-              id: item.id,
-              componente: item.componente,
-              peso: parseFloat(item.peso),
-              elementos: item.elementos,
-              necesidadIntervencion: 0,
-              existencia: "si",
-              pesoEvaluado: 0,
-              puntaje: 0,
-              elementosValorar: ""
-            } as Componente));
-      setComponentes(componentesActualizados);
-      calcularPesoTotal(componentesActualizados);
+      try {
+        const response = await getComponentes();
+        const componentesActualizados = (response.data ?? []).map((item: { id: number; componente: string; peso: string; elementos: string }) => ({
+          id: item.id,
+          componente: item.componente,
+          peso: parseFloat(item.peso),
+          elementos: item.elementos,
+          necesidadIntervencion: 0,
+          existencia: "si",
+          pesoEvaluado: 0,
+          puntaje: 0,
+          elementosValorar: ""
+        } as Componente));
+        setComponentes(componentesActualizados);
+        calcularPesoTotal(componentesActualizados);
+      } catch (error) {
+        console.error('Error fetching componentes:', error);
+        toast.error('Error al cargar los componentes');
+      }
     };
 
-    fetchComponentes();
+    void fetchComponentes();
   }, []);
 
   useEffect(() => {
     const fetchEstadoConservacion = async (): Promise<void> => {
-      const response = await getEstadoConservacion();
-      const estadoConservacionActualizado = (response.data ?? []).map((item) => ({
-        id: item.id,
-        estado_conservacion: item.estado_conservacion,
-        condiciones_fisicas: item.condiciones_fisicas,
-        clasificacion: item.clasificacion,
-        coef_depreciacion: parseFloat(item.coef_depreciacion),
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt
-      } as EstadoConservacion));
-      setEstadoConservacion(estadoConservacionActualizado);
+      try {
+        const response = await getEstadoConservacion();
+        const estadoConservacionActualizado = (response.data ?? []).map((item) => ({
+          id: item.id,
+          estado_conservacion: item.estado_conservacion,
+          condiciones_fisicas: item.condiciones_fisicas,
+          clasificacion: item.clasificacion,
+          coef_depreciacion: parseFloat(item.coef_depreciacion),
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt
+        } as EstadoConservacion));
+        setEstadoConservacion(estadoConservacionActualizado);
+      } catch (error) {
+        console.error('Error fetching estado conservacion:', error);
+        toast.error('Error al cargar los estados de conservación');
+      }
     };
 
-    fetchEstadoConservacion();
+    void fetchEstadoConservacion();
   }, []);
 
   useEffect(() => {
     const fetchFuncionalidades = async (): Promise<void> => {
-      const response = await getFuncionalidades();
-      const funcionalidadesActualizadas = (response.data ?? []).map((item) => ({
-        id: item.id,
-        Estado: item.Estado,
-        Puntuacion: parseFloat(item.Puntuacion),
-        Descripcion: item.Descripcion
-      } as Funcionalidad));
-      setFuncionalidades(funcionalidadesActualizadas);
+      try {
+        const response = await getFuncionalidades();
+        const funcionalidadesActualizadas = (response.data ?? []).map((item) => ({
+          id: item.id,
+          Estado: item.Estado,
+          Puntuacion: parseFloat(item.Puntuacion),
+          Descripcion: item.Descripcion
+        } as Funcionalidad));
+        setFuncionalidades(funcionalidadesActualizadas);
+      } catch (error) {
+        console.error('Error fetching funcionalidades:', error);
+        toast.error('Error al cargar las funcionalidades');
+      }
     };
 
-    fetchFuncionalidades();
+    void fetchFuncionalidades();
   }, []);
 
   useEffect(() => {
     const fetchNormativas = async (): Promise<void> => {
-      const response = await getNormativas();
-      const normativasActualizadas = (response.data ?? []).map((item) => ({
-        id: item.id,
-        Estado: item.Estado,
-        Puntuacion: parseFloat(item.Puntuacion),
-        Descripcion: item.Descripcion,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt
-      } as Normativa));
-      setNormativas(normativasActualizadas);
+      try {
+        const response = await getNormativas();
+        const normativasActualizadas = (response.data ?? []).map((item) => ({
+          id: item.id,
+          Estado: item.Estado,
+          Puntuacion: parseFloat(item.Puntuacion),
+          Descripcion: item.Descripcion,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt
+        } as Normativa));
+        setNormativas(normativasActualizadas);
+      } catch (error) {
+        console.error('Error fetching normativas:', error);
+        toast.error('Error al cargar las normativas');
+      }
     };
 
-    fetchNormativas();
+    void fetchNormativas();
   }, []);
 
   useEffect(() => {
