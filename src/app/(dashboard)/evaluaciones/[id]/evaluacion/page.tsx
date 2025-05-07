@@ -239,7 +239,7 @@ export default function Page(): JSX.Element {
       }
     };
 
-    fetchEvaluacionData();
+    void fetchEvaluacionData();
   }, [codigo]);
 
   useEffect(() => {
