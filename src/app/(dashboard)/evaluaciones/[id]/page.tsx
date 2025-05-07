@@ -83,8 +83,8 @@ interface PageParams {
 
 export default function EvaluacionesDeEdificio() {
   const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
-  const params = useParams() as { id: string };
-  const codigo = params.id;
+  const params = useParams();
+  const codigo = typeof params?.id === 'string' ? params.id : "";
 
   useEffect(() => {
     async function fetchEvaluaciones() {
@@ -99,13 +99,14 @@ export default function EvaluacionesDeEdificio() {
           throw new Error("Error al obtener evaluaciones");
         }
         
-        const { data }: EvaluacionResponse = await response.json();
-        const evaluacionesFiltradas = data.filter((evaluacion: Evaluacion) => {
+        const responseData = await response.json() as EvaluacionResponse;
+        const evaluacionesFiltradas = responseData.data.filter((evaluacion) => {
           const codigoEvaluacion = Array.isArray(evaluacion.edificio.codigo)
             ? evaluacion.edificio.codigo[0]
             : evaluacion.edificio.codigo;
           
-          return codigoEvaluacion?.toLowerCase() === (typeof codigo === "string" ? codigo : "");
+          const normalizedCodigo = typeof codigoEvaluacion === 'string' ? codigoEvaluacion.toLowerCase() : '';
+          return normalizedCodigo === codigo.toLowerCase();
         });
 
         const evaluadoresPromises = evaluacionesFiltradas.map(async (evaluacion) => {

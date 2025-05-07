@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { MongoClient, ObjectId } from "mongodb";
 
-const uri = process.env.MONGODB_URI || "";
+const uri = process.env.MONGODB_URI ??"";
 let client = new MongoClient(uri);
-const dbName = process.env.DB_NAME || "evaluacionedificiositcr";
+const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
 const collectionName = "imagenes";
 
 export async function GET(request: Request) {

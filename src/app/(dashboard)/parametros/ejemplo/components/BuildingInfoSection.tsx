@@ -19,7 +19,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <input
             id="edificio"
             placeholder="Ej: Edificio U-11"
-            value={edificioData?.nombre || ""}
+            value={edificioData?.nombre ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
@@ -28,7 +28,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <label htmlFor="codigo" className="text-base font-medium text-gray-700">Código</label>
           <input
             id="codigo"
-            value={edificioData?.codigoEdificio || ""}
+            value={edificioData?.codigoEdificio ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
@@ -39,7 +39,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
         <label htmlFor="campus" className="text-base font-medium text-gray-700">Campus Tecnológico / Centro Académico</label>
         <input
           id="campus"
-          value={edificioData?.sedeNombre || ""}
+          value={edificioData?.sedeNombre ??""}
           readOnly
           className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
         />
@@ -50,7 +50,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <label htmlFor="area" className="text-base font-medium text-gray-700">Área (m²)</label>
           <input
             id="area"
-            value={edificioData?.m2Construccion || ""}
+            value={edificioData?.m2Construccion ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />
@@ -59,7 +59,7 @@ const BuildingInfoSection: React.FC<BuildingInfoProps> = ({ edificioData }) => {
           <label htmlFor="uso" className="text-base font-medium text-gray-700">Uso</label>
           <input
             id="uso"
-            value={edificioData?.usoActualDescripcion || ""}
+            value={edificioData?.usoActualDescripcion ??""}
             readOnly
             className="w-full h-11 px-4 border border-gray-300 rounded-md bg-gray-50"
           />

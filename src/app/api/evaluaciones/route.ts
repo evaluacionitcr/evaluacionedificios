@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 
-const uri = process.env.MONGODB_URI || '';
+const uri = process.env.MONGODB_URI ??'';
 const client = new MongoClient(uri);
-const dbName = process.env.DB_NAME || "evaluacionedificiositcr";
-const collectionName = process.env.COLLECTION_NAME || "evaluaciones";
+const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
+const collectionName = process.env.COLLECTION_NAME ??"evaluaciones";
 const db = client.db(dbName);
 const collection = db.collection(collectionName);
 
