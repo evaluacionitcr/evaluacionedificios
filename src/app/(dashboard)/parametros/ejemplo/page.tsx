@@ -12,8 +12,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, X, Upload } from "lucide-react";
 import { useDropzone } from 'react-dropzone';
 import { useUploadThing } from "~/utils/uploadthing";
-import Image from "next/image";
 import { toast } from "sonner";
+import { useAuth } from "@clerk/clerk-react";
 
 
 interface Componente {
@@ -118,6 +118,8 @@ export default function Page(): JSX.Element {
     componentesCriticos: '',
     mejorasRequeridas: ''
   });
+
+  const { userId } = useAuth();
 
   const router = useRouter();
 
@@ -394,7 +396,8 @@ export default function Page(): JSX.Element {
         puntajeServiciabilidad: puntajeSeviciabilidad
       },
       puntajeTotalEdificio: puntajeTotalEdificio,
-      comentarios
+      comentarios,
+      idEvaluador: userId
     };
 
     try {
