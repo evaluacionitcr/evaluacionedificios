@@ -63,7 +63,7 @@ export default function ComponentesPage() {
           throw new Error(`Error al obtener datos del edificio: ${datosResponse.statusText}`);
         }
         
-        const datosJson = await datosResponse.json();
+        const datosJson: unknown = await datosResponse.json();
         console.log("Datos del edificio recibidos:", datosJson);
         
         // Segunda petición: componentes
@@ -74,14 +74,14 @@ export default function ComponentesPage() {
           throw new Error(`Error al obtener componentes: ${componentesResponse.statusText}`);
         }
         
-        const componentesJson = await componentesResponse.json();
+        const componentesJson: unknown = await componentesResponse.json();
         console.log("Componentes recibidos:", componentesJson);
 
         // Validación detallada de la estructura de datos
         if (!isDatosFijos(datosJson)) {
           console.error("Estructura de DatosFijos inválida:", datosJson);
           console.error("Propiedades esperadas:", ["id", "codigoEdificio", "usoActualId", "usoActualDescripcion", "noFinca", "noFincaId", "fechaConstruccion"]);
-          console.error("Propiedades recibidas:", Object.keys(datosJson));
+          console.error("Propiedades recibidas:", Object.keys(datosJson as object));
           throw new Error('Datos del edificio en formato inválido');
         }
 
@@ -93,9 +93,9 @@ export default function ComponentesPage() {
 
         setDatosFijos(datosJson);
         setComponentesExistentes({
-          aceras: componentesJson.aceras ?? null,
-          terrenos: componentesJson.terrenos ?? null,
-          zonasVerdes: componentesJson.zonasVerdes ?? null,
+          aceras: componentesJson.aceras,
+          terrenos: componentesJson.terrenos,
+          zonasVerdes: componentesJson.zonasVerdes,
         });
       } catch (error) {
         console.error("Error detallado al cargar datos:", error);
