@@ -22,7 +22,10 @@ const useUploadThingInputProps = (
     if (!e.target.files) return;
     const selectedFiles = Array.from(e.target.files);
 
-    const result = await $ut.startUpload(selectedFiles, customData ?? {});
+    const result = await $ut.startUpload(selectedFiles, {
+      ...customData,
+      evaluationId: customData?.evaluationId?.toString(),
+    });
     console.log("uploaded files", result);
   };
   return {
