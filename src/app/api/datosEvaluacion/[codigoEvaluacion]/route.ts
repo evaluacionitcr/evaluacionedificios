@@ -9,7 +9,7 @@ const collectionName = process.env.COLLECTION_NAME || "evaluaciones";
 
 export async function GET(
   request: Request,
-  { params }: { params: { codigoEvaluacion: string } }
+  { params }: { params: Promise<{ codigoEvaluacion: string }> },
 ) {
   try {
     //NECESITO AWAIT LOS PARAMAS
