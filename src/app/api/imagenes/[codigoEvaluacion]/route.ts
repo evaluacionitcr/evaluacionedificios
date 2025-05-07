@@ -8,7 +8,7 @@ const collectionName = "imagenes";
 
 export async function GET(
     request: Request,
-    { params }: { params: { codigoEvaluacion: string } }
+    { params }: { params: Promise<{ codigoEvaluacion: string }> }
   ) {
     try {
       let { codigoEvaluacion } = await params;
