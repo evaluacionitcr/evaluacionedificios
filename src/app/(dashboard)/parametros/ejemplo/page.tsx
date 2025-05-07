@@ -15,7 +15,6 @@ import { useUploadThing } from "~/utils/uploadthing";
 import { toast } from "sonner";
 import { useAuth } from "@clerk/clerk-react";
 
-
 interface Componente {
   id: number;
   componente: string;
@@ -66,6 +65,29 @@ interface StagedFile {
   id: string;
   file: File;
   preview: string;
+}
+
+interface EdificioResponse {
+  edad?: number;
+  vidaUtilExperto?: number;
+  codigoEdificio?: string;
+  nombre?: string;
+  usoActualDescripcion?: string;
+  m2Construccion?: number;
+  sedeNombre?: string;
+}
+
+interface ComponenteResponse {
+  id: number;
+  componente: string;
+  peso: string;
+  elementos: string;
+}
+
+interface ApiResponse<T> {
+  data: T[];
+  success?: boolean;
+  message?: string;
 }
 
 import { LoadingSpinnerSVG } from "~/components/ui/svg";
@@ -123,56 +145,55 @@ export default function Page(): JSX.Element {
 
   const router = useRouter();
 
-
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
-      onUploadBegin() {
-        toast(
-          <div className="flex items-center gap-2">
-            <LoadingSpinnerSVG /> <span className="text-lg">Subiendo imagenes...</span>
-          </div>,
-          {
-            duration: 5000,
-            id: "uploading-toast",
-          },
-        );
-      },
-      onUploadError(err) {
-        toast.dismiss("uploading-toast");
-        toast.error("Upload failed. Please try again.");
-        setIsSaving(false);
-      },
-      onClientUploadComplete: (res) => {
-        if (res && res.length > 0) {
-          setStagedFiles([]); // Clear staged files after successful upload
-        }
-        setIsSaving(false);
-        toast.success("Imagenes guardadas correctamente!");
-      },
-    });
-  
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-      accept: {
-        'image/*': []
-      },
-      onDrop: (acceptedFiles) => {
-        const newStagedFiles = acceptedFiles.map(file => ({
-          id: crypto.randomUUID(),
-          file,
-          preview: URL.createObjectURL(file)
-        }));
-        setStagedFiles(prev => [...prev, ...newStagedFiles]);
+    onUploadBegin() {
+      toast(
+        <div className="flex items-center gap-2">
+          <LoadingSpinnerSVG /> <span className="text-lg">Subiendo imagenes...</span>
+        </div>,
+        {
+          duration: 5000,
+          id: "uploading-toast",
+        },
+      );
+    },
+    onUploadError(err) {
+      toast.dismiss("uploading-toast");
+      toast.error("Upload failed. Please try again.");
+      setIsSaving(false);
+    },
+    onClientUploadComplete: (res) => {
+      if (res && res.length > 0) {
+        setStagedFiles([]); // Clear staged files after successful upload
       }
+      setIsSaving(false);
+      toast.success("Imagenes guardadas correctamente!");
+    },
+  });
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'image/*': []
+    },
+    onDrop: (acceptedFiles) => {
+      const newStagedFiles = acceptedFiles.map(file => ({
+        id: crypto.randomUUID(),
+        file,
+        preview: URL.createObjectURL(file)
+      }));
+      setStagedFiles(prev => [...prev, ...newStagedFiles]);
+    }
+  });
+
+  const handleRemoveStaged = (id: string) => {
+    setStagedFiles(files => {
+      const fileToRemove = files.find(f => f.id === id);
+      if (fileToRemove) {
+        URL.revokeObjectURL(fileToRemove.preview);
+      }
+      return files.filter(f => f.id !== id);
     });
-  
-    const handleRemoveStaged = (id: string) => {
-      setStagedFiles(files => {
-        const fileToRemove = files.find(f => f.id === id);
-        if (fileToRemove) {
-          URL.revokeObjectURL(fileToRemove.preview);
-        }
-        return files.filter(f => f.id !== id);
-      });
-    };
+  };
 
   useEffect(() => {
     const fetchEdificioData = async () => {
@@ -183,10 +204,10 @@ export default function Page(): JSX.Element {
         try {
           const response = await fetch(`/api/datosEdificio/${codigo}`);
           if (response.ok) {
-            const data = await response.json();
+            const data = await response.json() as EdificioResponse;
             setEdificioData(data);
-            setEdadEdificio(data.edad?.toString() || "");
-            setVidaUtil(data.vidaUtilExperto?.toString() || "");
+            setEdadEdificio(data.edad?.toString() ?? "");
+            setVidaUtil(data.vidaUtilExperto?.toString() ?? "");
           }
         } catch (error) {
           console.error('Error fetching building data:', error);
@@ -194,23 +215,32 @@ export default function Page(): JSX.Element {
       }
     };
 
-    fetchEdificioData();
+    void fetchEdificioData();
   }, []);
 
   useEffect(() => {
     const fetchComponentes = async (): Promise<void> => {
-      const response = await getComponentes();
-      const componentesActualizados = (response.data ?? []).map((item: any) => ({
-        ...item,
-        peso: parseFloat(item.peso),
-        necesidadIntervencion: 0,
-        existencia: "si",
-      }));
-      setComponentes(componentesActualizados);
-      calcularPesoTotal(componentesActualizados);
+      try {
+        const response = await getComponentes();
+        const componentesResponse = response as ApiResponse<ComponenteResponse>;
+        const componentesActualizados = (componentesResponse.data ?? []).map((item: ComponenteResponse) => ({
+          id: item.id,
+          componente: item.componente,
+          peso: parseFloat(item.peso),
+          elementos: item.elementos,
+          necesidadIntervencion: 0,
+          existencia: "si" as const,
+          pesoEvaluado: 0,
+          puntaje: 0
+        }));
+        setComponentes(componentesActualizados);
+        calcularPesoTotal(componentesActualizados);
+      } catch (error) {
+        console.error('Error fetching componentes:', error);
+      }
     };
 
-    fetchComponentes();
+    void fetchComponentes();
   }, []);
 
   useEffect(() => {
@@ -274,7 +304,7 @@ export default function Page(): JSX.Element {
   }, [escalaDepreciacion, escalaDepreciacionRemodelacion, porcentajeRemodelacion]);
 
   useEffect(() => {
-    const totalPuntajeComponentes = componentes.reduce((total, componente) => total + (componente.puntaje || 0), 0);
+    const totalPuntajeComponentes = componentes.reduce((total, componente) => total + (componente.puntaje ??0), 0);
     setPuntajeComponentes(parseFloat(totalPuntajeComponentes.toFixed(3)));
   }, [componentes]);
 
@@ -357,23 +387,23 @@ export default function Page(): JSX.Element {
     
     const evaluacion = {
       edificio: {
-        codigo: edificioData?.codigoEdificio || '',
-        nombre: edificioData?.nombre || '',
-        campus: edificioData?.sedeNombre || '',
-        usoActual: edificioData?.usoActualDescripcion || '',
-        area: edificioData?.m2Construccion || 0,
+        codigo: edificioData?.codigoEdificio ??'',
+        nombre: edificioData?.nombre ??'',
+        campus: edificioData?.sedeNombre ??'',
+        usoActual: edificioData?.usoActualDescripcion ??'',
+        area: edificioData?.m2Construccion ??0,
         descripcion: (e.currentTarget.querySelector('#descripcion') as HTMLTextAreaElement).value
       },
       depreciacion: {
         principal: {
-          edad: parseInt(edadEdificio) || 0,
-          vidaUtil: parseInt(vidaUtil) || 0,
+          edad: parseInt(edadEdificio) ??0,
+          vidaUtil: parseInt(vidaUtil) ??0,
           estadoConservacionCoef: estadoSeleccionado,
           escalaDepreciacion: escalaDepreciacion
         },
         remodelacion: {
-          edad: parseInt(edadEdificioRemodelacion) || 0,
-          vidaUtil: parseInt(vidaUtilRemodelacion) || 0,
+          edad: parseInt(edadEdificioRemodelacion) ??0,
+          vidaUtil: parseInt(vidaUtilRemodelacion) ??0,
           estadoConservacionCoef: estadoSeleccionadoRemodelacion,
           porcentaje: porcentajeRemodelacion,
           escalaDepreciacion: escalaDepreciacionRemodelacion
@@ -416,7 +446,7 @@ export default function Page(): JSX.Element {
         
         router.push('/edificios');
       } else {
-        toast.error(result.message || "Error al guardar la evaluación");
+        toast.error(result.message ??"Error al guardar la evaluación");
       }
     } catch (error) {
       console.error("Error al guardar la evaluación:", error);
@@ -492,65 +522,63 @@ export default function Page(): JSX.Element {
           handleComentarioChange={handleComentarioChange}
         />
 
-<div className="mt-6 border-t pt-6">
-      <h2 className="mb-4 text-xl font-semibold">
-        Imágenes de la evaluación
-      </h2>
+        <div className="mt-6 border-t pt-6">
+          <h2 className="mb-4 text-xl font-semibold">
+            Imágenes de la evaluación
+          </h2>
 
-      <div {...getRootProps()} className={`mb-4 border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}>
-        <input {...getInputProps()} />
-        <div className="flex flex-col items-center">
-          <Upload className="h-12 w-12 text-gray-400 mb-2" />
-          {isDragActive ? (
-            <p>Suelta las imágenes aquí ...</p>
-          ) : (
-            <p>Arrastra y suelta imágenes aquí, o haz clic para seleccionar</p>
+          <div {...getRootProps()} className={`mb-4 border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}>
+            <input {...getInputProps()} />
+            <div className="flex flex-col items-center">
+              <Upload className="h-12 w-12 text-gray-400 mb-2" />
+              {isDragActive ? (
+                <p>Suelta las imágenes aquí ...</p>
+              ) : (
+                <p>Arrastra y suelta imágenes aquí, o haz clic para seleccionar</p>
+              )}
+            </div>
+          </div>
+
+          {/* Staged Images */}
+          {stagedFiles.length > 0 && (
+            <div className="mt-4">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-medium">
+                  Imágenes pendientes ({stagedFiles.length})
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                {stagedFiles.map((file) => (
+                  <div key={file.id} className="group relative overflow-hidden rounded-md border">
+                    <div className="relative aspect-square">
+                      <img
+                        src={file.preview}
+                        alt={file.file.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveStaged(file.id)}
+                      className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <div className="truncate p-2 text-xs">{file.file.name}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
-      </div>
-
-      {/* Staged Images */}
-      {stagedFiles.length > 0 && (
-        <div className="mt-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-medium">
-              Imágenes pendientes ({stagedFiles.length})
-            </h3>
-            
-          </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {stagedFiles.map((file) => (
-              <div key={file.id} className="group relative overflow-hidden rounded-md border">
-                <div className="relative aspect-square">
-                  <img
-                    src={file.preview}
-                    alt={file.file.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveStaged(file.id)}
-                  className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-                <div className="truncate p-2 text-xs">{file.file.name}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-      }
-      </div>
 
         <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline" type="reset" className="px-6 text-gray-700 border-gray-300 hover:bg-gray-100" >
             Limpiar
           </Button>
 
-          <Button type="submit" className="px-6 bg-[#00205B] hover:bg-[#003080] text-white" disabled={isSaving || isUploading}>
-          {isSaving ? 'Guardando...' : 'Guardar'}
+          <Button type="submit" className="px-6 bg-[#00205B] hover:bg-[#003080] text-white" disabled={isSaving ??isUploading}>
+            {isSaving ? 'Guardando...' : 'Guardar'}
           </Button>
         </div>
       </form>

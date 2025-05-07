@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param currency - El símbolo de moneda a usar (₡ por defecto)
  * @returns Valor formateado como string (ej: ₡1.234,56)
  */
-export function formatMoney(value: string | number | null, currency: string = "₡"): string {
+export function formatMoney(value: string | number | null, currency = "₡"): string {
   // Si el valor es nulo, undefined, cero o N/A, devolver 0 formateado
   if (!value || value === "0.00" || value === "0" || value === "N/A") {
     return `${currency}0,00`;

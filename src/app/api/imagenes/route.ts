@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { MongoClient, ObjectId } from "mongodb";
 
 const uri = process.env.MONGODB_URI ??"";
-let client = new MongoClient(uri);
+const client = new MongoClient(uri);
 const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
 const collectionName = "imagenes";
 

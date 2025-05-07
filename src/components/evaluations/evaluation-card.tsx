@@ -10,8 +10,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import Link from "next/link";
-import { Eye, ClipboardList } from "lucide-react";
-import { useEffect } from "react";
+import { Eye } from "lucide-react";
 
 interface Edificio {
   id: number;
@@ -19,16 +18,21 @@ interface Edificio {
   codigo: string;
 }
 
+interface Evaluacion {
+  _id: string;
+  createdAt: string;
+  estado: string;
+  puntajeTotalEdificio: number;
+}
+
 export default function EvaluatedBuildingCard({
   edificio,
   evaluaciones,
 }: {
   edificio: Edificio;
-  evaluaciones: any[]; 
+  evaluaciones: Evaluacion[];
 }) {
-  const cantidadEvaluaciones = evaluaciones.length;  
-  useEffect(() => {
-  }, [cantidadEvaluaciones]); 
+  const cantidadEvaluaciones = evaluaciones.length;
 
   return (
     <Card className="rounded-lg border p-4 shadow-sm bg-white">
@@ -50,23 +54,20 @@ export default function EvaluatedBuildingCard({
         )}
       </CardContent>
 
-    <CardFooter className="flex gap-2">
-      {/* Mostrar botón solo si hay evaluaciones */}
-      {cantidadEvaluaciones > 0 && (
-        <Link
-      href={`/evaluaciones/${encodeURIComponent(edificio.codigo.toLowerCase())}`}
-      passHref className="w-full"
-        >
-      <Button
-        variant="default"
-        className="w-full"
-      >
-        Ver evaluaciones <Eye size={16} className="inline-block ml-1" />
-      </Button>
-        </Link>
-      )}
-    </CardFooter>
-
+      <CardFooter className="flex gap-2">
+        {/* Mostrar botón solo si hay evaluaciones */}
+        {cantidadEvaluaciones > 0 && (
+          <Link
+            href={`/evaluaciones/${encodeURIComponent(edificio.codigo.toLowerCase())}`}
+            passHref
+            className="w-full"
+          >
+            <Button variant="default" className="w-full">
+              Ver evaluaciones <Eye size={16} className="inline-block ml-1" />
+            </Button>
+          </Link>
+        )}
+      </CardFooter>
     </Card>
   );
 }

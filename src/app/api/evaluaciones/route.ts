@@ -1,5 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { MongoClient, Document } from "mongodb";
+
+interface Evaluacion {
+  edificio: {
+    codigo: string;
+    nombre: string;
+    campus: string;
+    usoActual: string;
+    area: number;
+    descripcion: string;
+  };
+  depreciacion: {
+    principal: {
+      edad: number;
+      vidaUtil: number;
+      estadoConservacionCoef: number;
+      escalaDepreciacion: number;
+    };
+    remodelacion: {
+      edad: number;
+      vidaUtil: number;
+      estadoConservacionCoef: number;
+      porcentaje: number;
+      escalaDepreciacion: number;
+    };
+    puntajeDepreciacionTotal: number;
+  };
+  componentes: Array<{
+    id: number;
+    componente: string;
+    peso: number;
+    existencia: string;
+    necesidadIntervencion: number;
+    pesoEvaluado: number;
+    puntaje: number;
+  }>;
+  puntajeComponentes: number;
+  serviciabilidad: {
+    funcionalidadId: number;
+    normativaId: number;
+    puntajeServiciabilidad: number;
+  };
+  puntajeTotalEdificio: number;
+  comentarios: {
+    funcionalidad: string;
+    normativa: string;
+    componentesCriticos: string;
+    mejorasRequeridas: string;
+  };
+  idEvaluador: string;
+}
 
 const uri = process.env.MONGODB_URI ??'';
 const client = new MongoClient(uri);
@@ -14,9 +64,10 @@ export async function POST(request: NextRequest) {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    const evaluacion = await request.json();
+    const requestData = await request.json();
+    const evaluacion = requestData as Evaluacion;
     
-    const documentoEvaluacion = {
+    const documentoEvaluacion: Document = {
       ...evaluacion,
       createdAt: new Date(),
       estado: "Pendiente"

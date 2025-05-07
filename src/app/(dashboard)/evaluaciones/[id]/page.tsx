@@ -77,6 +77,12 @@ interface EvaluacionResponse {
   data: Evaluacion[];
 }
 
+interface UserData {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
 interface PageParams {
   id: string;
 }
@@ -111,7 +117,7 @@ export default function EvaluacionesDeEdificio() {
 
         const evaluadoresPromises = evaluacionesFiltradas.map(async (evaluacion) => {
           try {
-            const userData = await getUserData(evaluacion.idEvaluador);
+            const userData = await getUserData(evaluacion.idEvaluador) as UserData;
             return { ...evaluacion, evaluador: userData };
           } catch (error) {
             console.error(`Error al obtener datos del evaluador ${evaluacion.idEvaluador}:`, error);

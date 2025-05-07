@@ -77,6 +77,12 @@ interface EvaluatedBuildingsContainerProps {
   sedesConEdificios: Sede[];
 }
 
+interface ApiResponse {
+  data: Evaluacion[];
+  status: string;
+  message?: string;
+}
+
 export default function EvaluatedBuildingsContainer({
   sedesConEdificios,
 }: EvaluatedBuildingsContainerProps) {
@@ -113,14 +119,18 @@ export default function EvaluatedBuildingsContainer({
 
   useEffect(() => {
     async function fetchEvaluaciones() {
-      const response = await fetch("/api/evaluaciones");
-      if (response.ok) {
-        const data = await response.json();
+      try {
+        const response = await fetch("/api/evaluaciones");
+        if (!response.ok) {
+          throw new Error("Error al obtener evaluaciones");
+        }
   
+        const { data } = await response.json() as ApiResponse;
+        
         // Agrupar evaluaciones por código de edificio
         const agrupadasPorCodigo: Record<string, Evaluacion[]> = {};
   
-        for (const evaluacion of data.data) {
+        for (const evaluacion of data) {
           const codigo = evaluacion.edificio?.codigo;
           if (!codigo) continue;
   
@@ -131,12 +141,12 @@ export default function EvaluatedBuildingsContainer({
         }
   
         setEvaluacionesPorCodigo(agrupadasPorCodigo);
-      } else {
-        console.error("Error al obtener evaluaciones");
+      } catch (error) {
+        console.error("Error al obtener evaluaciones:", error);
       }
     }
   
-    fetchEvaluaciones();
+    void fetchEvaluaciones();
   }, []);
 
   const getEvaluacionesForEdificio = (codigo: string) => {
@@ -190,7 +200,7 @@ export default function EvaluatedBuildingsContainer({
                 {filteredEdificios.length > 0 ? (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {filteredEdificios.map((edificio) => {
-                      const evaluaciones = evaluacionesPorCodigo[edificio.codigo] || [];
+                      const evaluaciones = evaluacionesPorCodigo[edificio.codigo] ?? [];
                       return (
                         <EvaluatedBuildingCard
                           key={edificio.id}
