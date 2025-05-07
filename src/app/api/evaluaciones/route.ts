@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    const requestData = await request.json();
+    const requestData = await request.json(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
     const evaluacion = requestData as Evaluacion;
     
     const documentoEvaluacion: Document = {

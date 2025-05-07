@@ -439,7 +439,7 @@ export default function Page(): JSX.Element {
         campus: edificioData?.sedeNombre ?? '',
         usoActual: edificioData?.usoActualDescripcion ?? '',
         area: edificioData?.m2Construccion ?? 0,
-        descripcion: (document.querySelector('#descripcion') as HTMLTextAreaElement)?.value ?? ''
+        descripcion: (document.querySelector('#descripcion') as HTMLTextAreaElement)?.value ?? '' // eslint-disable-line @typescript-eslint/non-nullable-type-assertion-style
       },
       depreciacion: {
         principal: {

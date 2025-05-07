@@ -109,10 +109,11 @@ export default function EvaluacionesDeEdificio() {
         
         const responseJson = await response.json() as ResponseData;
         const evaluacionesFiltradas = responseJson.data.filter((evaluacion) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const codigoEvaluacion = Array.isArray(evaluacion.edificio.codigo)
-            ? evaluacion.edificio.codigo[0]
-            : evaluacion.edificio.codigo;
-          
+          ? evaluacion.edificio.codigo[0]
+          : evaluacion.edificio.codigo;
+
           const normalizedCodigo = typeof codigoEvaluacion === 'string' ? codigoEvaluacion.toLowerCase() : '';
           return normalizedCodigo === codigo.toLowerCase();
         });
