@@ -200,7 +200,7 @@ export default function Page() {
                     )}
                     <Link href={`/parametros/priorizacion/${eje.id}`}>
                       <Button>
-                        Parametros
+                        Criterios
                       </Button>
                     </Link>
                     <Button 
