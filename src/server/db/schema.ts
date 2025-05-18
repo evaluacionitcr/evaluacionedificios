@@ -315,5 +315,13 @@ export const Normativas = createTable("normativa", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const EjesPriorizacion = createTable("ejes_priorizacion", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  eje: varchar("eje", { length: 256 }).notNull(),
+  peso: decimal("peso", { precision: 5, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export type Evaluation = typeof Evaluaciones.$inferSelect;
 export type NewEvaluation = typeof Evaluaciones.$inferInsert;
