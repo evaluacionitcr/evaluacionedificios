@@ -323,5 +323,29 @@ export const EjesPriorizacion = createTable("ejes_priorizacion", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const CriteriosPriorizacion = createTable(
+  "criterios_priorizacion", {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    criterio: varchar("criterio", { length: 256 }).notNull(),
+    peso: decimal("peso", { precision: 5, scale: 2 }).notNull(),
+    ejesPriorizacionId: integer("ejes_priorizacion_id").references(
+      () => EjesPriorizacion.id,
+    ),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  });
+
+export const ParametrosPriorizacion = createTable(
+  "parametros_priorizacion", {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    parametro: varchar("parametro", { length: 256 }).notNull(),
+    peso: decimal("peso", { precision: 5, scale: 2 }).notNull(),
+    criteriosPriorizacionId: integer("criterios_priorizacion_id").references(
+      () => CriteriosPriorizacion.id,
+    ),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  });
+
 export type Evaluation = typeof Evaluaciones.$inferSelect;
 export type NewEvaluation = typeof Evaluaciones.$inferInsert;
