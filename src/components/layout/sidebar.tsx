@@ -93,11 +93,11 @@ export default function Sidebar({ activeTab }: SidebarProps) {
             </Link>
           </li>
           <li>
-            <Link href="/reportes">
+            <Link href="/priorizacion">
               <Button
                 variant="ghost"
                 className={`w-full justify-start ${
-                  activeTab === "reportes"
+                  activeTab === "priorizacion"
                     ? "bg-white/10 font-medium text-primary-foreground"
                     : "text-white hover:bg-white/10 hover:text-white"
                 }`}
