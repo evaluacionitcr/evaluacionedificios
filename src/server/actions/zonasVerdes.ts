@@ -58,8 +58,7 @@ export async function getDetallesZonasVerdes(
         valorReposicion: ZonasVerdes.valorReposicion,
         depreciacionLinealAnual: ZonasVerdes.depreciacionLinealAnual,
         valorActualRevaluado: ZonasVerdes.valorActualRevaluado,
-        anoDeRevaluacion: ZonasVerdes.anoDeRevaluacion,
-        usoActual: UsosActuales.descripcion,
+        anoDeRevaluacion: ZonasVerdes.anoDeRevaluacion, usoActual: UsosActuales.descripcion,
       })
       .from(ZonasVerdes)
       .leftJoin(Construcciones, eq(ZonasVerdes.idConstruccion, Construcciones.id))

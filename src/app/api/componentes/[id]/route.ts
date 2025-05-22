@@ -7,11 +7,12 @@ import { type NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const id = url.pathname.split("/").pop()?.toUpperCase(); // extraemos el id de la URL
+    const idStr = url.pathname.split("/").pop();
+    const id = idStr ? parseInt(idStr) : null;
 
-    if (!id) {
+    if (!id || isNaN(id)) {
       return NextResponse.json(
-        { error: "No se proporcionó id" },
+        { error: "ID inválido o no proporcionado" },
         { status: 400 }
       );
     }
@@ -19,19 +20,19 @@ export async function GET(request: NextRequest) {
     const [aceras, terrenos, zonasVerdes] = await Promise.all([
       db.select()
         .from(Aceras)
-        .where(eq(Aceras.codigoEdificio, id))
+        .where(eq(Aceras.idConstruccion, id))
         .orderBy(desc(Aceras.createdAt))
         .limit(1),
 
       db.select()
         .from(Terrenos)
-        .where(eq(Terrenos.codigoEdificio, id))
+        .where(eq(Terrenos.idConstruccion, id))
         .orderBy(desc(Terrenos.createdAt))
         .limit(1),
 
       db.select()
         .from(ZonasVerdes)
-        .where(eq(ZonasVerdes.codigoEdificio, id))
+        .where(eq(ZonasVerdes.idConstruccion, id))
         .orderBy(desc(ZonasVerdes.createdAt))
         .limit(1)
     ]);

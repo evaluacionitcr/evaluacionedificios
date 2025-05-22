@@ -5,12 +5,13 @@ import { eq, ilike } from "drizzle-orm";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ codigoEdificio: string }> },
+  { params }: { params: Promise<{ id: string}> },
 ) {
   try {
-    const { codigoEdificio } = await params;
+    const { id } = await params;
 
-    if (!codigoEdificio) {
+    if (!id) {
+
       return NextResponse.json(
         { error: "Código de edificio no proporcionado" },
         { status: 400 },
@@ -43,7 +44,7 @@ export async function GET(
       .leftJoin(UsosActuales, eq(Construcciones.usoActual, UsosActuales.id))
       .leftJoin(NumeroFincas, eq(Construcciones.noFinca, NumeroFincas.id))
       .leftJoin(Sedes, eq(Construcciones.sede, Sedes.id))
-      .where(ilike(Construcciones.codigoEdificio, codigoEdificio))
+      .where(eq(Construcciones.id, parseInt(id)))
       .limit(1);
 
     if (!resultado.length) {

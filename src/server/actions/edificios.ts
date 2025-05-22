@@ -156,6 +156,59 @@ export async function getDetallesEdificio(
   }
 }
 
+
+export async function getDetallesEdificioPorId(
+  id: number,
+): Promise<DetallesEdificio[]> {
+  try {
+    if (!id) {
+      throw new Error("El código del edificio es requerido");
+    }
+
+    console.log("Buscando edificio con id:", id);
+
+    // Eliminar la búsqueda del ID más reciente y obtener directamente todos los registros con el mismo código
+    const edificios = await db
+      .select({
+        id: Construcciones.id,
+        codigoEdificio: Construcciones.codigoEdificio,
+        sede: Construcciones.sede,
+        sedeNombre: Sedes.nombre,
+        esRenovacion: Construcciones.esRenovacion,
+        nombre: Construcciones.nombre,
+        fechaConstruccion: Construcciones.fechaConstruccion,
+        noFinca: Construcciones.noFinca,
+        numeroFinca: NumeroFincas.numero,
+        m2Construccion: Construcciones.m2Construccion,
+        valorDolarPorM2: Construcciones.valorDolarPorM2,
+        valorColonPorM2: Construcciones.valorColonPorM2,
+        edad: Construcciones.edad,
+        vidaUtilHacienda: Construcciones.vidaUtilHacienda,
+        vidaUtilExperto: Construcciones.vidaUtilExperto,
+        valorReposicion: Construcciones.valorReposicion,
+        depreciacionLinealAnual: Construcciones.depreciacionLinealAnual,
+        valorActualRevaluado: Construcciones.valorActualRevaluado,
+        anoDeRevaluacion: Construcciones.anoDeRevaluacion,
+        usoActual: UsosActuales.descripcion,
+      })
+      .from(Construcciones)
+      .leftJoin(Sedes, eq(Construcciones.sede, Sedes.id))
+      .leftJoin(NumeroFincas, eq(Construcciones.noFinca, NumeroFincas.id))
+      .leftJoin(UsosActuales, eq(Construcciones.usoActual, UsosActuales.id))
+      .where(eq(Construcciones.id, id))
+      .orderBy(sql`${Construcciones.id} ASC`); // Mantener el orden descendente para que los más recientes aparezcan primero
+
+    console.log("Resultados encontrados:", edificios.length);
+    if (edificios.length > 0) {
+      console.log("Datos del primer edificio:", edificios[0]);
+    }
+    return edificios;
+  } catch (error) {
+    console.error("Error obteniendo detalles del edificio:", error);
+    throw error;
+  }
+}
+
 // Nueva función para eliminar un registro de edificio
 export async function eliminarRegistroEdificio(id: number) {
   try {

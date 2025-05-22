@@ -5,6 +5,7 @@ import { fetchFincas, fetchUsosActuales, createRemodelacion } from "./actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 interface Finca {
   id: number;
@@ -274,7 +275,11 @@ export function RemodelacionForm({ buildingId }: RemodelacionFormProps) {
 
       if (response.success) {
         // Redirigir al usuario a editar aceras, zonas verdes y terrenos
-        router.push(`/edificios/${buildingId}/componentes`);
+        toast.success("Remodelación creada con éxito");
+        if (response.data ){
+          if(response.data[0]){
+          router.push(`/edificios/${response.data[0].id}/componentes`);
+        }}
       } else {
         setError(response.error ?? "Error al crear la remodelación");
       }

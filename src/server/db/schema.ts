@@ -57,8 +57,7 @@ export const Construcciones = createTable(
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     codigoEdificio: varchar("codigo_edificio", { length: 50 })
-      .notNull()
-      .unique(),
+      .notNull(),
     sede: integer("sede").references(() => Sedes.id),
     esRenovacion: boolean("es_renovacion"),
     nombre: varchar("nombre", { length: 256 }).notNull(),
@@ -109,8 +108,7 @@ export const Aceras = createTable(
       { onDelete: "cascade" },
     ),
     codigoEdificio: varchar("codigo_edificio", { length: 50 })
-      .notNull()
-      .unique(),
+      .notNull(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
     fechaConstruccion: integer("fecha_construccion"), // Año como entero
     noFinca: integer("no_finca").references(() => NumeroFincas.id),
@@ -205,8 +203,7 @@ export const Terrenos = createTable(
       { onDelete: "cascade" },
     ),
     codigoEdificio: varchar("codigo_edificio", { length: 50 })
-      .notNull()
-      .unique(),
+      .notNull(),
     nombre: varchar("nombre", { length: 256 }).notNull(),
     fechaConstruccion: integer("fecha_construccion"), // Año como entero
     noFinca: integer("no_finca").references(() => NumeroFincas.id),

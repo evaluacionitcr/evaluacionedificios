@@ -39,20 +39,6 @@ async function checkExistingComponent(
 
 export async function createAceras(data: ComponentData) {
   try {
-    const existing = await checkExistingComponent(data.codigoEdificio, Aceras);
-    
-    if (existing.length > 0) {
-      const result = await db
-        .update(Aceras)
-        .set({
-          ...data,
-          updatedAt: new Date(),
-        })
-        .where(eq(Aceras.codigoEdificio, data.codigoEdificio))
-        .returning();
-      return { success: true, data: result[0] };
-    }
-
     const result = await db.insert(Aceras).values({
       ...data,
       createdAt: new Date(),
@@ -61,26 +47,12 @@ export async function createAceras(data: ComponentData) {
     return { success: true, data: result[0] };
   } catch (error) {
     console.error("Error en createAceras:", error);
-    return { success: false, error: "Error al crear/actualizar acera" };
+    return { success: false, error: "Error al crear"};
   }
 }
 
 export async function createTerrenos(data: ComponentData) {
   try {
-    const existing = await checkExistingComponent(data.codigoEdificio, Terrenos);
-    
-    if (existing.length > 0) {
-      const result = await db
-        .update(Terrenos)
-        .set({
-          ...data,
-          updatedAt: new Date(),
-        })
-        .where(eq(Terrenos.codigoEdificio, data.codigoEdificio))
-        .returning();
-      return { success: true, data: result[0] };
-    }
-
     const result = await db.insert(Terrenos).values({
       ...data,
       createdAt: new Date(),
@@ -95,19 +67,6 @@ export async function createTerrenos(data: ComponentData) {
 
 export async function createZonasVerdes(data: ComponentData) {
   try {
-    const existing = await checkExistingComponent(data.codigoEdificio, ZonasVerdes);
-    
-    if (existing.length > 0) {
-      const result = await db
-        .update(ZonasVerdes)
-        .set({
-          ...data,
-          updatedAt: new Date(),
-        })
-        .where(eq(ZonasVerdes.codigoEdificio, data.codigoEdificio))
-        .returning();
-      return { success: true, data: result[0] };
-    }
 
     const result = await db.insert(ZonasVerdes).values({
       ...data,

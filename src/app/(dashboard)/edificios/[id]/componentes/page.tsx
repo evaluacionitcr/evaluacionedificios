@@ -34,14 +34,51 @@ interface ComponenteDetalle {
   usoActual: number | null; // Changed from string to number
 }
 
+// Type guards con validación mejorada
+function isDatosFijos(data: unknown): data is DatosFijos {
+  if (typeof data !== 'object' || data === null) {
+    console.error("data no es un objeto", data);
+    return false;
+  }
+  
+  const requiredProps = ['id', 'codigoEdificio', 'usoActualId', 'usoActualDescripcion', 'noFinca', 'noFincaId', 'fechaConstruccion'];
+  const missingProps = requiredProps.filter(prop => !(prop in data));
+  
+  if (missingProps.length > 0) {
+    console.error(`Faltan propiedades requeridas en DatosFijos: ${missingProps.join(", ")}`, data);
+    return false;
+  }
+  
+  return true;
+}
+
+function isComponenteDetalle(data: unknown): data is ComponenteDetalle {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'id' in data &&
+    'codigoEdificio' in data &&
+    'nombre' in data
+  );
+}
+
+function isComponentesResponse(data: unknown): data is ComponentesResponse {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'aceras' in data &&
+    'terrenos' in data &&
+    'zonasVerdes' in data &&
+    (data.aceras === null || isComponenteDetalle(data.aceras)) &&
+    (data.terrenos === null || isComponenteDetalle(data.terrenos)) &&
+    (data.zonasVerdes === null || isComponenteDetalle(data.zonasVerdes))
+  );
+}
+
 export default function ComponentesPage() {
   const params = useParams();
   const [datosFijos, setDatosFijos] = useState<DatosFijos | undefined>(undefined);
-  const [componentesExistentes, setComponentesExistentes] = useState<{
-    aceras: ComponenteDetalle | null;
-    terrenos: ComponenteDetalle | null;
-    zonasVerdes: ComponenteDetalle | null;
-  }>({
+  const [componentesExistentes, setComponentesExistentes] = useState<ComponentesResponse>({
     aceras: null,
     terrenos: null,
     zonasVerdes: null,
@@ -53,100 +90,40 @@ export default function ComponentesPage() {
 
     const fetchData = async () => {
       try {
-        console.log(`Iniciando peticiones para edificio con ID: ${id.toString()}`);
-        
-        // Primera petición: datos del edificio
-        const datosResponse = await fetch(`/api/datosEdificio/${id.toString()}`);
+        const [datosResponse, componentesResponse] = await Promise.all([
+          fetch(`/api/datosEdificio/${id.toString()}`),
+          fetch(`/api/componentes/${id.toString()}`)
+        ]);
         
         if (!datosResponse.ok) {
-          console.error(`Error en la petición de datos del edificio. Status: ${datosResponse.status}`);
           throw new Error(`Error al obtener datos del edificio: ${datosResponse.statusText}`);
         }
         
-        const datosJson: unknown = await datosResponse.json();
-        console.log("Datos del edificio recibidos:", datosJson);
-        
-        // Segunda petición: componentes
-        const componentesResponse = await fetch(`/api/componentes/${id.toString()}`);
-        
         if (!componentesResponse.ok) {
-          console.error(`Error en la petición de componentes. Status: ${componentesResponse.status}`);
           throw new Error(`Error al obtener componentes: ${componentesResponse.statusText}`);
         }
-        
-        const componentesJson: unknown = await componentesResponse.json();
-        console.log("Componentes recibidos:", componentesJson);
 
-        // Validación detallada de la estructura de datos
+        const datosJson: unknown = await datosResponse.json();
+        const componentesJson: unknown = await componentesResponse.json();
+
         if (!isDatosFijos(datosJson)) {
-          console.error("Estructura de DatosFijos inválida:", datosJson);
-          console.error("Propiedades esperadas:", ["id", "codigoEdificio", "usoActualId", "usoActualDescripcion", "noFinca", "noFincaId", "fechaConstruccion"]);
-          console.error("Propiedades recibidas:", Object.keys(datosJson as object));
           throw new Error('Datos del edificio en formato inválido');
         }
 
-        // Validación detallada de componentes
         if (!isComponentesResponse(componentesJson)) {
-          console.error("Estructura de Componentes inválida:", componentesJson);
           throw new Error('Componentes en formato inválido');
         }
 
         setDatosFijos(datosJson);
-        setComponentesExistentes({
-          aceras: componentesJson.aceras,
-          terrenos: componentesJson.terrenos,
-          zonasVerdes: componentesJson.zonasVerdes,
-        });
+        setComponentesExistentes(componentesJson);
       } catch (error) {
         console.error("Error detallado al cargar datos:", error);
-        // Alertar al usuario sobre el error
         alert(`Error al cargar datos: ${error instanceof Error ? error.message : 'Error desconocido'}`);
       }
     };
 
     void fetchData();
   }, [params?.id]);
-
-  // Type guards con validación mejorada
-  function isDatosFijos(data: unknown): data is DatosFijos {
-    if (typeof data !== 'object' || data === null) {
-      console.error("data no es un objeto", data);
-      return false;
-    }
-    
-    const requiredProps = ['id', 'codigoEdificio', 'usoActualId', 'usoActualDescripcion', 'noFinca', 'noFincaId', 'fechaConstruccion'];
-    const missingProps = requiredProps.filter(prop => !(prop in data));
-    
-    if (missingProps.length > 0) {
-      console.error(`Faltan propiedades requeridas en DatosFijos: ${missingProps.join(", ")}`, data);
-      return false;
-    }
-    
-    return true;
-  }
-
-  function isComponenteDetalle(data: unknown): data is ComponenteDetalle {
-    return (
-      typeof data === 'object' &&
-      data !== null &&
-      'id' in data &&
-      'codigoEdificio' in data &&
-      'nombre' in data
-    );
-  }
-
-  function isComponentesResponse(data: unknown): data is ComponentesResponse {
-    return (
-      typeof data === 'object' &&
-      data !== null &&
-      'aceras' in data &&
-      'terrenos' in data &&
-      'zonasVerdes' in data &&
-      (data.aceras === null || isComponenteDetalle(data.aceras)) &&
-      (data.terrenos === null || isComponenteDetalle(data.terrenos)) &&
-      (data.zonasVerdes === null || isComponenteDetalle(data.zonasVerdes))
-    );
-  }
 
   if (!params) {
     return <div>Error: Parámetros no disponibles</div>;
@@ -160,7 +137,7 @@ export default function ComponentesPage() {
   return (
     <div className="space-y-6">
       <ComponentesTabs 
-        codigoEdificio={id.toString()} 
+        codigoEdificio={datosFijos?.codigoEdificio ?? ''} 
         datosFijos={datosFijos} 
         componentesExistentes={componentesExistentes}
       />

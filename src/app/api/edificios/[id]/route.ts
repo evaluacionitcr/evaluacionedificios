@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { getDetallesEdificio } from "~/server/actions/edificios";
+import { getDetallesEdificio, getDetallesEdificioPorId } from "~/server/actions/edificios";
 import { db } from "~/server/db";
 import { Construcciones } from "~/server/db/schema";
 import type { InferSelectModel } from "drizzle-orm";
@@ -20,7 +20,7 @@ export async function GET(
       );
     }
 
-    const edificios = await getDetallesEdificio(id);
+    const edificios = await getDetallesEdificioPorId(parseInt(id));
 
     if (edificios.length === 0) {
       return NextResponse.json(

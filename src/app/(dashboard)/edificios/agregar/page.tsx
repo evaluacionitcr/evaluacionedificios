@@ -285,12 +285,14 @@ export default function CreateEdificioPage() {
       };
 
       const response = await createEdificio(data);
-
-      if (response?.success) {
+      
+        if (response?.success) {
         toast.success(
           "Edificio creado exitosamente. Complete los datos de los componentes.",
         );
-        router.push(`/edificios/${codigoEdificio}/componentes`);
+        if (response.data && Array.isArray(response.data) && response.data[0]){
+          router.push(`/edificios/${response.data[0].id}/componentes`);
+        }
       } else {
         toast.error("Error al guardar: " + response?.error);
       }

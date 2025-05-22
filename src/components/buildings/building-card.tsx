@@ -13,14 +13,15 @@ import { Eye, ClipboardList } from "lucide-react";
 
 interface BuildingCardProps {
   building: {
-    nombre: string;
     codigo: string;
+    nombre: string;
+    id: number;
   };
 }
 
 export default function BuildingCard({ building }: BuildingCardProps) {
   // Extraer el ID del código para la navegación
-  const buildingId = building.codigo.toLowerCase();
+  const buildingId = building.id;
 
   return (
     <Card className="bg-white shadow-sm transition-shadow hover:shadow-md">

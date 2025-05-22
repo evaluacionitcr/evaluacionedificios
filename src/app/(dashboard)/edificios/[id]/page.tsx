@@ -47,6 +47,7 @@ import {
   obtenerDetallesTerreno,
   obtenerDetallesZonasVerdes,
 } from "./actions";
+import { set } from "zod";
 
 interface EdificioDetalle {
   id: number;
@@ -134,6 +135,14 @@ interface ZonaVerdeDetalle {
   usoActual: string | null;
 }
 
+interface DatosEdificioResponse {
+  codigoEdificio: string;
+  nombre?: string;
+  usoActualDescripcion?: string;
+  m2Construccion?: number;
+  sedeNombre?: string;
+}
+
 interface BuildingPageProps {
   params: Promise<{ id: string }>;
 }
@@ -161,18 +170,52 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     useState(false);
   const [isDeletingEdificio, setIsDeletingEdificio] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [datosJson, setDatosJson] = useState<DatosEdificioResponse | null>(null);
+  
+
+  useEffect(() => {
+    const cargarCodigo = async () => {
+      if (!id) {
+        setError("ID no proporcionado");
+        setIsLoading(false);
+        return;
+      }
+      try {
+        // Primero obtener el código del edificio
+        const datosResponse = await fetch(`/api/datosEdificio/${id}`);
+        if (!datosResponse.ok) {
+          throw new Error('Error al obtener datos del edificio');
+        }
+        
+        const datos = await datosResponse.json() as DatosEdificioResponse;
+        
+        if (!datos.codigoEdificio) {
+          setError("No se encontró el código del edificio");
+          return;
+        }
+        
+        setDatosJson(datos);
+        console.log("Código del edificio:", datos.codigoEdificio);
+      } catch (error) {
+        console.error("Error al obtener datos del edificio:", error);
+        setError("Error al obtener datos del edificio");
+        return;
+      }
+    };
+
+    void cargarCodigo();  }, [id]);
 
   // Cargar los datos del edificio al iniciar
   useEffect(() => {
+    if (!datosJson?.codigoEdificio) return;
     const cargarDatos = async () => {
       if (!id) {
         setError("ID no proporcionado");
         setIsLoading(false);
         return;
       }
-
       try {
-        const response = await obtenerDetallesEdificio(id);
+        const response = await obtenerDetallesEdificio(datosJson.codigoEdificio);
         if (response.success && response.data) {
           if (response.data.length === 0) {
             setError("No se encontró el edificio");
@@ -191,10 +234,11 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     };
 
     void cargarDatos();
-  }, [id]);
+  }, [id, datosJson?.codigoEdificio]);
 
   // Cargar los datos de las aceras al iniciar
   useEffect(() => {
+    if (!datosJson?.codigoEdificio) return;
     const cargarDatosAceras = async () => {
       if (!id) {
         setError("ID no proporcionado");
@@ -203,7 +247,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
       }
 
       try {
-        const response = await obtenerDetallesAceras(id);
+        const response = await obtenerDetallesAceras(datosJson.codigoEdificio);
         if (response.success && response.data) {
           if (response.data.length === 0) {
             setError("No se encontró las aceras del edificio");
@@ -222,10 +266,11 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     };
 
     void cargarDatosAceras();
-  }, [id]);
+  }, [id, datosJson?.codigoEdificio]);
 
   // Cargar los datos de los terrenos al iniciar
   useEffect(() => {
+    if (!datosJson?.codigoEdificio) return;
     const cargarDatosTerrenos = async () => {
       if (!id) {
         setError("ID no proporcionado");
@@ -234,7 +279,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
       }
 
       try {
-        const response = await obtenerDetallesTerreno(id);
+        const response = await obtenerDetallesTerreno(datosJson.codigoEdificio);
         if (response.success && response.data) {
           if (response.data.length === 0) {
             setError("No se encontró el terreno del edificio");
@@ -253,10 +298,11 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     };
 
     void cargarDatosTerrenos();
-  }, [id]);
+  }, [id, datosJson?.codigoEdificio]);
 
   // Cargar los datos de las zonas verdes al iniciar
   useEffect(() => {
+    if (!datosJson?.codigoEdificio) return;
     const cargarDatosZonasVerdes = async () => {
       if (!id) {
         setError("ID no proporcionado");
@@ -265,7 +311,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
       }
 
       try {
-        const response = await obtenerDetallesZonasVerdes(id);
+        const response = await obtenerDetallesZonasVerdes(datosJson.codigoEdificio);
         if (response.success && response.data) {
           if (response.data.length === 0) {
             setError("No se encontró la zona verde del edificio");
@@ -284,7 +330,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
     };
 
     void cargarDatosZonasVerdes();
-  }, [id]);
+  }, [id, datosJson?.codigoEdificio]);
 
   // Función para abrir el diálogo de confirmación de eliminación de registro
   const openDeleteDialog = (edificioId: number) => {
@@ -434,7 +480,7 @@ export default function BuildingPage({ params }: BuildingPageProps) {
               Editar Edificio
             </Button>
           </Link>
-          <Link href={`/edificios/${id}/componentes`}>
+          <Link href={`/edificios/${edificio.id}/componentes`}>
             <Button
               variant="outline"
               size="sm"
@@ -540,15 +586,41 @@ export default function BuildingPage({ params }: BuildingPageProps) {
                         <TableCell>{e.vidaUtilExperto ?? 0} años</TableCell>
                         <TableCell>{e.esRenovacion ? "Sí" : "No"}</TableCell>
                         <TableCell>
-                          <Button
-                            onClick={() => openDeleteDialog(e.id)}
-                            variant="destructive"
-                            size="sm"
-                            title="Eliminar registro"
-                            className="bg-[#EF3340] hover:bg-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              onClick={() => openDeleteDialog(e.id)}
+                              variant="destructive"
+                              size="sm"
+                              title="Eliminar registro"
+                              className="bg-[#EF3340] hover:bg-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            {e.esRenovacion && (
+                              <>
+                                <Link href={`/edificios/${e.id}/editar`}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    title="Editar renovación"
+                                    className="bg-primary text-white hover:bg-primary/90"
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                                <Link href={`/edificios/${e.id}/componentes`}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    title="Gestionar componentes"
+                                    className="bg-primary text-white hover:bg-primary/90"
+                                  >
+                                    <Building className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              </>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
 
