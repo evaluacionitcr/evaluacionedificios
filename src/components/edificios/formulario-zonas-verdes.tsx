@@ -40,6 +40,7 @@ interface FormularioZonasVerdesProps {
   datosExistentes?: ZonasVerdesResponse["data"];
 }
 
+
 export default function FormularioZonasVerdes({
   codigoEdificio,
   datosFijos,
@@ -87,6 +88,14 @@ export default function FormularioZonasVerdes({
     }
   };
 
+  const resetValoresNumericos = () => {
+  setValorDolarM2("");
+  setValorColonM2("");
+  setTipoCambio("");
+  setValorReposicion(0);
+  };
+
+
   const calcularValorReposicion = () => {
     const m2 = parseFloat(m2Construccion.replace(/\./g, "").replace(",", "."));
     const dolar = parseFloat(valorDolarM2.replace(/\./g, "").replace(",", "."));
@@ -120,94 +129,115 @@ export default function FormularioZonasVerdes({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const formatNumber = (value: string | number) => {
-      if (typeof value === "number") {
-        value = value.toString();
-      }
-      if (!value) return null;
-      const numStr = value.replace(/\./g, "").replace(",", ".");
-      return parseFloat(numStr);
-    };
 
-    const data = {
-      idConstruccion: datosFijos?.id ?? null,
-      codigoEdificio,
-      nombre: "Porción de Zonas verdes",
-      m2Construccion: Number(formatNumber(m2Construccion) ?? 0),
-      fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
-      valorDolarPorM2: (formatNumber(valorDolarM2) ?? 0).toString(),
-      valorColonPorM2: (formatNumber(valorColonM2) ?? 0).toString(),
-      edad: edad || null,
-      vidaUtilHacienda: parseInt(vidaUtilHacienda) || 0,
-      vidaUtilExperto: parseInt(vidaUtilExperto) || 0,
-      valorReposicion: (formatNumber(valorReposicion.toString()) ?? 0).toString(),
-      depreciacionLinealAnual: (formatNumber(depreciacionAnual.toString()) ?? 0).toString(),
-      valorActualRevaluado: (formatNumber(valorRevaluado.toString()) ?? 0).toString(),
-      anoDeRevaluacion: parseInt(anoRevaluacion) || null,
-      noFinca: datosFijos?.noFincaId ?? null,
-      usoActual: datosFijos?.usoActualId ?? null,
-    };
-
-    try {
-      let result: ZonasVerdesResponse;
-      if (datosExistentes) {
-        const response = await fetch(`/api/componentes/zonas-verdes/${datosExistentes.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
-        const jsonData = (await response.json()) as ApiResponse;
-        
-        // Validate the response structure
-        if (
-          typeof jsonData === 'object' &&
-          jsonData !== null &&
-          'success' in jsonData &&
-          typeof jsonData.success === 'boolean'
-        ) {
-          result = {
-            success: jsonData.success,
-            error: jsonData.error,
-            data: jsonData.data
-          };
-          if (result.success) {
-            toast.success("Zona verde actualizada exitosamente");
-          } else {
-            toast.error(result.error ?? "Error al actualizar zona verde");
-          }
-        } else {
-          throw new Error('Invalid response format');
-        }
-      } else {
-        const createResult = await createZonasVerdes(data);
-        if (
-          typeof createResult === 'object' &&
-          createResult !== null &&
-          'success' in createResult &&
-          typeof createResult.success === 'boolean'
-        ) {
-          result = {
-            success: createResult.success,
-            error: createResult.error,
-            data: createResult.data as ZonasVerdesResponse['data']
-          };
-          if (result.success) {
-            toast.success("Zona verde guardada exitosamente");
-          } else {
-            toast.error(result.error ?? "Error al guardar zona verde");
-          }
-        } else {
-          throw new Error('Invalid create response format');
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Error inesperado");
+  const formatNumber = (value: string | number) => {
+    if (typeof value === "number") {
+      value = value.toString();
     }
+    if (!value) return null;
+    const numStr = value.replace(/\./g, "").replace(",", ".");
+    return parseFloat(numStr);
   };
+
+  const MAX_NUMERIC_LIMIT = 9999999999.99;
+  const exceedsLimit = (num: number) => Math.abs(num) > MAX_NUMERIC_LIMIT;
+
+  // Preparar valores antes de validación
+  const valorReposicionParsed = formatNumber(valorReposicion.toString()) ?? 0;
+  const depreciacionAnualParsed = formatNumber(depreciacionAnual.toString()) ?? 0;
+  const valorRevaluadoParsed = formatNumber(valorRevaluado.toString()) ?? 0;
+
+
+
+  const data = {
+    idConstruccion: datosFijos?.id ?? null,
+    codigoEdificio,
+    nombre: "Porción de Zonas verdes",
+    m2Construccion: Number(formatNumber(m2Construccion) ?? 0),
+    fechaConstruccion: datosFijos?.fechaConstruccion ?? null,
+    valorDolarPorM2: (formatNumber(valorDolarM2) ?? 0).toString(),
+    valorColonPorM2: (formatNumber(valorColonM2) ?? 0).toString(),
+    edad: edad || null,
+    vidaUtilHacienda: parseInt(vidaUtilHacienda) || 0,
+    vidaUtilExperto: parseInt(vidaUtilExperto) || 0,
+    valorReposicion: valorReposicionParsed.toString(),
+    depreciacionLinealAnual: depreciacionAnualParsed.toString(),
+    valorActualRevaluado: valorRevaluadoParsed.toString(),
+    anoDeRevaluacion: parseInt(anoRevaluacion) || null,
+    noFinca: datosFijos?.noFincaId ?? null,
+    usoActual: datosFijos?.usoActualId ?? null,
+  };
+
+
+  try {
+    let result: ZonasVerdesResponse;
+    if (datosExistentes) {
+      const response = await fetch(`/api/componentes/zonas-verdes/${datosExistentes.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const jsonData = (await response.json()) as ApiResponse;
+
+      if (
+        typeof jsonData === 'object' &&
+        jsonData !== null &&
+        'success' in jsonData &&
+        typeof jsonData.success === 'boolean'
+      ) {
+        result = {
+          success: jsonData.success,
+          error: jsonData.error,
+          data: jsonData.data
+        };
+        if (result.success) {
+          toast.success("Zona verde actualizada exitosamente");
+        } else {
+            console.log("Valores enviados:");
+            console.log("valorDolarPorM2:", formatNumber(valorDolarM2) ?? "0");
+            console.log("valorColonPorM2:", formatNumber(valorColonM2) ?? "0");
+            console.log("valorReposicion:", formatNumber(valorReposicion) ?? "0");
+            console.log("depreciacionLinealAnual:", formatNumber(depreciacionAnual) ?? "0");
+            console.log("valorActualRevaluado:", formatNumber(valorRevaluado) ?? "0");
+          toast.error(result.error ?? "Error al actualizar zona verde");
+          resetValoresNumericos(); 
+        }
+
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } else {
+      const createResult = await createZonasVerdes(data);
+      if (
+        typeof createResult === 'object' &&
+        createResult !== null &&
+        'success' in createResult &&
+        typeof createResult.success === 'boolean'
+      ) {
+        result = {
+          success: createResult.success,
+          error: createResult.error,
+          data: createResult.data as ZonasVerdesResponse['data']
+        };
+       if (result.success) {
+          toast.success("Zona verde guardada exitosamente");
+       } else {
+            toast.error(result.error ?? "Error al guardar zona verde");
+           resetValoresNumericos(); 
+      }
+      } else {
+        throw new Error('Invalid create response format');
+      }
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    toast.error("Error inesperado");
+  }
+};
+
 
   return (
     <form

@@ -84,6 +84,15 @@ export default function FormularioAceras({
     }
   };
 
+
+  const resetValoresNumericos = () => {
+  setValorDolarM2("");
+  setValorColonM2("");
+  setTipoCambio("");
+  setValorReposicion(0);
+  };
+
+
   // Cálculo automático del valor de reposición
   const calcularValorReposicion = () => {
     const m2 = parseFloat(m2Construccion.replace(/\./g, "").replace(",", "."));
@@ -162,6 +171,7 @@ export default function FormularioAceras({
           toast.success("Acera actualizada exitosamente");
         } else {
           toast.error(result.message ?? "Error al actualizar acera");
+          resetValoresNumericos(); 
         }
       } else {
         // Si no existen datos, crear
@@ -170,6 +180,7 @@ export default function FormularioAceras({
           toast.success("Acera guardada exitosamente");
         } else {
           toast.error(result.message ?? "Error al guardar acera");
+          resetValoresNumericos(); 
         }
       }
     } catch (error) {

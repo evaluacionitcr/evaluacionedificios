@@ -65,11 +65,20 @@ export default function FormularioTerrenos({
     const dolar = parseFloat(valorDolar.replace(/\./g, "").replace(",", "."));
     const tCambio = parseFloat(cambio.replace(/\./g, "").replace(",", "."));
 
+    
+
+
     if (!isNaN(dolar) && !isNaN(tCambio)) {
       const resultado = dolar * tCambio;
       setValorColonM2(resultado.toFixed(2));
     }
   };
+
+  const resetValoresNumericos = () => {
+    setValorDolarM2("");
+    setValorColonM2("");
+    setTipoCambio("");
+    };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,6 +120,7 @@ export default function FormularioTerrenos({
           toast.success("Terreno actualizado exitosamente");
         } else {
           toast.error(result.error ?? "Error al actualizar terreno");
+          resetValoresNumericos(); 
         }
       } else {
         const createResult = await createTerrenos(data);
@@ -123,6 +133,7 @@ export default function FormularioTerrenos({
           toast.success("Terreno guardado exitosamente");
         } else {
           toast.error(result.error ?? "Error al guardar terreno");
+          resetValoresNumericos(); 
         }
       }
     } catch (error) {
