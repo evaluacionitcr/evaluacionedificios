@@ -69,3 +69,39 @@ export async function getEvaluacionPorId(id: string) {
     await client.close();
   }
 }
+
+export async function getUltimaEvaluacionDeEdificio(){
+  const client = new MongoClient(uri);
+
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection<Evaluacion>(collectionName);
+
+    const evaluaciones = await collection.find({}).toArray();
+
+    // Agrupar por código de edificio y encontrar la última evaluación para cada uno
+    const ultimasEvaluaciones: Record<string, Evaluacion> = {};
+    
+    for (const evaluacion of evaluaciones) {
+      const codigo = evaluacion.edificio?.codigo?.toLowerCase() ?? evaluacion.codigoEdificio?.toLowerCase();
+      if (!codigo) continue;
+
+      // Si no existe una evaluación para este edificio o la actual es más reciente
+      if (
+        !ultimasEvaluaciones[codigo] || 
+        new Date(evaluacion.createdAt) > new Date(ultimasEvaluaciones[codigo].createdAt)
+      ) {
+        ultimasEvaluaciones[codigo] = evaluacion;
+      }
+    }
+
+    // Convertir el objeto a un array de evaluaciones
+    return Object.values(ultimasEvaluaciones);
+  } catch (error) {
+    console.error("Error al obtener últimas evaluaciones de edificios:", error);
+    return [];
+  } finally {
+    await client.close();
+  }
+}
