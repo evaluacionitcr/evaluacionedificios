@@ -12,10 +12,11 @@ import {
 import { getEjes, getCriterios, getParametros } from "./actions";
 
 // Interfaces para los tipos de datos
-import { Eje, Criterio, Parametro, FormularioProyecto } from "../types";
+import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion } from "../types";
 
 export default function CrearProyectoPage() {
     const [projectName, setProjectName] = useState("");
+    const [projectDescription, setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
     const [selectedBuilding, setSelectedBuilding] = useState("");
     const [depreciacion, setDepreciacion] = useState("");
@@ -40,6 +41,10 @@ export default function CrearProyectoPage() {
     const [loading, setLoading] = useState(true);
     // Estado para manejar errores de carga
     const [loadError, setLoadError] = useState<string | null>(null);
+
+    // Variables para manejar la evaluación reciente
+    const [evaluacionesPorCodigo, setEvaluacionesPorCodigo] = useState<Record<string, Evaluacion[]>>({});
+    const [evaluacionRecientePorCodigo, setEvaluacionRecientePorCodigo] = useState<Record<string, Evaluacion | null>>({});
     
     // Estados para el manejo de formularios de nuevos elementos
     const [showAddEjeForm, setShowAddEjeForm] = useState(false);
@@ -115,6 +120,36 @@ export default function CrearProyectoPage() {
       
       fetchData();
     }, []);
+
+   
+
+    useEffect(() => {
+      async function fetchEvaluaciones() {
+        try {
+          const response = await fetch("/api/evaluacionesPriorizacion");
+          if (!response.ok) {
+            throw new Error("Error al obtener evaluaciones");
+          }
+
+          const { data } = await response.json() as ApiResponse;
+
+          // data ya contiene solo la evaluación más reciente por edificio
+          // Creamos un objeto con el código como key y la evaluación como valor
+          const recientes: Record<string, Evaluacion | null> = {};
+          for (const evaluacion of data) {
+            const codigo = evaluacion.edificio?.codigo;
+            if (!codigo) continue;
+            recientes[codigo] = evaluacion;
+          }
+          setEvaluacionRecientePorCodigo(recientes);
+
+        } catch (error) {
+          console.error("Error al obtener evaluaciones:", error);
+        }
+      }
+
+      void fetchEvaluaciones();
+    }, []);
     
     // Inicializar el estado de parámetros seleccionados
     useEffect(() => {
@@ -178,6 +213,24 @@ export default function CrearProyectoPage() {
       setEjes([...ejes, { id: newId, eje: newEje.eje, peso: newEje.peso }]);
       setNewEje({ eje: "", peso: 0 });
       setShowAddEjeForm(false);
+    };
+
+    const actualizarValoresEdificio = (codigo: string) => {
+        const evaluacion = evaluacionRecientePorCodigo[codigo];
+        if (evaluacion) {
+          // Actualizar depreciación
+          setSelectedBuilding(codigo);
+          const depreciacionTotal = evaluacion.depreciacion?.puntajeDepreciacionTotal || 0;
+          setDepreciacion(depreciacionTotal.toString());
+
+          // Actualizar estado de componentes
+          const puntajeComponentes = evaluacion.puntajeComponentes || 0;
+          setEstadoComponentes(puntajeComponentes.toString());
+
+          // Actualizar condición de funcionalidad
+          const puntajeServiciabilidad = evaluacion.serviciabilidad?.puntajeServiciabilidad || 0;
+          setCondicionFuncionalidad(puntajeServiciabilidad.toString());
+        }
     };
     
     // Función para agregar un nuevo criterio
@@ -298,6 +351,7 @@ export default function CrearProyectoPage() {
       alert("Proyecto guardado exitosamente!");
       // Redirigir o limpiar el formulario según sea necesario
     };
+
     
     // Componente para renderizar una tabla de eje
     const renderTablaEje = (ejeId: number) => {
@@ -521,17 +575,22 @@ export default function CrearProyectoPage() {
                   
                   <div className="space-y-2 mb-4">
                     <label htmlFor="building" className="text-base font-medium text-gray-700">Edificio</label>
-                    <Select value={selectedBuilding} onValueChange={setSelectedBuilding}>
+                    <Select value={selectedBuilding} onValueChange={(codigo) => actualizarValoresEdificio(codigo)}>
                       <SelectTrigger id="building" className="w-full h-11">
                         <SelectValue placeholder="Seleccionar edificio" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="fi-01">Facultad de Ingeniería</SelectItem>
-                        <SelectItem value="fc-02">Facultad de Ciencias</SelectItem>
-                        <SelectItem value="bc-01">Biblioteca Central</SelectItem>
-                        <SelectItem value="ea-01">Edificio Administrativo</SelectItem>
-                        <SelectItem value="ap-01">Auditorio Principal</SelectItem>
-                        <SelectItem value="fm-01">Facultad de Medicina</SelectItem>
+                      {Object.keys(evaluacionRecientePorCodigo).length > 0 ? (
+                        Object.entries(evaluacionRecientePorCodigo).map(([codigo, evaluacion]) =>
+                          evaluacion ? (
+                            <SelectItem key={evaluacion._id} value={codigo}>
+                              {evaluacion.edificio?.nombre || codigo}
+                            </SelectItem>
+                          ) : null
+                        )
+                      ) : (
+                        <SelectItem disabled value={""}>No hay edificios disponibles</SelectItem>
+                      )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -549,7 +608,7 @@ export default function CrearProyectoPage() {
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación del edificio</td>
                           <td className="px-6 py-4">
                             <input
                               type="number"
@@ -561,7 +620,8 @@ export default function CrearProyectoPage() {
                               onChange={(e) => setDepreciacion(e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                          </td>                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          </td>                          
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
                             {depreciacion ? parseFloat(depreciacion).toFixed(2) : "0.00"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">5%</td>
