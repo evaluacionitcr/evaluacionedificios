@@ -12,9 +12,11 @@ import {
 import { getEjes, getCriterios, getParametros } from "./actions";
 
 // Interfaces para los tipos de datos
-import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion } from "../types";
+import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, EjeTotal } from "../types";
 
 export default function CrearProyectoPage() {
+
+    const [totalGeneral, setTotalGeneral] = useState("");
     const [projectName, setProjectName] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
@@ -279,77 +281,84 @@ export default function CrearProyectoPage() {
     };
     
     // Función para el envío del formulario
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-  
+
       // Construir el objeto para el envío
       const parametrosData: Record<string, any> = {};
       
       ejes.forEach(eje => {
-        const criteriosDeEje = criterios.filter(c => c.ejeId === eje.id);
-        const ejePuntajes: Record<string, any> = {};
+      const criteriosDeEje = criterios.filter(c => c.ejeId === eje.id);
+      const ejePuntajes: Record<string, any> = {};
+      
+      criteriosDeEje.forEach(criterio => {
+        const criterioKey = `criterio_${criterio.id}`;
+        const parametroSeleccionado = selectedParametros[criterioKey];
         
-        criteriosDeEje.forEach(criterio => {
-          const criterioKey = `criterio_${criterio.id}`;
-          const parametroSeleccionado = selectedParametros[criterioKey];
-          
-          // Si se seleccionó un parámetro para este criterio
-          if (parametroSeleccionado) {
-            const parametro = parametros.find(p => p.id.toString() === parametroSeleccionado);
-            
-            ejePuntajes[criterioKey] = {
-              id: parametroSeleccionado,
-              valor: getParametroValor(parametroSeleccionado),
-              puntaje: calcularPuntaje(parametroSeleccionado, criterio.id),
-              parametroTexto: parametro?.parametro || ""
-            };
-          } else {
-            ejePuntajes[criterioKey] = {
-              id: "",
-              valor: 0,
-              puntaje: "0.00",
-              parametroTexto: ""
-            };
-          }
-        });
+        // Si se seleccionó un parámetro para este criterio
+        if (parametroSeleccionado) {
+        const parametro = parametros.find(p => p.id.toString() === parametroSeleccionado);
         
-        ejePuntajes.totalPuntaje = calcularTotalEje(eje.id);
-        parametrosData[eje.eje.toLowerCase()] = ejePuntajes;
+        ejePuntajes[criterioKey] = {
+          id: parametroSeleccionado,
+          valor: getParametroValor(parametroSeleccionado),
+          puntaje: calcularPuntaje(parametroSeleccionado, criterio.id),
+          parametroTexto: parametro?.parametro || ""
+        };
+        } else {
+        ejePuntajes[criterioKey] = {
+          id: "",
+          valor: 0,
+          puntaje: "0.00",
+          parametroTexto: ""
+        };
+        }
+      });
+      
+      ejePuntajes.totalPuntaje = calcularTotalEje(eje.id);
+      parametrosData[eje.eje.toLowerCase()] = ejePuntajes;
       });
       
       // Construir el objeto completo de datos
       const formData = {
-        informacionGeneral: {
-          nombre: projectName, 
-          descripcion: projectDescription, 
-          tipoEdificacion: buildingType,
-          edificioSeleccionado: selectedBuilding,
-        },        edificacionExistente: buildingType === "existing" ? {          
-            depreciacion: depreciacion ? parseFloat(depreciacion) : 0,
-          estadoComponentes: estadoComponentes ? parseFloat(estadoComponentes) : 0,
-          condicionFuncionalidad: condicionFuncionalidad ? parseFloat(condicionFuncionalidad) : 0,
-          totalPuntaje: puntajeEdificacionExistente.toFixed(2)
-        } : null,
-        configuracion: {
-          ejes: ejes,
-          criterios: criterios,
-          parametros: parametros
-        },
-        evaluacion: parametrosData
+      informacionGeneral: {
+        nombre: projectName, 
+        descripcion: projectDescription, 
+        tipoEdificacion: buildingType,
+        edificioSeleccionado: selectedBuilding,
+      },        
+      edificacionExistente: buildingType === "existing" ? {          
+        depreciacion: depreciacion ? parseFloat(depreciacion) : 0,
+        estadoComponentes: estadoComponentes ? parseFloat(estadoComponentes) : 0,
+        condicionFuncionalidad: condicionFuncionalidad ? parseFloat(condicionFuncionalidad) : 0,
+        totalPuntaje: puntajeEdificacionExistente.toFixed(2)
+      } : null,
+      configuracion: {
+        ejes: ejes,
+        criterios: criterios,
+        parametros: parametros
+      },
+      evaluacion: parametrosData,
+      totalGeneral: totalGeneral
       };
-      
-      console.log("Datos del proyecto:", formData);
-      
-      // Aquí se puede agregar código para enviar los datos al servidor
-      // Por ejemplo: 
-      // await fetch('/api/proyectos', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      
+
+      try {
+      const response = await fetch("/api/priorizacion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al guardar el proyecto");
+      }
+
       alert("Proyecto guardado exitosamente!");
-      // Redirigir o limpiar el formulario según sea necesario
+      window.location.href = "/priorizacion";
+      } catch (error) {
+      alert("Ocurrió un error al guardar el proyecto.");
+      console.error(error);
+      }
     };
 
     
@@ -613,9 +622,9 @@ export default function CrearProyectoPage() {
                             <input
                               type="number"
                               min="0.00"
-                              max="1.00"
                               step="0.01"
                               placeholder="0-1"
+                              readOnly
                               value={depreciacion}
                               onChange={(e) => setDepreciacion(e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -635,14 +644,15 @@ export default function CrearProyectoPage() {
                             <input
                               type="number"
                               min="0.00"
-                              max="1.00"
+                              readOnly
                               step="0.01"
                               placeholder="0-1"
                               value={estadoComponentes}
                               onChange={(e) => setEstadoComponentes(e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                          </td>                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          </td>                          
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
                             {estadoComponentes ? parseFloat(estadoComponentes).toFixed(2) : "0.00"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">10%</td>
@@ -656,14 +666,15 @@ export default function CrearProyectoPage() {
                             <input
                               type="number"
                               min="0.00"
-                              max="1.00"
+                              readOnly
                               step="0.01"
                               placeholder="0-1"
                               value={condicionFuncionalidad}
                               onChange={(e) => setCondicionFuncionalidad(e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                          </td>                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          </td>                          
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
                             {condicionFuncionalidad ? parseFloat(condicionFuncionalidad).toFixed(2) : "0.00"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">20%</td>
@@ -756,10 +767,12 @@ export default function CrearProyectoPage() {
                               {ejes.reduce((sum, eje) => sum + eje.peso, 0) + (buildingType === "existing" ? 35 : 0)}%
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-center font-medium text-blue-600">
-                              {(
-                                ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) + 
-                                (buildingType === "existing" ? puntajeEdificacionExistente : 0)
-                              ).toFixed(2)}
+                              {(() => {
+                                const total = ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) +
+                                  (buildingType === "existing" ? puntajeEdificacionExistente : 0);
+                                if (totalGeneral !== total.toFixed(2)) setTotalGeneral(total.toFixed(2));
+                                return total.toFixed(2);
+                              })()}
                             </td>
                           </tr>
                         </tbody>
@@ -768,9 +781,6 @@ export default function CrearProyectoPage() {
                   </div>
                 </>
               )}
-
-              
-              
               <div className="flex justify-end space-x-3 pt-4">
                 <Link href="/priorizacion">
                   <Button variant="outline" className="px-6">Cancelar</Button>

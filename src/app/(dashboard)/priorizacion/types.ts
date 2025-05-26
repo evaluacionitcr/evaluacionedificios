@@ -47,6 +47,7 @@ export interface FormularioProyecto {
     parametros: Parametro[];
   };
   evaluacion: Record<string, any>;
+  totalGeneral: number;
 }
 
 export interface ApiResponse {
@@ -107,4 +108,10 @@ export interface Evaluacion {
   createdAt: string; 
   estado: string;
   revisado: boolean;
+}
+
+export interface EjeTotal {
+    ejeId: number;
+    nombre: string;
+    total: number;
 }
