@@ -1,8 +1,9 @@
-import { Building, ClipboardCheck, FileText, Settings } from "lucide-react"
+import { Building, Car, ClipboardCheck, FileText, Settings } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import StatsCard from "~/components/dashboard/stats-card"
 import BuildingStatusList from "~/components/dashboard/building-status-list"
 import UpcomingEvaluations from "~/components/dashboard/upcoming-evaluations"
+import RankingNewestEvaluations from "~/components/dashboard/ranking-newest-evaluations"
 
 export default function DashboardView() {
   return (
@@ -33,6 +34,9 @@ export default function DashboardView() {
           <CardContent>
             <UpcomingEvaluations />
           </CardContent>
+        </Card>        
+        <Card className="col-span-7 bg-white shadow-sm">
+          <RankingNewestEvaluations />
         </Card>
       </div>
     </div>
