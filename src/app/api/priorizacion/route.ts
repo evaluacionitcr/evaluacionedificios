@@ -5,7 +5,7 @@ import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, 
 const uri = process.env.MONGODB_URI ??'';
 const client = new MongoClient(uri);
 const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
-const collectionName = process.env.COLLECTION_NAME ??"proyectos";
+const collectionName = "proyectos";
 const db = client.db(dbName);
 const collection = db.collection(collectionName);
 
@@ -27,6 +27,8 @@ export async function POST(request: NextRequest) {
     console.log("Guardando proyecto:", documentoEvaluacion);
 
     const result = await collection.insertOne(documentoEvaluacion);
+    console.log("Proyecto guardado con ID:", result.insertedId);
+    console.log("Resultado de la inserción:", result);
 
     return NextResponse.json({ 
       status: "success", 
@@ -37,6 +39,7 @@ export async function POST(request: NextRequest) {
     console.error("Error al guardar el proyecto:", error);
     return NextResponse.json({ 
       status: "error", 
+      collection: collectionName,
       message: "Error al guardar el proyecto",
       error: error instanceof Error ? error.message : "Error desconocido"
     }, { status: 500 });
