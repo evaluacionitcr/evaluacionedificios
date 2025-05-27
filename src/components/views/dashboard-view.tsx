@@ -4,6 +4,7 @@ import StatsCard from "~/components/dashboard/stats-card"
 import BuildingStatusList from "~/components/dashboard/building-status-list"
 import UpcomingEvaluations from "~/components/dashboard/upcoming-evaluations"
 import RankingNewestEvaluations from "~/components/dashboard/ranking-newest-evaluations"
+import RankingPriorizacion from "~/components/dashboard/ranking-priorizacion"
 
 export default function DashboardView() {
   return (
@@ -37,6 +38,9 @@ export default function DashboardView() {
         </Card>        
         <Card className="col-span-7 bg-white shadow-sm">
           <RankingNewestEvaluations />
+        </Card>
+        <Card className="col-span-7 bg-white shadow-sm">
+          <RankingPriorizacion />
         </Card>
       </div>
     </div>

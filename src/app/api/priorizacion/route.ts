@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    const requestData = await request.json(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+    const requestData = await request.json(); 
     const proyecto = requestData as FormularioProyecto;
     
     const documentoEvaluacion: Document = {
@@ -41,6 +41,32 @@ export async function POST(request: NextRequest) {
       status: "error", 
       collection: collectionName,
       message: "Error al guardar el proyecto",
+      error: error instanceof Error ? error.message : "Error desconocido"
+    }, { status: 500 });
+  } finally {
+    await client.close();
+  }
+}
+
+export async function GET() {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    const proyectos = await collection.find({}).toArray();
+
+    console.log("Proyectos obtenidos desde la base de datos:", proyectos);
+
+    return NextResponse.json({
+      status: "success",
+      data: proyectos
+    });
+  } catch (error) {
+    console.error("Error al obtener los proyectos:", error);
+    return NextResponse.json({
+      status: "error",
+      message: "Error al obtener los proyectos",
       error: error instanceof Error ? error.message : "Error desconocido"
     }, { status: 500 });
   } finally {
