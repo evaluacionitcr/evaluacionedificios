@@ -326,6 +326,8 @@ export default function CrearProyectoPage() {
         descripcion: projectDescription, 
         tipoEdificacion: buildingType,
         edificioSeleccionado: selectedBuilding,
+        nombreEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.nombre,
+        campusEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.campus
       },        
       edificacionExistente: buildingType === "existing" ? {          
         depreciacion: depreciacion ? parseFloat(depreciacion) : 0,

@@ -34,6 +34,8 @@ export interface FormularioProyecto {
     descripcion: string;
     tipoEdificacion: string;
     edificioSeleccionado: string;
+    nombreEdificio: string;
+    campusEdificio: string;
   };
   edificacionExistente: {
     depreciacion: number;
