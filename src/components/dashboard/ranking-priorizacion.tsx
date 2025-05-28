@@ -9,6 +9,8 @@ interface Proyecto {
   _id: string;
   nombre: string;
   prioridad: number | null;
+  tipoEdificacion: string;
+  edificioSeleccionado?: string;
 }
 
 export default function RankingPriorizacion() {
@@ -40,6 +42,8 @@ export default function RankingPriorizacion() {
           _id: proyecto._id,
           nombre: proyecto.informacionGeneral?.nombre || "Sin nombre",
           prioridad: parseFloat(proyecto.totalGeneral) || null,
+          tipoEdificacion: proyecto.informacionGeneral?.tipoEdificacion || "nuevo",
+          edificioSeleccionado: proyecto.informacionGeneral?.edificioSeleccionado || null,
         }));
         const proyectosOrdenados = ordenarPorPrioridad(proyectosTransformados, ordenAscendente);
         setProyectos(proyectosOrdenados);
@@ -61,7 +65,7 @@ export default function RankingPriorizacion() {
   return (
     <Card className="col-span-1">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xl">Ranking de Proyectos</CardTitle>
+        <CardTitle className="text-xl">Ranking de Priorización de Proyectos</CardTitle>
         <button
           onClick={cambiarOrden}
           className="flex items-center gap-1 text-sm text-primary hover:underline"
@@ -90,6 +94,7 @@ export default function RankingPriorizacion() {
               <TableHeader>
                 <TableRow>
                   <TableCell className="font-medium">Nombre</TableCell>
+                  <TableCell className="font-medium">Edificio</TableCell>
                   <TableCell className="font-medium">Prioridad</TableCell>
                 </TableRow>
               </TableHeader>
@@ -97,6 +102,11 @@ export default function RankingPriorizacion() {
                 {proyectos.map((proyecto) => (
                   <TableRow key={proyecto._id}>
                     <TableCell className="font-medium">{proyecto.nombre}</TableCell>
+                    <TableCell>
+                      {proyecto.tipoEdificacion === "existing"
+                        ? proyecto.edificioSeleccionado || "Sin edificio asignado"
+                        : "Sin edificio asignado"}
+                    </TableCell>
                     <TableCell>{proyecto.prioridad !== null ? proyecto.prioridad.toFixed(2) : "N/A"}</TableCell>
                   </TableRow>
                 ))}
