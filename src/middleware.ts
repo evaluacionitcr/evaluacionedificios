@@ -2,12 +2,33 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+const isEvaluacionesRoute = createRouteMatcher(["/evaluaciones(.*)"]);
+const isEdificiosRoute = createRouteMatcher(["/edificios(.*)"]);
+const isPriorizacionRoute = createRouteMatcher(["/priorizacion(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // Protect all routes starting with `/admin`
+  const { sessionClaims } = await auth();
+  const userRole = sessionClaims?.metadata?.role;
+
+  // Protect admin routes
+  if (isAdminRoute(req) && userRole !== "admin") {
+    const url = new URL("/", req.url);
+    return NextResponse.redirect(url);
+  }
+
+  // Protect evaluaciones and edificios routes
   if (
-    isAdminRoute(req) &&
-    (await auth()).sessionClaims?.metadata?.role !== "admin"
+    (isEvaluacionesRoute(req) || isEdificiosRoute(req)) &&
+    !["evaluadorCondiciones", "evaluadorGeneral", "admin"].includes(userRole as string)
+  ) {
+    const url = new URL("/", req.url);
+    return NextResponse.redirect(url);
+  }
+
+  // Protect priorizacion routes
+  if (
+    isPriorizacionRoute(req) &&
+    !["evaluadorProyecto", "evaluadorGeneral", "admin"].includes(userRole as string)
   ) {
     const url = new URL("/", req.url);
     return NextResponse.redirect(url);

@@ -5,9 +5,9 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import Link from "next/link";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
-import { getNormativas, createNormativa, updateNormativa, deleteNormativa } from "../normativa/actions";
+import { getFuncionalidades, createFuncionalidad, updateFuncionalidad, deleteFuncionalidad } from "./actions";
 
-interface Normativa {
+interface Funcionalidad {
   id: number;
   estado: string;
   puntuacion: number;
@@ -16,7 +16,7 @@ interface Normativa {
   updatedAt?: Date;
 }
 
-interface APINormativa {
+interface APIFuncionalidad {
     id: number;
     estado: string;
     puntuacion: number;
@@ -25,16 +25,15 @@ interface APINormativa {
     updatedAt?: Date;
 }
 
-interface NormativaResponse {
+interface FuncionalidadResponse {
     success: boolean;
-    data?: APINormativa[];
+    data?: APIFuncionalidad[];
     error?: string;
 }
-
 export default function Page() {
 
     const [editRowIndex, setEditRowIndex] = useState<number | null>(null);
-    const [tableData, setTableData] = useState<Normativa[]>([]);
+    const [tableData, setTableData] = useState<Funcionalidad[]>([]);
 
     const handleEditClick = (index: number) => {
         setEditRowIndex(index);
@@ -42,7 +41,7 @@ export default function Page() {
 
       const handleInputChange = (
         index: number,
-        field: keyof Omit<Normativa, "id">,
+        field: keyof Omit<Funcionalidad, "id">,
         value: string | number,
       ) => {
         const updatedData = [...tableData];
@@ -60,40 +59,40 @@ export default function Page() {
         const row = tableData[index];
         if (!row) return;
     
-        const data: Normativa = {
+        const data: Funcionalidad = {
           id: row.id,
           estado: row.estado,
           puntuacion: row.puntuacion,
           descripcion: row.descripcion,
         };
     
-        updateNormativa(data)
+        updateFuncionalidad(data)
           .then((response) => {
             console.log("Response:", response);
             if (response.success) {
-              console.log("Normativa actualizada exitosamente");
+              console.log("Funcionalidad actualizada exitosamente");
               setEditRowIndex(null);
             } else {
-              console.error("Error al actualizar normativa");
+              console.error("Error al actualizar funcionalidad");
             }
           })
           .catch((error) => {
-            console.error("Error al actualizar normativa:", error);
+            console.error("Error al actualizar funcionalidad:", error);
           });
       };
 
       const handleDeleteClick = (id: number) => {
-          deleteNormativa(id)
+          deleteFuncionalidad(id)
             .then((response) => {
               if (response.success) {
-                console.log("Normativa eliminada exitosamente");
+                console.log("Funcionalidad eliminada exitosamente");
                 setTableData((prevData) => prevData.filter((row) => row.id !== id));
               } else {
-                console.error("Error al eliminar normativa");
+                console.error("Error al eliminar funcionalidad");
               }
             })
             .catch((error) => {
-              console.error("Error al eliminar normativa:", error);
+              console.error("Error al eliminar funcionalidad:", error);
             });
         };
     
@@ -101,45 +100,45 @@ export default function Page() {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
     
-        const newRow: Omit<Normativa, "id"> = {
-          estado: "Nueva normativa",
+        const newRow: Omit<Funcionalidad, "id"> = {
+          estado: "Nueva funcionalidad",
           puntuacion: 0,
-          descripcion: "Descripción de la nueva normativa",
+          descripcion: "Descripción de la nueva funcionalidad",
         };
     
         try {
-          const response = await createNormativa(newRow);
+          const response = await createFuncionalidad(newRow);
           if (response.success && response.data) {
-            const apiNormativa = Array.isArray(response.data)
+            const apiFuncionalidad = Array.isArray(response.data)
               ? response.data[0]
               : response.data;
-            if (apiNormativa) {
-              const newComponente: Normativa = {
-                id: apiNormativa.id,
-                estado: apiNormativa.Estado,
-                descripcion: apiNormativa.Descripcion,
-                puntuacion: parseFloat(apiNormativa.Puntuacion),
-                createdAt: apiNormativa.createdAt,
-                updatedAt: apiNormativa.updatedAt,
+            if (apiFuncionalidad) {
+              const newComponente: Funcionalidad = {
+                id: apiFuncionalidad.id,
+                estado: apiFuncionalidad.Estado,
+                descripcion: apiFuncionalidad.Descripcion,
+                puntuacion: parseFloat(apiFuncionalidad.Puntuacion),
+                createdAt: apiFuncionalidad.createdAt,
+                updatedAt: apiFuncionalidad.updatedAt,
               };
               setTableData((prevData) => [...prevData, newComponente]);
-              console.log("Normativa agregada exitosamente");
+              console.log("Funcionalidad agregada exitosamente");
             }
           } else {
-            console.error("Error al agregar normativa:", response.error);
+            console.error("Error al agregar funcionalidad:", response.error);
           }
         } catch (error) {
-          console.error("Error al insertar normativa:", error);
+          console.error("Error al insertar funcionalidad:", error);
         }
       };
 
       useEffect(() => {
-          const loadNormativas = async () => {
+          const loadFuncionalidades = async () => {
             try {
-              const response = await getNormativas();
+              const response = await getFuncionalidades();
               if (response.success && response.data) {
-                // Convert API response to Normativas type
-                const convertedData: Normativa[] = response.data.map((item) => ({
+                // Convert API response to Funcionalidades type
+                const convertedData: Funcionalidad[] = response.data.map((item) => ({
                   id: item.id,
                   estado: item.Estado,
                   descripcion: item.Descripcion,
@@ -150,10 +149,10 @@ export default function Page() {
                 setTableData(convertedData);
               }
             } catch (error) {
-              console.error("Error loading normativas:", error);
+              console.error("Error loading funcionalidades:", error);
             }
           };
-          void loadNormativas();
+          void loadFuncionalidades();
     }, []);
       
   return (
@@ -165,7 +164,7 @@ export default function Page() {
               <ArrowLeft className="h-5 w-5 text-primary" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-primary">Normativa</h1>
+          <h1 className="text-2xl font-bold text-primary">Funcionalidad</h1>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6">
@@ -219,7 +218,7 @@ export default function Page() {
                             className="w-full rounded border px-2 py-1"
                           />
                         ) : (
-                          row.puntuacion
+                          `${row.puntuacion}`
                         )}
                       </TableCell>
 
@@ -279,7 +278,7 @@ export default function Page() {
             className="rounded px-4 py-2 text-white"
             onClick={(event) => handleSubmit(event)}
           >
-            Agregar Normativa
+            Agregar Funcionalidad
           </Button>
         </div>
       </div>

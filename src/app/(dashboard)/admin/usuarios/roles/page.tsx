@@ -78,8 +78,6 @@ export default async function AdminDashboard() {
                             className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${
                               currentRole === "admin"
                                 ? "bg-purple-100 text-purple-800"
-                                : currentRole === "auxiliar"
-                                  ? "bg-blue-100 text-blue-800"
                                   : currentRole === "evaluadorProyecto"
                                     ? "bg-green-100 text-green-800"
                                     : currentRole === "evaluadorCondiciones"
@@ -105,16 +103,6 @@ export default async function AdminDashboard() {
                               className="rounded bg-purple-600 px-3 py-1 text-sm text-white transition hover:bg-purple-700"
                             >
                               Admin
-                            </button>
-                          </form>
-                          <form action={setRole} className="inline-block">
-                            <input type="hidden" value={user.id} name="id" />
-                            <input type="hidden" value="auxiliar" name="role" />
-                            <button
-                              type="submit"
-                              className="rounded bg-blue-600 px-3 py-1 text-sm text-white transition hover:bg-blue-700"
-                            >
-                              Auxiliar de Administrador
                             </button>
                           </form>
                           <form action={setRole} className="inline-block">

@@ -123,7 +123,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
             </Link>
           </li>
           <li>
-            <Link href="/parametros">
+            <Link href="/admin/parametros">
               <Button
                 variant="ghost"
                 className={`w-full justify-start ${

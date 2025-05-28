@@ -31,7 +31,7 @@ export default function DashboardLayout({
       setActiveTab("reportes");
     } else if (pathname.startsWith("/admin/usuarios")) {
       setActiveTab("usuarios");
-    } else if (pathname.startsWith("/parametros")) {
+    } else if (pathname.startsWith("/admin/parametros")) {
       setActiveTab("parametros");
     }
   }, [pathname]);
