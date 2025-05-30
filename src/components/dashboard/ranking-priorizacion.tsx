@@ -13,6 +13,7 @@ interface Proyecto {
   edificioSeleccionado?: string;
   nombreEdificio?: string | null;
   campusEdificio?: string | null;
+  sede?: string | null;
 }
 
 export default function RankingPriorizacion() {
@@ -48,6 +49,7 @@ export default function RankingPriorizacion() {
           edificioSeleccionado: proyecto.informacionGeneral?.edificioSeleccionado || null,
           nombreEdificio: proyecto.informacionGeneral?.nombreEdificio || null,
           campusEdificio: proyecto.informacionGeneral?.campusEdificio || null,
+          sede: proyecto.informacionGeneral?.sede || null,
         }));
         const proyectosOrdenados = ordenarPorPrioridad(proyectosTransformados, ordenAscendente);
         setProyectos(proyectosOrdenados);
@@ -121,7 +123,7 @@ export default function RankingPriorizacion() {
                     <TableCell>
                       {proyecto.tipoEdificacion === "existing"
                         ? proyecto.campusEdificio || "-"
-                        : "-"}
+                        : proyecto.sede || "-"}
                     </TableCell>
                     <TableCell>{proyecto.prioridad !== null ? proyecto.prioridad.toFixed(2) : "N/A"}</TableCell>
                   </TableRow>

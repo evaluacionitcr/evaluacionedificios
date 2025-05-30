@@ -9,8 +9,6 @@ export default async function EvaluationsView() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Evaluaciones</h1>
           <div className="container mx-auto py-6">
-          
-
           <h2 className="mb-6 text-xl font-semibold sm:text-2xl">
             Evaluaciones por Campus/Centro Académico
           </h2>

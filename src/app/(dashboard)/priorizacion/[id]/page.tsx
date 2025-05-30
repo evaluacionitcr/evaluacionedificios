@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link"; 
 import { Button } from "~/components/ui/button";
 import {
@@ -9,17 +9,70 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { getEjes, getCriterios, getParametros } from "./actions";
+import { getEjes, getCriterios, getParametros } from "../crearProyecto/actions";
 
 // Interfaces para los tipos de datos
 import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, EjeTotal, Sedes } from "../types";
 
-export default function CrearProyectoPage() {
+export default function VerProyectoPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
 
     const [totalGeneral, setTotalGeneral] = useState("");
     const [projectName, setProjectName] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
+    
+    // Cargar datos del proyecto
+    useEffect(() => {
+      const fetchProyecto = async () => {
+        try {
+          setLoading(true);
+          const response = await fetch(`/api/priorizacion/${id}`);
+          
+          if (!response.ok) {
+            throw new Error("Error al obtener el proyecto");
+          }
+
+          const proyecto = await response.json();
+          
+          // Actualizar estados con la información del proyecto
+          setProjectName(proyecto.data.informacionGeneral.nombre);
+          setProjectDescription(proyecto.data.informacionGeneral.descripcion);
+          setBuildingType(proyecto.data.informacionGeneral.tipoEdificacion);
+          setSelectedBuilding(proyecto.data.informacionGeneral.edificioSeleccionado || "");
+          setSelectedSede(proyecto.data.informacionGeneral.sede || "");
+          setTotalGeneral(proyecto.data.totalGeneral);
+          
+          // Si es edificación existente, establecer los valores
+          if (proyecto.data.edificacionExistente) {
+            setDepreciacion(proyecto.data.edificacionExistente.depreciacion.toString());
+            setEstadoComponentes(proyecto.data.edificacionExistente.estadoComponentes.toString());
+            setCondicionFuncionalidad(proyecto.data.edificacionExistente.condicionFuncionalidad.toString());
+          }
+
+          // Establecer los parámetros seleccionados
+          const parametrosSeleccionados: Record<string, string> = {};
+          if (proyecto.data.evaluacion) {
+            Object.entries(proyecto.data.evaluacion).forEach(([eje, datos]: [string, any]) => {
+              Object.entries(datos).forEach(([criterioKey, valor]: [string, any]) => {
+                if (criterioKey !== 'totalPuntaje') {
+                  parametrosSeleccionados[criterioKey] = valor.id;
+                }
+              });
+            });
+          }
+          setSelectedParametros(parametrosSeleccionados);
+          
+        } catch (error) {
+          console.error("Error al cargar el proyecto:", error);
+          setLoadError("Error al cargar los datos del proyecto");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      void fetchProyecto();
+    }, [id]);
     const [selectedBuilding, setSelectedBuilding] = useState("");
     const [depreciacion, setDepreciacion] = useState("");
     const [estadoComponentes, setEstadoComponentes] = useState("");
@@ -422,21 +475,14 @@ export default function CrearProyectoPage() {
                         {criterio.criterio}
                       </td>
                       <td className="px-6 py-4">
-                        <select 
-                          value={selectedParametros[`criterio_${criterio.id}`] || ""} 
-                          onChange={(e) => handleParametroChange(criterio.id, e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="">Seleccionar parámetro</option>
-                          {parametros
-                            .filter(p => p.criterios_priorizacion_Id === criterio.id)
-                            .map((parametro) => (
-                              <option key={parametro.id} value={parametro.id.toString()}>
-                                {parametro.parametro}
-                              </option>
-                            ))
-                          }
-                        </select>
+                        <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-700">
+                          {(() => {
+                            const parametroId = selectedParametros[`criterio_${criterio.id}`];
+                            if (!parametroId) return "No seleccionado";
+                            const parametro = parametros.find(p => p.id.toString() === parametroId);
+                            return parametro ? parametro.parametro : "No seleccionado";
+                          })()}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         {selectedParametros[`criterio_${criterio.id}`] ? 
@@ -485,14 +531,14 @@ export default function CrearProyectoPage() {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Nuevo Proyecto</h1>
+          <h1 className="text-2xl font-bold">Ver Proyecto</h1>
           <Link href="/priorizacion">
             <Button variant="outline" className="flex items-center gap-2">
               Volver
             </Button>
           </Link>
         </div>
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm border">
+        
           <h2 className="text-xl font-semibold mb-6">Información del Proyecto</h2>
           
           {loading ? (
@@ -518,11 +564,9 @@ export default function CrearProyectoPage() {
                 <label htmlFor="projectName" className="text-base font-medium text-gray-700">Nombre del Proyecto</label>
                 <input
                   id="projectName"
-                  placeholder="Ingrese el nombre del proyecto"
                   value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                  required
-                  className="w-full h-11 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  readOnly
+                  className="w-full h-11 px-4 bg-gray-50 border border-gray-300 rounded-md"
                 />
               </div>
               
@@ -533,6 +577,7 @@ export default function CrearProyectoPage() {
                     <input
                       id="building-new"
                       type="radio"
+                      disabled
                       name="buildingType"
                       value="new"
                       checked={buildingType === "new"}
@@ -548,6 +593,7 @@ export default function CrearProyectoPage() {
                     <input
                       id="building-existing"
                       type="radio"
+                      disabled
                       name="buildingType"
                       value="existing"
                       checked={buildingType === "existing"}
@@ -569,7 +615,7 @@ export default function CrearProyectoPage() {
                   
                   <div className="space-y-2 mb-4">
                     <label htmlFor="sede" className="text-base font-medium text-gray-700">Sede</label>
-                    <Select value={selectedSede} onValueChange={setSelectedSede}>
+                    <Select disabled value={selectedSede} onValueChange={setSelectedSede}>
                       <SelectTrigger id="sede" className="w-full h-11">
                         <SelectValue placeholder="Seleccionar sede" />
                       </SelectTrigger>
@@ -636,7 +682,7 @@ export default function CrearProyectoPage() {
                   
                   <div className="space-y-2 mb-4">
                     <label htmlFor="building" className="text-base font-medium text-gray-700">Edificio</label>
-                    <Select value={selectedBuilding} onValueChange={(codigo) => actualizarValoresEdificio(codigo)}>
+                    <Select disabled value={selectedBuilding} onValueChange={(codigo) => actualizarValoresEdificio(codigo)}>
                       <SelectTrigger id="building" className="w-full h-11">
                         <SelectValue placeholder="Seleccionar edificio" />
                       </SelectTrigger>
@@ -752,7 +798,11 @@ export default function CrearProyectoPage() {
                   
                   
                   {/* Tablas de ejes */}
-                  {ejes.map(eje => renderTablaEje(eje.id))}
+                  {ejes.map(eje => (
+                    <div key={eje.id}>
+                      {renderTablaEje(eje.id)}
+                    </div>
+                  ))}
 
                   {/* Tabla de Total General */}
                   <div className="mt-8 border-t pt-6">
@@ -833,15 +883,9 @@ export default function CrearProyectoPage() {
                   </div>
                 </>
               )}
-              <div className="flex justify-end space-x-3 pt-4">
-                <Link href="/priorizacion">
-                  <Button variant="outline" className="px-6">Cancelar</Button>
-                </Link>
-                <Button type="submit" className="px-6">Guardar Proyecto</Button>
-              </div>
             </div>
           )}
-        </form>
+        
       </div>
     );
 }

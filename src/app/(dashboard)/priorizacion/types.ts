@@ -29,6 +29,7 @@ export interface ParametroSeleccionado {
 }
 
 export interface FormularioProyecto {
+  _id : string;
   informacionGeneral: {
     nombre: string;
     descripcion: string;
@@ -36,6 +37,7 @@ export interface FormularioProyecto {
     edificioSeleccionado: string;
     nombreEdificio: string;
     campusEdificio: string;
+    sede?: string; // ID of selected sede for new buildings
   };
   edificacionExistente: {
     depreciacion: number;
@@ -56,6 +58,12 @@ export interface ApiResponse {
   data: Evaluacion[];
   status: string;
   message?: string;
+}
+
+interface Sede{
+  id: number;
+  nombre: string;
+  proyectos: FormularioProyecto[];
 }
 
 export interface Evaluacion {
@@ -116,4 +124,9 @@ export interface EjeTotal {
     ejeId: number;
     nombre: string;
     total: number;
+}
+
+export interface Sedes {
+  idSede: number;
+  nombre: string;
 }
