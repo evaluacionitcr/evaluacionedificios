@@ -131,11 +131,6 @@ export default function ProjectList() {
                       <div key={proyecto.informacionGeneral.nombre} className="rounded-lg border p-4 bg-white">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="font-semibold">{proyecto.informacionGeneral.nombre}</h3>
-                          <Link href={`/priorizacion/${proyecto._id}`}>
-                            <Button variant="ghost" size="sm" className="p-1">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
                         </div>
                         <p className="text-sm text-gray-600">
                           Edificio: {proyecto.informacionGeneral.nombreEdificio && proyecto.informacionGeneral.nombreEdificio.trim() !== "" 
@@ -148,6 +143,13 @@ export default function ProjectList() {
                         <p className="text-sm text-gray-600">
                           Puntaje Total: {proyecto.totalGeneral}
                         </p>
+                        <div className="mt-4 flex justify-center">
+                          <Link href={`/priorizacion/${proyecto._id}`} className="w-full">
+                            <Button variant="default" className="w-full flex items-center justify-center">
+                              <Eye size={16} className="inline-block ml-1" /> Ver Detalles
+                            </Button>
+                          </Link>
+                        </div>
                       </div>
                     ))}
                   </div>
