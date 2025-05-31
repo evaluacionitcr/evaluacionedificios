@@ -77,6 +77,12 @@ export default function Page(): JSX.Element {
   
   // Buscar el eje actual basado en el ID de la URL  
   const params = useParams();
+  if (!params){
+    throw new Error("No se encontraron parámetros en la URL");
+  }
+  if (!params.id ) {
+    throw new Error("El ID del eje no está definido en la URL");
+  }
   const ejeId = params.id ? Number(params.id) : null;
   
   // Cargar los datos iniciales
@@ -104,7 +110,7 @@ export default function Page(): JSX.Element {
             // Convertir los pesos a números y asegurarse de que el tipo es correcto
             const criteriosWithNumericPeso: Criterio[] = criteriosData.map((criterio: CriterioDB): Criterio => ({
               id: criterio.id,
-              ejesPriorizacionId: criterio.ejesPriorizacionId || ejeId, // En caso de que sea null
+              ejesPriorizacionId: criterio.ejesPriorizacionId ?? ejeId, // En caso de que sea null
               criterio: criterio.criterio,
               peso: Number(criterio.peso)
             }));
@@ -118,7 +124,7 @@ export default function Page(): JSX.Element {
                 // Convertir los pesos a números y asegurarse de que el tipo es correcto
                 const parametrosWithNumericPeso: Parametro[] = parametrosData.map((parametro: ParametroDB): Parametro => ({
                   id: parametro.id,
-                  criteriosPriorizacionId: parametro.criteriosPriorizacionId || criterio.id, // En caso de que sea null
+                  criteriosPriorizacionId: parametro.criteriosPriorizacionId ?? criterio.id, // En caso de que sea null
                   parametro: parametro.parametro,
                   peso: Number(parametro.peso)
                 }));

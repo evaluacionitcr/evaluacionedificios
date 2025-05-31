@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, Document } from "mongodb";
-import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, EjeTotal } from "../../(dashboard)/priorizacion/types";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { MongoClient } from "mongodb";
+import type { Document } from "mongodb";
+import type { FormularioProyecto } from "../../(dashboard)/priorizacion/types";
 
 const uri = process.env.MONGODB_URI ??'';
 const client = new MongoClient(uri);
 const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
 const collectionName = "proyectos";
-const db = client.db(dbName);
-const collection = db.collection(collectionName);
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    const requestData = await request.json(); 
+    const requestData = await request.json() as unknown; 
     const proyecto = requestData as FormularioProyecto;
     
     const documentoEvaluacion: Document = {

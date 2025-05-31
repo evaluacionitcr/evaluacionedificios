@@ -5,7 +5,12 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { ChevronDown, ChevronUp, Search, Eye } from "lucide-react";
 import Link from "next/link";
-import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, EjeTotal } from "../../app/(dashboard)/priorizacion/types";
+import type { FormularioProyecto } from "../../app/(dashboard)/priorizacion/types";
+
+interface ApiResponse {
+  status: string;
+  data: FormularioProyecto[];
+}
 
 
 interface SedeProyectos {
@@ -23,13 +28,13 @@ export default function ProjectList() {
   const fetchProyectos = async () => {
     try {
       const response = await fetch('/api/priorizacion');
-      const data = await response.json();
+      const data = await response.json() as ApiResponse;
       
       if (data.status === "success") {
         // Agrupar proyectos por sede
         const proyectosPorSede = data.data.reduce((acc: Record<string, FormularioProyecto[]>, proyecto: FormularioProyecto) => {
           // Use sede if available (new building), otherwise use campusEdificio (existing building)
-          const sede = proyecto.informacionGeneral.sede || proyecto.informacionGeneral.campusEdificio;
+          const sede = proyecto.informacionGeneral.sede ?? proyecto.informacionGeneral.campusEdificio;
           
           if (!acc[sede]) {
             acc[sede] = [];
@@ -41,7 +46,7 @@ export default function ProjectList() {
         // Convertir a array de SedeProyectos
         const sedesArray = Object.entries(proyectosPorSede).map(([nombre, proyectos]) => ({
           nombre,
-          proyectos: proyectos as FormularioProyecto[]
+          proyectos
         }));
 
         setSedesConProyectos(sedesArray);
@@ -53,7 +58,7 @@ export default function ProjectList() {
     }
   };
 
-  fetchProyectos();
+  void fetchProyectos();
 }, []);
 
   const toggleSede = (sedeNombre: string) => {

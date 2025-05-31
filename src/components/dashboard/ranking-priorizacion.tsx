@@ -18,6 +18,23 @@ interface Proyecto {
   sede?: string | null;
 }
 
+interface ApiProyecto {
+  _id: string;
+  totalGeneral: string | number;
+  informacionGeneral?: {
+    nombre?: string;
+    tipoEdificacion?: string;
+    edificioSeleccionado?: string;
+    nombreEdificio?: string;
+    campusEdificio?: string;
+    sede?: string;
+  };
+}
+
+interface ApiResponse {
+  data: ApiProyecto[];
+}
+
 export default function RankingPriorizacion() {
   const router = useRouter();
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
@@ -43,16 +60,17 @@ export default function RankingPriorizacion() {
           throw new Error("Error al obtener los proyectos");
         }
 
-        const data = await response.json();
-        const proyectosTransformados = (data.data || []).map((proyecto: any) => ({
+        const data = await response.json() as unknown;
+        const apiResponse = data as ApiResponse;
+        const proyectosTransformados = (apiResponse.data ?? []).map((proyecto: ApiProyecto): Proyecto => ({
           _id: proyecto._id,
-          nombre: proyecto.informacionGeneral?.nombre || "Sin nombre",
-          prioridad: parseFloat(proyecto.totalGeneral) || null,
-          tipoEdificacion: proyecto.informacionGeneral?.tipoEdificacion || "nuevo",
-          edificioSeleccionado: proyecto.informacionGeneral?.edificioSeleccionado || null,
-          nombreEdificio: proyecto.informacionGeneral?.nombreEdificio || null,
-          campusEdificio: proyecto.informacionGeneral?.campusEdificio || null,
-          sede: proyecto.informacionGeneral?.sede || null,
+          nombre: proyecto.informacionGeneral?.nombre ?? "Sin nombre",
+          prioridad: parseFloat(String(proyecto.totalGeneral)) || null,
+          tipoEdificacion: proyecto.informacionGeneral?.tipoEdificacion ?? "nuevo",
+          edificioSeleccionado: proyecto.informacionGeneral?.edificioSeleccionado ?? undefined,
+          nombreEdificio: proyecto.informacionGeneral?.nombreEdificio ?? null,
+          campusEdificio: proyecto.informacionGeneral?.campusEdificio ?? null,
+          sede: proyecto.informacionGeneral?.sede ?? null,
         }));
         const proyectosOrdenados = ordenarPorPrioridad(proyectosTransformados, ordenAscendente);
         setProyectos(proyectosOrdenados);
@@ -96,9 +114,9 @@ export default function RankingPriorizacion() {
               <TableCell className="font-medium">Acciones</TableCell>
             </TableRow></TableHeader><TableBody>{proyectos.map(proyecto => (              <TableRow key={proyecto._id}>
                 <TableCell className="font-medium">{proyecto.nombre}</TableCell>
-                <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.edificioSeleccionado || "-" : "-"}</TableCell>
-                <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.nombreEdificio || "Sin edificio asociado" : "Sin edificio asociado"}</TableCell>
-                <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.campusEdificio || "-" : proyecto.sede || "-"}</TableCell>
+                <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.edificioSeleccionado ?? "-" : "-"}</TableCell>
+                <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.nombreEdificio ?? "Sin edificio asociado" : "Sin edificio asociado"}</TableCell>
+                <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.campusEdificio ?? "-" : proyecto.sede ?? "-"}</TableCell>
                 <TableCell>{proyecto.prioridad !== null ? proyecto.prioridad.toFixed(2) : "N/A"}</TableCell>
                 <TableCell>
                   <Button 

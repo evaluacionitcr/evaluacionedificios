@@ -12,14 +12,14 @@ import {
 import { getEjes, getCriterios, getParametros } from "../crearProyecto/actions";
 
 // Interfaces para los tipos de datos
-import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, EjeTotal, Sedes } from "../types";
+import type { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, Sedes } from "../types";
 
 export default function VerProyectoPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
 
     const [totalGeneral, setTotalGeneral] = useState("");
     const [projectName, setProjectName] = useState("");
-    const [projectDescription, setProjectDescription] = useState("");
+    const [_projectDescription, setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
     
     // Cargar datos del proyecto
@@ -33,32 +33,34 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
             throw new Error("Error al obtener el proyecto");
           }
 
-          const proyecto = await response.json();
+          const proyecto = await response.json() as { data: FormularioProyecto };
           
           // Actualizar estados con la información del proyecto
           setProjectName(proyecto.data.informacionGeneral.nombre);
           setProjectDescription(proyecto.data.informacionGeneral.descripcion);
           setBuildingType(proyecto.data.informacionGeneral.tipoEdificacion);
-          setSelectedBuilding(proyecto.data.informacionGeneral.edificioSeleccionado || "");
-          setSelectedSede(proyecto.data.informacionGeneral.sede || "");
-          setTotalGeneral(proyecto.data.totalGeneral);
+          setSelectedBuilding(proyecto.data.informacionGeneral.edificioSeleccionado ?? "");
+          setSelectedSede(proyecto.data.informacionGeneral.sede ?? "");
+          setTotalGeneral(proyecto.data.totalGeneral.toString());
           
           // Si es edificación existente, establecer los valores
           if (proyecto.data.edificacionExistente) {
-            setDepreciacion(proyecto.data.edificacionExistente.depreciacion.toString());
-            setEstadoComponentes(proyecto.data.edificacionExistente.estadoComponentes.toString());
-            setCondicionFuncionalidad(proyecto.data.edificacionExistente.condicionFuncionalidad.toString());
+            setDepreciacion(proyecto.data.edificacionExistente.depreciacion?.toString() ?? "0");
+            setEstadoComponentes(proyecto.data.edificacionExistente.estadoComponentes?.toString() ?? "0");
+            setCondicionFuncionalidad(proyecto.data.edificacionExistente.condicionFuncionalidad?.toString() ?? "0");
           }
 
           // Establecer los parámetros seleccionados
           const parametrosSeleccionados: Record<string, string> = {};
           if (proyecto.data.evaluacion) {
-            Object.entries(proyecto.data.evaluacion).forEach(([eje, datos]: [string, any]) => {
-              Object.entries(datos).forEach(([criterioKey, valor]: [string, any]) => {
-                if (criterioKey !== 'totalPuntaje') {
-                  parametrosSeleccionados[criterioKey] = valor.id;
-                }
-              });
+            Object.entries(proyecto.data.evaluacion).forEach(([_eje, datos]) => {
+              if (datos && typeof datos === 'object') {
+                Object.entries(datos).forEach(([criterioKey, valor]) => {
+                  if (criterioKey !== 'totalPuntaje' && valor && typeof valor === 'object' && 'id' in valor) {
+                    parametrosSeleccionados[criterioKey] = String(valor.id);
+                  }
+                });
+              }
             });
           }
           setSelectedParametros(parametrosSeleccionados);
@@ -98,19 +100,10 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
     const [loadError, setLoadError] = useState<string | null>(null);
 
     // Variables para manejar la evaluación reciente
-    const [evaluacionesPorCodigo, setEvaluacionesPorCodigo] = useState<Record<string, Evaluacion[]>>({});
     const [evaluacionRecientePorCodigo, setEvaluacionRecientePorCodigo] = useState<Record<string, Evaluacion | null>>({});
     const [sedes, setSedes] = useState<Sedes[]>([]);
     const [selectedSede, setSelectedSede] = useState("");
-    // Estados para el manejo de formularios de nuevos elementos
-    const [showAddEjeForm, setShowAddEjeForm] = useState(false);
-    const [showAddCriterioForm, setShowAddCriterioForm] = useState(false);
-    const [showAddParametroForm, setShowAddParametroForm] = useState(false);
-    
-    // Estados para los nuevos elementos a agregar
-    const [newEje, setNewEje] = useState({ eje: "", peso: 0 });
-    const [newCriterio, setNewCriterio] = useState({ ejeId: 0, criterio: "", peso: 0 });
-    const [newParametro, setNewParametro] = useState({ criterioId: 0, parametro: "", peso: 0 });
+    // Estados para el manejo de formularios de nuevos elementos (no usados en vista de solo lectura)
     
     // Cargar datos desde el servidor
     useEffect(() => {
@@ -174,7 +167,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
         }
       };
       
-      fetchData();
+      void fetchData();
     }, []);
 
    
@@ -215,7 +208,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
             throw new Error("Error al obtener sedes");
           }
 
-          const data = await response.json();
+          const data = await response.json() as Sedes[];
           setSedes(data);
 
         } catch (error) {
@@ -237,14 +230,6 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
         setIsInitialized(true);
       }
     }, [criterios, loading]);
-    
-    // Función para manejar cambios en los parámetros seleccionados
-    const handleParametroChange = (criterioId: number, value: string) => {
-      setSelectedParametros(prev => ({
-        ...prev,
-        [`criterio_${criterioId}`]: value
-      }));
-    };
     
     // Función para obtener el valor de un parámetro seleccionado
     const getParametroValor = (parametroId: string | undefined): number => {
@@ -276,19 +261,6 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
       
       return total.toFixed(2);
     };
-    
-    // Función para agregar un nuevo eje
-    const handleAddEje = () => {
-      if (newEje.eje.trim() === "" || newEje.peso <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...ejes.map(e => e.id), 0) + 1;
-      setEjes([...ejes, { id: newId, eje: newEje.eje, peso: newEje.peso }]);
-      setNewEje({ eje: "", peso: 0 });
-      setShowAddEjeForm(false);
-    };
 
     const actualizarValoresEdificio = (codigo: string) => {
         const evaluacion = evaluacionRecientePorCodigo[codigo];
@@ -307,142 +279,6 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
           setCondicionFuncionalidad(puntajeServiciabilidad.toString());
         }
     };
-    
-    // Función para agregar un nuevo criterio
-    const handleAddCriterio = () => {
-      if (newCriterio.ejeId === 0 || newCriterio.criterio.trim() === "" || newCriterio.peso <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...criterios.map(c => c.id), 0) + 1;
-      setCriterios([...criterios, { 
-        id: newId, 
-        ejeId: newCriterio.ejeId, 
-        criterio: newCriterio.criterio, 
-        peso: newCriterio.peso,
-        ejes_priorizacion_Id: newCriterio.ejeId
-      }]);
-      
-      // Actualizar el estado de parametros seleccionados para incluir el nuevo criterio
-      setSelectedParametros(prev => ({
-        ...prev,
-        [`criterio_${newId}`]: ""
-      }));
-      
-      setNewCriterio({ ejeId: 0, criterio: "", peso: 0 });
-      setShowAddCriterioForm(false);
-    };
-    
-    // Función para agregar un nuevo parámetro
-    const handleAddParametro = () => {
-      if (newParametro.criterioId === 0 || newParametro.parametro.trim() === "") {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...parametros.map(p => p.id), 0) + 1;
-      setParametros([...parametros, { 
-        id: newId, 
-        parametro: newParametro.parametro, 
-        peso: newParametro.peso,
-        criterios_priorizacion_Id: newParametro.criterioId
-      }]);
-      
-      setNewParametro({ criterioId: 0, parametro: "", peso: 0 });
-      setShowAddParametroForm(false);
-    };
-    
-    // Función para el envío del formulario
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-
-      // Validate sede selection for new buildings
-      if (buildingType === "new" && !selectedSede) {
-        alert("Por favor, seleccione una sede para la nueva edificación.");
-        return;
-      }
-
-      // Construir el objeto para el envío
-      const parametrosData: Record<string, any> = {};
-      
-      ejes.forEach(eje => {
-      const criteriosDeEje = criterios.filter(c => c.ejeId === eje.id);
-      const ejePuntajes: Record<string, any> = {};
-      
-      criteriosDeEje.forEach(criterio => {
-        const criterioKey = `criterio_${criterio.id}`;
-        const parametroSeleccionado = selectedParametros[criterioKey];
-        
-        // Si se seleccionó un parámetro para este criterio
-        if (parametroSeleccionado) {
-        const parametro = parametros.find(p => p.id.toString() === parametroSeleccionado);
-        
-        ejePuntajes[criterioKey] = {
-          id: parametroSeleccionado,
-          valor: getParametroValor(parametroSeleccionado),
-          puntaje: calcularPuntaje(parametroSeleccionado, criterio.id),
-          parametroTexto: parametro?.parametro || ""
-        };
-        } else {
-        ejePuntajes[criterioKey] = {
-          id: "",
-          valor: 0,
-          puntaje: "0.00",
-          parametroTexto: ""
-        };
-        }
-      });
-      
-      ejePuntajes.totalPuntaje = calcularTotalEje(eje.id);
-      parametrosData[eje.eje.toLowerCase()] = ejePuntajes;
-      });
-      
-      // Construir el objeto completo de datos
-      const formData = {
-      informacionGeneral: {
-        nombre: projectName, 
-        descripcion: projectDescription, 
-        tipoEdificacion: buildingType,
-        edificioSeleccionado: selectedBuilding,
-        nombreEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.nombre,
-        campusEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.campus,
-        sede: buildingType === "new" ? selectedSede : undefined
-      },        
-      edificacionExistente: buildingType === "existing" ? {          
-        depreciacion: depreciacion ? parseFloat(depreciacion) : 0,
-        estadoComponentes: estadoComponentes ? parseFloat(estadoComponentes) : 0,
-        condicionFuncionalidad: condicionFuncionalidad ? parseFloat(condicionFuncionalidad) : 0,
-        totalPuntaje: puntajeEdificacionExistente.toFixed(2)
-      } : null,
-      configuracion: {
-        ejes: ejes,
-        criterios: criterios,
-        parametros: parametros
-      },
-      evaluacion: parametrosData,
-      totalGeneral: totalGeneral
-      };
-
-      try {
-      const response = await fetch("/api/priorizacion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al guardar el proyecto");
-      }
-
-      alert("Proyecto guardado exitosamente!");
-      window.location.href = "/priorizacion";
-      } catch (error) {
-      alert("Ocurrió un error al guardar el proyecto.");
-      console.error(error);
-      }
-    };
-
     
     // Componente para renderizar una tabla de eje
     const renderTablaEje = (ejeId: number) => {

@@ -22,6 +22,10 @@ interface Evaluacion {
   puntajeTotalEdificio?: number;
 }
 
+interface ApiResponse {
+  data: Evaluacion[];
+}
+
 export default function RankingNewestEvaluations() {
   const [ultimasEvaluaciones, setUltimasEvaluaciones] = useState<Evaluacion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,9 +56,10 @@ export default function RankingNewestEvaluations() {
           throw new Error("Error al obtener las evaluaciones más recientes");
         }
 
-        const data = await response.json();
+        const data = await response.json() as unknown;
+        const apiResponse = data as ApiResponse;
         // Ordenamos por puntaje más alto (descendente por defecto)
-        const evaluacionesOrdenadas = ordenarPorPuntaje(data.data || [], ordenAscendente);
+        const evaluacionesOrdenadas = ordenarPorPuntaje(apiResponse.data ?? [], ordenAscendente);
         setUltimasEvaluaciones(evaluacionesOrdenadas);
       } catch (error) {
         console.error("Error fetching últimas evaluaciones:", error);
@@ -79,14 +84,6 @@ export default function RankingNewestEvaluations() {
       month: '2-digit',
       year: 'numeric'
     }).format(date);
-  };
-
-  // Determinar el color según el puntaje
-  const getPuntajeColor = (puntaje?: number) => {
-    if (!puntaje) return "text-gray-500";
-    if (puntaje >= 75) return "text-green-600";
-    if (puntaje >= 50) return "text-yellow-600";
-    return "text-red-600";
   };
 
   return (

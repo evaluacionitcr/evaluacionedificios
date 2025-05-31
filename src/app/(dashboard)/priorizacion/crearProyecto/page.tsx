@@ -12,13 +12,13 @@ import {
 import { getEjes, getCriterios, getParametros } from "./actions";
 
 // Interfaces para los tipos de datos
-import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, EjeTotal, Sedes } from "../types";
+import type { Eje, Criterio, Parametro, ApiResponse, Evaluacion, Sedes } from "../types";
 
 export default function CrearProyectoPage() {
 
     const [totalGeneral, setTotalGeneral] = useState("");
     const [projectName, setProjectName] = useState("");
-    const [projectDescription, setProjectDescription] = useState("");
+    const [_projectDescription, _setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
     const [selectedBuilding, setSelectedBuilding] = useState("");
     const [depreciacion, setDepreciacion] = useState("");
@@ -45,14 +45,14 @@ export default function CrearProyectoPage() {
     const [loadError, setLoadError] = useState<string | null>(null);
 
     // Variables para manejar la evaluación reciente
-    const [evaluacionesPorCodigo, setEvaluacionesPorCodigo] = useState<Record<string, Evaluacion[]>>({});
+    const [_evaluacionesPorCodigo, _setEvaluacionesPorCodigo] = useState<Record<string, Evaluacion[]>>({});
     const [evaluacionRecientePorCodigo, setEvaluacionRecientePorCodigo] = useState<Record<string, Evaluacion | null>>({});
     const [sedes, setSedes] = useState<Sedes[]>([]);
     const [selectedSede, setSelectedSede] = useState("");
     // Estados para el manejo de formularios de nuevos elementos
-    const [showAddEjeForm, setShowAddEjeForm] = useState(false);
-    const [showAddCriterioForm, setShowAddCriterioForm] = useState(false);
-    const [showAddParametroForm, setShowAddParametroForm] = useState(false);
+    const [_showAddEjeForm, _setShowAddEjeForm] = useState(false);
+    const [_showAddCriterioForm, _setShowAddCriterioForm] = useState(false);
+    const [_showAddParametroForm, _setShowAddParametroForm] = useState(false);
     
     // Estados para los nuevos elementos a agregar
     const [newEje, setNewEje] = useState({ eje: "", peso: 0 });
@@ -121,7 +121,7 @@ export default function CrearProyectoPage() {
         }
       };
       
-      fetchData();
+      void fetchData();
     }, []);
 
    
@@ -162,7 +162,7 @@ export default function CrearProyectoPage() {
             throw new Error("Error al obtener sedes");
           }
 
-          const data = await response.json();
+          const data = await response.json() as Sedes[];
           setSedes(data);
 
         } catch (error) {
@@ -224,8 +224,8 @@ export default function CrearProyectoPage() {
       return total.toFixed(2);
     };
     
-    // Función para agregar un nuevo eje
-    const handleAddEje = () => {
+    // Función para agregar un nuevo eje (no usada actualmente)
+    const _handleAddEje = () => {
       if (newEje.eje.trim() === "" || newEje.peso <= 0) {
         alert("Por favor, complete todos los campos correctamente.");
         return;
@@ -234,7 +234,7 @@ export default function CrearProyectoPage() {
       const newId = Math.max(...ejes.map(e => e.id), 0) + 1;
       setEjes([...ejes, { id: newId, eje: newEje.eje, peso: newEje.peso }]);
       setNewEje({ eje: "", peso: 0 });
-      setShowAddEjeForm(false);
+      _setShowAddEjeForm(false);
     };
 
     const actualizarValoresEdificio = (codigo: string) => {
@@ -255,8 +255,8 @@ export default function CrearProyectoPage() {
         }
     };
     
-    // Función para agregar un nuevo criterio
-    const handleAddCriterio = () => {
+    // Función para agregar un nuevo criterio (no usada actualmente)
+    const _handleAddCriterio = () => {
       if (newCriterio.ejeId === 0 || newCriterio.criterio.trim() === "" || newCriterio.peso <= 0) {
         alert("Por favor, complete todos los campos correctamente.");
         return;
@@ -278,11 +278,11 @@ export default function CrearProyectoPage() {
       }));
       
       setNewCriterio({ ejeId: 0, criterio: "", peso: 0 });
-      setShowAddCriterioForm(false);
+      _setShowAddCriterioForm(false);
     };
     
-    // Función para agregar un nuevo parámetro
-    const handleAddParametro = () => {
+    // Función para agregar un nuevo parámetro (no usada actualmente)
+    const _handleAddParametro = () => {
       if (newParametro.criterioId === 0 || newParametro.parametro.trim() === "") {
         alert("Por favor, complete todos los campos correctamente.");
         return;
@@ -297,7 +297,7 @@ export default function CrearProyectoPage() {
       }]);
       
       setNewParametro({ criterioId: 0, parametro: "", peso: 0 });
-      setShowAddParametroForm(false);
+      _setShowAddParametroForm(false);
     };
     
     // Función para el envío del formulario
@@ -311,11 +311,16 @@ export default function CrearProyectoPage() {
       }
 
       // Construir el objeto para el envío
-      const parametrosData: Record<string, any> = {};
+      const parametrosData: Record<string, Record<string, unknown>> = {};
       
       ejes.forEach(eje => {
       const criteriosDeEje = criterios.filter(c => c.ejeId === eje.id);
-      const ejePuntajes: Record<string, any> = {};
+      const ejePuntajes: Record<string, {
+        id: string;
+        valor: number;
+        puntaje: string;
+        parametroTexto: string;
+      } | string> = {};
       
       criteriosDeEje.forEach(criterio => {
         const criterioKey = `criterio_${criterio.id}`;
@@ -329,7 +334,7 @@ export default function CrearProyectoPage() {
           id: parametroSeleccionado,
           valor: getParametroValor(parametroSeleccionado),
           puntaje: calcularPuntaje(parametroSeleccionado, criterio.id),
-          parametroTexto: parametro?.parametro || ""
+          parametroTexto: parametro?.parametro ?? ""
         };
         } else {
         ejePuntajes[criterioKey] = {
@@ -349,7 +354,7 @@ export default function CrearProyectoPage() {
       const formData = {
       informacionGeneral: {
         nombre: projectName, 
-        descripcion: projectDescription, 
+        descripcion: _projectDescription, 
         tipoEdificacion: buildingType,
         edificioSeleccionado: selectedBuilding,
         nombreEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.nombre,
@@ -423,7 +428,7 @@ export default function CrearProyectoPage() {
                       </td>
                       <td className="px-6 py-4">
                         <select 
-                          value={selectedParametros[`criterio_${criterio.id}`] || ""} 
+                          value={selectedParametros[`criterio_${criterio.id}`] ?? ""} 
                           onChange={(e) => handleParametroChange(criterio.id, e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >

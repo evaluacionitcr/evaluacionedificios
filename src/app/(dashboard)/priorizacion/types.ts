@@ -50,7 +50,7 @@ export interface FormularioProyecto {
     criterios: Criterio[];
     parametros: Parametro[];
   };
-  evaluacion: Record<string, any>;
+  evaluacion: Record<string, Record<string, unknown>>;
   totalGeneral: number;
 }
 
@@ -60,7 +60,7 @@ export interface ApiResponse {
   message?: string;
 }
 
-interface Sede{
+export interface Sede{
   id: number;
   nombre: string;
   proyectos: FormularioProyecto[];

@@ -45,7 +45,7 @@ export default function Page(): JSX.Element {
           }));
           setEjes(formattedEjes);
         } else {
-          toast.error(result.error || "Error al cargar los ejes");
+          toast.error(result.error ?? "Error al cargar los ejes");
           // Cargar datos por defecto si hay error
           setEjes([
             { id: 1, eje: "FUNCIONAL", peso: 40 },
@@ -133,7 +133,7 @@ export default function Page(): JSX.Element {
             setEjes(formattedEjes);
           }
         } else {
-          toast.error(result.error || "Error al actualizar eje");
+          toast.error(result.error ?? "Error al actualizar eje");
         }
       }
       
@@ -152,7 +152,7 @@ export default function Page(): JSX.Element {
         toast.success("Eje eliminado correctamente");
         setEjes((prevData) => prevData.filter((eje) => eje.id !== id));
       } else {
-        toast.error(result.error || "Error al eliminar eje");
+        toast.error(result.error ?? "Error al eliminar eje");
       }
     } catch (error: unknown) {
       console.error("Error al eliminar eje:", error);
@@ -181,7 +181,7 @@ export default function Page(): JSX.Element {
         };
         setEjes([...ejes, newEje]);
       } else {
-        toast.error(result.error || "Error al crear eje");
+        toast.error(result.error ?? "Error al crear eje");
       }
     } catch (error: unknown) {
       console.error("Error al crear eje:", error);
