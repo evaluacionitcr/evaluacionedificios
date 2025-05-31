@@ -216,7 +216,7 @@ export default function Page(): JSX.Element {
               <TableRow>
                 <TableCell className="text-xl font-semibold sm:text-2xl">Componentes</TableCell>
                 <TableCell className="text-right">
-                  <Link href="/parametros/componentes">
+                  <Link href="/admin/parametros/componentes">
                     <Button>
                       Editar
                     </Button>
@@ -228,7 +228,7 @@ export default function Page(): JSX.Element {
               <TableRow>
                 <TableCell className="text-xl font-semibold sm:text-2xl">Estado de conservación</TableCell>
                 <TableCell className="text-right">
-                  <Link href="/parametros/conservacion">
+                  <Link href="/admin/parametros/conservacion">
                     <Button>
                       Editar
                     </Button>
@@ -240,7 +240,7 @@ export default function Page(): JSX.Element {
               <TableRow>
                 <TableCell className="text-xl font-semibold sm:text-2xl">Funcionalidad </TableCell>
                 <TableCell className="text-right">
-                  <Link href="/parametros/funcionalidad">
+                  <Link href="/admin/parametros/funcionalidad">
                     <Button>
                       Editar
                     </Button>
@@ -252,7 +252,7 @@ export default function Page(): JSX.Element {
               <TableRow>
                 <TableCell className="text-xl font-semibold sm:text-2xl">Normativa </TableCell>
                 <TableCell className="text-right">
-                  <Link href="/parametros/normativa">
+                  <Link href="/admin/parametros/normativa">
                     <Button>
                       Editar
                     </Button>
@@ -357,7 +357,7 @@ export default function Page(): JSX.Element {
                           Editar
                         </Button>
                       )}
-                      <Link href={`/parametros/criterios/${eje.id}`}>
+                      <Link href={`/admin/parametros/criterios/${eje.id}`}>
                         <Button>
                           Criterios
                         </Button>
