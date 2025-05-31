@@ -9,13 +9,13 @@ const collectionName = "proyectos";
 const db = client.db(dbName);
 const collection = db.collection(collectionName);
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
     
-    const id = params.id;
+    const { id } = await params;
     
     const proyecto = await collection.findOne({ _id: new ObjectId(id) });
     
