@@ -266,10 +266,6 @@ export default function Page(): JSX.Element {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Ejes para Priorización</h1>
         <div className="flex gap-2">
-          <Link href="/parametros/priorizacion/preview">
-            <Button>Previsualizar Priorización</Button>
-          </Link>
-
           <Button onClick={handleAddEje}>Agregar Eje</Button>
         </div>
       </div>

@@ -6,7 +6,7 @@ export default function PriorizacionPage() {
   return (
     <div className="container mx-auto py-6">
       <div className="flex gap-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold">Reportes</h1>
+        <h1 className="text-2xl font-bold">Priorización</h1>
         <Link href="/priorizacion/crearProyecto">
           <Button>Nuevo Proyecto</Button>
         </Link>
