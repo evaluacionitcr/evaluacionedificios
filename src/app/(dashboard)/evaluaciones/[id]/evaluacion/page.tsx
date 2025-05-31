@@ -24,7 +24,7 @@ interface Componente {
   existencia: string;
   pesoEvaluado?: number;
   puntaje?: number;
-  elementosValorar?: string;
+  elementos: string;
 }
 
 interface EstadoConservacion {
@@ -274,7 +274,6 @@ export default function Page(): JSX.Element {
           existencia: "si",
           pesoEvaluado: 0,
           puntaje: 0,
-          elementosValorar: ""
         } as Componente));
         setComponentes(componentesActualizados);
         calcularPesoTotal(componentesActualizados);

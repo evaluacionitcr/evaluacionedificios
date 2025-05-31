@@ -23,7 +23,7 @@ interface Componente {
   existencia: string;
   pesoEvaluado?: number;
   puntaje?: number;
-  elementosValorar?: string;
+  elementos: string;
 }
 
 interface EstadoConservacion {
@@ -456,7 +456,7 @@ export default function Page(): JSX.Element {
           escalaDepreciacion: escalaDepreciacionRemodelacion
         },
         puntajeDepreciacionTotal: puntajeDepreciacionTotal
-      },
+      },      
       componentes: componentes.map(comp => ({
         id: comp.id,
         componente: comp.componente,
@@ -464,7 +464,8 @@ export default function Page(): JSX.Element {
         existencia: comp.existencia,
         necesidadIntervencion: comp.necesidadIntervencion,
         pesoEvaluado: comp.pesoEvaluado,
-        puntaje: comp.puntaje
+        puntaje: comp.puntaje,
+        elementos: comp.elementos
       })),
       puntajeComponentes: puntajeComponentes,
       serviciabilidad: {

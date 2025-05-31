@@ -12,7 +12,7 @@ interface Componente {
   existencia: string;
   pesoEvaluado?: number;
   puntaje?: number;
-  elementosValorar?: string;
+  elementos: string;
 }
 
 interface ComponentsTableProps {
@@ -110,13 +110,7 @@ const ComponentsTable: React.FC<ComponentsTableProps> = ({
                 </div>
               </TableCell>
               <TableCell className="text-sm">
-                <textarea 
-                  onChange={(e) => componente.elementosValorar = e.target.value} 
-                  
-                  readOnly
-                  className="w-full h-20 px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" 
-                  placeholder="Ingrese los elementos a valorar"
-                ></textarea>
+                {componente.elementos}
               </TableCell>
               <TableCell colSpan={3} className="text-center">
                 <div className="relative flex items-center justify-center">
