@@ -470,7 +470,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
               <tbody className="bg-white divide-y divide-gray-200">
                 {criteriosDeEje.length > 0 ? (
                   criteriosDeEje.map((criterio) => (
-                    <tr key={criterio.id}>
+                    <tr key={`criterio-${criterio.id}`}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                         {criterio.criterio}
                       </td>
@@ -619,57 +619,48 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                       <SelectTrigger id="sede" className="w-full h-11">
                         <SelectValue placeholder="Seleccionar sede" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {sedes.length > 0 ? 
-                          sedes.map((sede) => (
-                            <SelectItem key={sede.idSede} value={sede.nombre}>
-                              {sede.nombre}
-                            </SelectItem>
-                          ))
-                         : 
-                          <SelectItem disabled value="">No hay sedes disponibles</SelectItem>
-                        }
-                      </SelectContent>
+                      <SelectContent>{sedes.length > 0 ? 
+                        sedes.map((sede) => (
+                          <SelectItem 
+                            key={`sede-${sede.idSede || sede.nombre}`} 
+                            value={sede.nombre || '_no_value_'}
+                          >{sede.nombre}</SelectItem>
+                        )) : 
+                        <SelectItem key="no-sedes" value="_no_sedes_">No hay sedes disponibles</SelectItem>
+                      }</SelectContent>
                     </Select>
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="min-w-full border rounded-md">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600 bg-red-100">No hay posibilidad de reacondicionar edificio existente</td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600 bg-red-100">Se cuenta con viabilidad ambiental</td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600 bg-red-100">Es requerido para mejorar el servicio</td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                        </tr>
-                        <tr className="bg-gray-50">
-                          <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium">0%</td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium">0%</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <table className="min-w-full border rounded-md"><thead className="bg-gray-50"><tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
+                    </tr></thead><tbody className="bg-white divide-y divide-gray-200"><tr>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación del edificio</td>
+                      <td className="px-6 py-4">
+                        <input type="number" min="0.00" step="0.01" placeholder="0-1" readOnly 
+                          value={depreciacion}
+                          onChange={(e) => setDepreciacion(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{depreciacion ? parseFloat(depreciacion).toFixed(2) : "0.00"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">5%</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{depreciacion ? (parseFloat(depreciacion) * 5).toFixed(2) : "0.00"}</td>
+                    </tr><tr>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Estados de los componentes y sistemas</td>
+                      <td className="px-6 py-4">
+                        <input type="number" min="0.00" readOnly step="0.01" placeholder="0-1" 
+                          value={estadoComponentes}
+                          onChange={(e) => setEstadoComponentes(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{estadoComponentes ? parseFloat(estadoComponentes).toFixed(2) : "0.00"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">10%</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{estadoComponentes ? (parseFloat(estadoComponentes) * 10).toFixed(2) : "0.00"}</td>
+                    </tr></tbody></table>
                   </div>
                   </>
               )}
@@ -686,107 +677,100 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                       <SelectTrigger id="building" className="w-full h-11">
                         <SelectValue placeholder="Seleccionar edificio" />
                       </SelectTrigger>
-                      <SelectContent>
-                      {Object.keys(evaluacionRecientePorCodigo).length > 0 ? (
+                      <SelectContent>{Object.keys(evaluacionRecientePorCodigo).length > 0 ? 
                         Object.entries(evaluacionRecientePorCodigo).map(([codigo, evaluacion]) =>
                           evaluacion ? (
-                            <SelectItem key={evaluacion._id} value={codigo}>
+                            <SelectItem key={`building-${evaluacion._id}`} value={codigo || '_no_value_'}>
                               {evaluacion.edificio?.nombre || codigo}
                             </SelectItem>
                           ) : null
-                        )
-                      ) : (
-                        <SelectItem disabled value={""}>No hay edificios disponibles</SelectItem>
-                      )}
-                      </SelectContent>
+                        ) : 
+                        <SelectItem key="no-buildings" value="_no_buildings_">No hay edificios disponibles</SelectItem>
+                      }</SelectContent>
                     </Select>
                   </div>
                   
                   <div className="overflow-x-auto">
-                    <table className="min-w-full border rounded-md">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación del edificio</td>
-                          <td className="px-6 py-4">
-                            <input
-                              type="number"
-                              min="0.00"
-                              step="0.01"
-                              placeholder="0-1"
-                              readOnly
-                              value={depreciacion}
-                              onChange={(e) => setDepreciacion(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </td>                          
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {depreciacion ? parseFloat(depreciacion).toFixed(2) : "0.00"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">5%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {depreciacion ? (parseFloat(depreciacion) * 5).toFixed(2) : "0.00"}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Estados de los componentes y sistemas</td>
-                          <td className="px-6 py-4">
-                            <input
-                              type="number"
-                              min="0.00"
-                              readOnly
-                              step="0.01"
-                              placeholder="0-1"
-                              value={estadoComponentes}
-                              onChange={(e) => setEstadoComponentes(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </td>                          
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {estadoComponentes ? parseFloat(estadoComponentes).toFixed(2) : "0.00"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">10%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {estadoComponentes ? (parseFloat(estadoComponentes) * 10).toFixed(2) : "0.00"}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Condición de funcionalidad y normativa del edificio</td>
-                          <td className="px-6 py-4">
-                            <input
-                              type="number"
-                              min="0.00"
-                              readOnly
-                              step="0.01"
-                              placeholder="0-1"
-                              value={condicionFuncionalidad}
-                              onChange={(e) => setCondicionFuncionalidad(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </td>                          
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {condicionFuncionalidad ? parseFloat(condicionFuncionalidad).toFixed(2) : "0.00"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">20%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {condicionFuncionalidad ? (parseFloat(condicionFuncionalidad) * 20).toFixed(2) : "0.00"}
-                          </td>
-                        </tr>
-                        <tr className="bg-gray-50">
-                          <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
-                            {puntajeEdificacionExistente.toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
+                    <table className="min-w-full border rounded-md"><thead className="bg-gray-50"><tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
+                    </tr></thead><tbody className="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación del edificio</td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="number"
+                            min="0.00"
+                            step="0.01"
+                            placeholder="0-1"
+                            readOnly
+                            value={depreciacion}
+                            onChange={(e) => setDepreciacion(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>                          
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {depreciacion ? parseFloat(depreciacion).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">5%</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {depreciacion ? (parseFloat(depreciacion) * 5).toFixed(2) : "0.00"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Estados de los componentes y sistemas</td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="number"
+                            min="0.00"
+                            readOnly
+                            step="0.01"
+                            placeholder="0-1"
+                            value={estadoComponentes}
+                            onChange={(e) => setEstadoComponentes(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>                          
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {estadoComponentes ? parseFloat(estadoComponentes).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">10%</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {estadoComponentes ? (parseFloat(estadoComponentes) * 10).toFixed(2) : "0.00"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Condición de funcionalidad y normativa del edificio</td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="number"
+                            min="0.00"
+                            readOnly
+                            step="0.01"
+                            placeholder="0-1"
+                            value={condicionFuncionalidad}
+                            onChange={(e) => setCondicionFuncionalidad(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>                          
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {condicionFuncionalidad ? parseFloat(condicionFuncionalidad).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">20%</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {condicionFuncionalidad ? (parseFloat(condicionFuncionalidad) * 20).toFixed(2) : "0.00"}
+                        </td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
+                          {puntajeEdificacionExistente.toFixed(2)}
+                        </td>
+                      </tr>
+                    </tbody>
                     </table>
                   </div>
                 </>
@@ -796,13 +780,14 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
               {isInitialized && (
                 <>
                   
-                  
-                  {/* Tablas de ejes */}
-                  {ejes.map(eje => (
-                    <div key={eje.id}>
-                      {renderTablaEje(eje.id)}
-                    </div>
-                  ))}
+                    {/* Tablas de ejes */}
+                  <div>
+                    {ejes.map(eje => (
+                      <div key={`eje-${eje.id}`}>
+                        {renderTablaEje(eje.id)}
+                      </div>
+                    ))}
+                  </div>
 
                   {/* Tabla de Total General */}
                   <div className="mt-8 border-t pt-6">
@@ -818,67 +803,34 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje Obtenido</th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">                          {/* Filas para los ejes */}
-                          {ejes.map(eje => (
-                            <tr key={`total_${eje.id}`}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                                {eje.eje}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center">
-                                {eje.peso}%
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center">
-                                {calcularTotalEje(eje.id)}
-                              </td>
-                            </tr>
-                          ))}
-                          
-                          {/* Fila para edificación existente o nueva */}
-                          {buildingType === "existing" ? (
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-50">
-                                Edificación Existente
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">
-                                35%
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">
-                                {puntajeEdificacionExistente.toFixed(2)}
-                              </td>
-                            </tr>
-                          ) : (
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-blue-50">
-                                Edificación Nueva
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">
-                                0%
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">
-                                0.00
-                              </td>
-                            </tr>
-                          )}
-                          
-                          {/* Fila del total general */}
-                          <tr className="bg-blue-50">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                              TOTAL GENERAL
-                            </td>                            
-                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium">
-                              {ejes.reduce((sum, eje) => sum + eje.peso, 0) + (buildingType === "existing" ? 35 : 0)}%
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium text-blue-600">
-                              {(() => {
-                                const total = ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) +
-                                  (buildingType === "existing" ? puntajeEdificacionExistente : 0);
-                                if (totalGeneral !== total.toFixed(2)) setTotalGeneral(total.toFixed(2));
-                                return total.toFixed(2);
-                              })()}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                        <tbody className="bg-white divide-y divide-gray-200">{ejes.map(eje => (
+                        <tr key={`total_${eje.id}`}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{eje.eje}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">{eje.peso}%</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">{calcularTotalEje(eje.id)}</td>
+                        </tr>
+                      ))}{buildingType === "existing" ? (
+                        <tr key="existing-building">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-50">Edificación Existente</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">35%</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">{puntajeEdificacionExistente.toFixed(2)}</td>
+                        </tr>
+                      ) : (
+                        <tr key="new-building">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-blue-50">Edificación Nueva</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0%</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0.00</td>
+                        </tr>
+                      )}<tr key="total-general">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">TOTAL GENERAL</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center font-medium">{ejes.reduce((sum, eje) => sum + eje.peso, 0) + (buildingType === "existing" ? 35 : 0)}%</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center font-medium text-blue-600">{(() => {
+                          const total = ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) +
+                            (buildingType === "existing" ? puntajeEdificacionExistente : 0);
+                          if (totalGeneral !== total.toFixed(2)) setTotalGeneral(total.toFixed(2));
+                          return total.toFixed(2);
+                        })()}</td>
+                      </tr></tbody></table>
                     </div>
                   </div>
                 </>
