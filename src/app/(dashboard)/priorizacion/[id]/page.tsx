@@ -10,9 +10,22 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { getEjes, getCriterios, getParametros } from "../crearProyecto/actions";
+import { Download, FileText, ExternalLink } from "lucide-react";
 
 // Interfaces para los tipos de datos
 import type { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, Sedes } from "../types";
+
+interface DocumentoProyecto {
+  _id: string;
+  name: string;
+  url: string;
+  description: string;
+  projectId: string;
+  userId: string;
+  type: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function VerProyectoPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -21,6 +34,11 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
     const [projectName, setProjectName] = useState("");
     // const [_projectDescription, setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
+    
+    // PDF state management
+    const [documentos, setDocumentos] = useState<DocumentoProyecto[]>([]);
+    const [loadingDocumentos, setLoadingDocumentos] = useState(false);
+    const [documentosError, setDocumentosError] = useState<string | null>(null);
     
     // Cargar datos del proyecto
     useEffect(() => {
@@ -74,6 +92,65 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
       };
 
       void fetchProyecto();
+    }, [id]);
+
+    // Fetch PDFs from API
+    const fetchDocumentos = async () => {
+      try {
+        setLoadingDocumentos(true);
+        setDocumentosError(null);
+        
+        const response = await fetch(`/api/priorizacion/${id}/documentos`);
+        
+        if (!response.ok) {
+          throw new Error("Error al cargar los documentos");
+        }
+        
+        const result = await response.json() as { status: string; data: DocumentoProyecto[]; message?: string };
+        
+        if (result.status === "success") {
+          setDocumentos(result.data);
+        } else {
+          throw new Error(result.message ?? "Error al cargar los documentos");
+        }
+      } catch (error) {
+        console.error("Error al cargar documentos:", error);
+        setDocumentosError(error instanceof Error ? error.message : "Error desconocido");
+        setDocumentos([]);
+      } finally {
+        setLoadingDocumentos(false);
+      }
+    };
+
+    // Handle PDF download
+    const handleDownload = async (documento: DocumentoProyecto) => {
+      try {
+        const response = await fetch(documento.url);
+        const blob = await response.blob();
+        
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = documento.name;
+        document.body.appendChild(link);
+        link.click();
+        
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error("Error al descargar el archivo:", error);
+      }
+    };
+
+    // Handle PDF view in new tab
+    const handleView = (documento: DocumentoProyecto) => {
+      window.open(documento.url, '_blank');
+    };
+
+    // Fetch PDFs when component loads
+    useEffect(() => {
+      void fetchDocumentos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
     const [selectedBuilding, setSelectedBuilding] = useState("");
     const [depreciacion, setDepreciacion] = useState("");
@@ -676,6 +753,69 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                   </div>
                 </>
               )}
+              
+              {/* Sección de documentos PDF */}
+              <div className="mt-8 border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Documentos del Proyecto</h3>
+                
+                {loadingDocumentos ? (
+                  <div className="flex items-center justify-center p-6">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <span className="ml-2 text-gray-600">Cargando documentos...</span>
+                  </div>
+                ) : documentosError ? (
+                  <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
+                    <p>{documentosError}</p>
+                  </div>
+                ) : documentos.length === 0 ? (
+                  <div className="bg-gray-50 border border-gray-200 text-gray-600 p-6 rounded-md text-center">
+                    <FileText className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                    <p>No hay documentos disponibles para este proyecto.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {documentos.map((documento) => (
+                      <div
+                        key={documento._id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start space-x-3">
+                          <FileText className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-gray-900 truncate">
+                              {documento.name}
+                            </h4>
+                            {documento.description && (
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                {documento.description}
+                              </p>
+                            )}
+                            <div className="flex items-center space-x-2 mt-3">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleView(documento)}
+                                className="flex items-center space-x-1"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                <span>Ver</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleDownload(documento)}
+                                className="flex items-center space-x-1"
+                              >
+                                <Download className="h-3 w-3" />
+                                <span>Descargar</span>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               
             </div>
             

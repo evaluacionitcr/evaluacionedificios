@@ -409,13 +409,13 @@ export default function CrearProyectoPage() {
           setIsSaving(false);
         }
         
-        alert("Proyecto guardado exitosamente!");
+        toast.success("Proyecto guardado exitosamente!");
         window.location.href = "/priorizacion";
       } else {
         throw new Error(result.message ?? "Error al guardar el proyecto");
       }
       } catch (error) {
-      alert("Ocurrió un error al guardar el proyecto.");
+      toast.error("Ocurrió un error al guardar el proyecto.");
       console.error(error);
       setIsSaving(false);
       }
