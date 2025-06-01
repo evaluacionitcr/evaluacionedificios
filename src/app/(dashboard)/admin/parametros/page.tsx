@@ -202,11 +202,6 @@ export default function Page(): JSX.Element {
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Criterios para evaluación</h1>
-        <div className="flex gap-2">
-          <Link href="/parametros/ejemplo">
-            <Button>Previsualizar Evaluacion</Button>
-          </Link>
-        </div>
       </div>
 
       <div className="container mx-auto py-6 border border-gray-300 rounded-xl">
