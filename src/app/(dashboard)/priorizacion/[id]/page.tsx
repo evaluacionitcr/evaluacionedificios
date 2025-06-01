@@ -298,15 +298,19 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
     
     // Inicializar el estado de parámetros seleccionados
     useEffect(() => {
-      if (!loading && criterios.length > 0) {
+      if (!loading && criterios.length > 0 && Object.keys(selectedParametros).length === 0) {
+        // Solo inicializar si no hay parámetros seleccionados
         const initialSelectedParams: Record<string, string> = {};
         criterios.forEach(criterio => {
           initialSelectedParams[`criterio_${criterio.id}`] = "";
         });
         setSelectedParametros(initialSelectedParams);
         setIsInitialized(true);
+      } else if (!loading && criterios.length > 0) {
+        // Si hay datos cargados y criterios disponibles, marcar como inicializado
+        setIsInitialized(true);
       }
-    }, [criterios, loading]);
+    }, [criterios, loading, selectedParametros]);
     
     // Función para obtener el valor de un parámetro seleccionado
     const getParametroValor = (parametroId: string | undefined): number => {
