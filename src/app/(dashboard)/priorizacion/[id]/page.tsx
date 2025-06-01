@@ -55,28 +55,33 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
           
           // Actualizar estados con la información del proyecto
           setProjectName(proyecto.data.informacionGeneral.nombre);
+          // setProjectDescription(proyecto.data.informacionGeneral.descripcion);
           setBuildingType(proyecto.data.informacionGeneral.tipoEdificacion);
           setSelectedBuilding(proyecto.data.informacionGeneral.edificioSeleccionado ?? "");
           setSelectedSede(proyecto.data.informacionGeneral.sede ?? "");
           setTotalGeneral(proyecto.data.totalGeneral.toString());
           
-          // Procesar los parámetros seleccionados
+          // Si es edificación existente, establecer los valores
+          if (proyecto.data.edificacionExistente) {
+            setDepreciacion(proyecto.data.edificacionExistente.depreciacion?.toString() ?? "0");
+            setEstadoComponentes(proyecto.data.edificacionExistente.estadoComponentes?.toString() ?? "0");
+            setCondicionFuncionalidad(proyecto.data.edificacionExistente.condicionFuncionalidad?.toString() ?? "0");
+          }
+
+          // Establecer los parámetros seleccionados 
+          const parametrosSeleccionados: Record<string, string> = {};
           if (proyecto.data.evaluacion) {
-            const parametrosSeleccionados: Record<string, string> = {};
-            Object.entries(proyecto.data.evaluacion).forEach(([eje, datos]) => {
+            Object.entries(proyecto.data.evaluacion).forEach(([_eje, datos]) => {
               if (datos && typeof datos === 'object') {
-                Object.entries(datos).forEach(([criterioId, valor]) => {
-                  if (criterioId !== 'totalPuntaje' && valor && typeof valor === 'object' && 'id' in valor) {
-                    parametrosSeleccionados[`criterio_${criterioId}`] = String(valor.id);
+                Object.entries(datos).forEach(([criterioKey, valor]) => {
+                  if (criterioKey !== 'totalPuntaje' && valor && typeof valor === 'object' && 'id' in valor) {
+                    parametrosSeleccionados[criterioKey] = String(valor.id);
                   }
                 });
               }
             });
-            setSelectedParametros(parametrosSeleccionados);
           }
-
-          // Marcar como inicializado después de cargar todos los datos
-          setIsInitialized(true);
+          setSelectedParametros(parametrosSeleccionados);
           
         } catch (error) {
           console.error("Error al cargar el proyecto:", error);
