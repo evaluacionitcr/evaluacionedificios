@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, Document } from "mongodb";
+import { NextResponse } from "next/server";
+import { MongoClient } from "mongodb";
 
 interface Evaluacion {
   edificio: {
@@ -51,16 +51,18 @@ interface Evaluacion {
   idEvaluador: string;
 }
 
-const uri = process.env.MONGODB_URI ??'';
-const client = new MongoClient(uri);
-const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
-const collectionName = process.env.COLLECTION_NAME ??"evaluaciones";
-const db = client.db(dbName);
-const collection = db.collection(collectionName);
+const uri = process.env.MONGODB_URI ?? '';
+const dbName = process.env.DB_NAME ?? "evaluacionedificiositcr";
+const collectionName = process.env.COLLECTION_NAME ?? "evaluaciones";
 
 export async function GET() {
+    const client = new MongoClient(uri);
+    
     try {
         await client.connect();
+        
+        const db = client.db(dbName);
+        const collection = db.collection(collectionName);
         
         // Get all documents from the collection
          const documents = await collection.aggregate([
@@ -83,7 +85,6 @@ export async function GET() {
                 $replaceRoot: { newRoot: "$latestEvaluation" }
             }
         ]).toArray() as unknown as Evaluacion[];
-        await client.close();
         
         return NextResponse.json({ 
             status: "success", 
@@ -97,6 +98,8 @@ export async function GET() {
             message: "Failed to retrieve documents",
             error: error instanceof Error ? error.message : "Unknown error"
         }, { status: 500 });
+    } finally {
+        await client.close();
     }
 }
 

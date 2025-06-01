@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link"; 
 import { Button } from "~/components/ui/button";
 import {
@@ -10,32 +10,50 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { getEjes, getCriterios, getParametros } from "./actions";
+import { useUploadThing } from "~/utils/uploadthing";
+import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
+import { Upload, X } from "lucide-react";
+import { LoadingSpinnerSVG } from "~/components/ui/svg";
 
 // Interfaces para los tipos de datos
 import type { Eje, Criterio, Parametro, ApiResponse, Evaluacion, Sedes } from "../types";
 
-export default function CrearProyectoPage() {
+interface StagedFile {
+  id: string;
+  file: File;
+  preview?: string;
+}
 
+export default function CrearProyectoPage() {
+    // Basic form states
     const [totalGeneral, setTotalGeneral] = useState("");
     const [projectName, setProjectName] = useState("");
-    const [_projectDescription, _setProjectDescription] = useState("");
+    // const [projectDescription, setProjectDescription] = useState(""); // Currently unused
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
     const [selectedBuilding, setSelectedBuilding] = useState("");
     const [depreciacion, setDepreciacion] = useState("");
     const [estadoComponentes, setEstadoComponentes] = useState("");
     const [condicionFuncionalidad, setCondicionFuncionalidad] = useState("");
-  // Estado para manejar dinámicamente los parámetros seleccionados
+    
+    // Dynamic parameter management
     const [selectedParametros, setSelectedParametros] = useState<Record<string, string>>({});
-    // Estado para controlar si la inicialización se ha completado
     const [isInitialized, setIsInitialized] = useState(false);
-    // Estados para la gestión de ejes, criterios y parámetros
+    
+    // Data management for ejes, criterios and parametros
     const [ejes, setEjes] = useState<Eje[]>([]);
     const [criterios, setCriterios] = useState<Criterio[]>([]);
     const [parametros, setParametros] = useState<Parametro[]>([]);
-      // Variable calculada para el puntaje total de edificación existente
+    
+    
+    // PDF upload states
+    const [stagedFiles, setStagedFiles] = useState<StagedFile[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Variable calculada para el puntaje total de edificación existente
     const puntajeEdificacionExistente = buildingType === "existing" 
       ? ((depreciacion ? (parseFloat(depreciacion) * 5) : 0) + 
-         (estadoComponentes ? (parseFloat(estadoComponentes) * 10) : 0) + 
+         (estadoComponentes ? (parseFloat(estadoComponentes) * 10) : 0) +
          (condicionFuncionalidad ? (parseFloat(condicionFuncionalidad) * 20) : 0))
       : 0;
     
@@ -45,19 +63,9 @@ export default function CrearProyectoPage() {
     const [loadError, setLoadError] = useState<string | null>(null);
 
     // Variables para manejar la evaluación reciente
-    const [_evaluacionesPorCodigo, _setEvaluacionesPorCodigo] = useState<Record<string, Evaluacion[]>>({});
     const [evaluacionRecientePorCodigo, setEvaluacionRecientePorCodigo] = useState<Record<string, Evaluacion | null>>({});
     const [sedes, setSedes] = useState<Sedes[]>([]);
     const [selectedSede, setSelectedSede] = useState("");
-    // Estados para el manejo de formularios de nuevos elementos
-    const [_showAddEjeForm, _setShowAddEjeForm] = useState(false);
-    const [_showAddCriterioForm, _setShowAddCriterioForm] = useState(false);
-    const [_showAddParametroForm, _setShowAddParametroForm] = useState(false);
-    
-    // Estados para los nuevos elementos a agregar
-    const [newEje, setNewEje] = useState({ eje: "", peso: 0 });
-    const [newCriterio, setNewCriterio] = useState({ ejeId: 0, criterio: "", peso: 0 });
-    const [newParametro, setNewParametro] = useState({ criterioId: 0, parametro: "", peso: 0 });
     
     // Cargar datos desde el servidor
     useEffect(() => {
@@ -223,19 +231,65 @@ export default function CrearProyectoPage() {
       
       return total.toFixed(2);
     };
+
+
+      const { startUpload } = useUploadThing("pdfUploader", {
+        onUploadBegin() {
+          setIsSaving(true);
+          toast(
+            <div className="flex items-center gap-2">
+              <LoadingSpinnerSVG /> <span className="text-lg">Subiendo PDFs...</span>
+            </div>,
+            {
+              duration: 5000,
+              id: "uploading-toast",
+            },
+          );
+        },
+        onUploadError(_err) {
+          toast.dismiss("uploading-toast");
+          toast.error("Upload failed. Please try again.");
+          setIsSaving(false);
+        },
+        onClientUploadComplete: (res) => {
+          if (res && res.length > 0) {
+            setStagedFiles([]); // Clear staged files after successful upload
+          }
+          setIsSaving(false);
+          toast.dismiss("uploading-toast");
+          toast.success("PDFs guardados correctamente!");
+        },
+      });
     
-    // Función para agregar un nuevo eje (no usada actualmente)
-    const _handleAddEje = () => {
-      if (newEje.eje.trim() === "" || newEje.peso <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...ejes.map(e => e.id), 0) + 1;
-      setEjes([...ejes, { id: newId, eje: newEje.eje, peso: newEje.peso }]);
-      setNewEje({ eje: "", peso: 0 });
-      _setShowAddEjeForm(false);
-    };
+      const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        accept: {
+          'application/pdf': []
+        },
+        onDrop: (acceptedFiles) => {
+          const newStagedFiles = acceptedFiles.map(file => ({
+            id: crypto.randomUUID(),
+            file,
+          }));
+          setStagedFiles((prev: StagedFile[]) => [...prev, ...newStagedFiles]);
+        }
+      });
+    
+      const handleRemoveStaged = (id: string) => {
+        setStagedFiles((files: StagedFile[]) => {
+          return files.filter((f: StagedFile) => f.id !== id);
+        });
+      };
+
+      const handleUploadPDFs = async (projectId: string) => {
+        if (stagedFiles.length === 0) return;
+        
+        setIsSaving(true);
+        const files = stagedFiles.map(sf => sf.file);
+        await startUpload(files, {
+          projectId: projectId,
+          description: `PDFs for project: ${projectName}`
+        });
+      };
 
     const actualizarValoresEdificio = (codigo: string) => {
         const evaluacion = evaluacionRecientePorCodigo[codigo];
@@ -255,50 +309,7 @@ export default function CrearProyectoPage() {
         }
     };
     
-    // Función para agregar un nuevo criterio (no usada actualmente)
-    const _handleAddCriterio = () => {
-      if (newCriterio.ejeId === 0 || newCriterio.criterio.trim() === "" || newCriterio.peso <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...criterios.map(c => c.id), 0) + 1;
-      setCriterios([...criterios, { 
-        id: newId, 
-        ejeId: newCriterio.ejeId, 
-        criterio: newCriterio.criterio, 
-        peso: newCriterio.peso,
-        ejes_priorizacion_Id: newCriterio.ejeId
-      }]);
-      
-      // Actualizar el estado de parametros seleccionados para incluir el nuevo criterio
-      setSelectedParametros(prev => ({
-        ...prev,
-        [`criterio_${newId}`]: ""
-      }));
-      
-      setNewCriterio({ ejeId: 0, criterio: "", peso: 0 });
-      _setShowAddCriterioForm(false);
-    };
-    
-    // Función para agregar un nuevo parámetro (no usada actualmente)
-    const _handleAddParametro = () => {
-      if (newParametro.criterioId === 0 || newParametro.parametro.trim() === "") {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...parametros.map(p => p.id), 0) + 1;
-      setParametros([...parametros, { 
-        id: newId, 
-        parametro: newParametro.parametro, 
-        peso: newParametro.peso,
-        criterios_priorizacion_Id: newParametro.criterioId
-      }]);
-      
-      setNewParametro({ criterioId: 0, parametro: "", peso: 0 });
-      _setShowAddParametroForm(false);
-    };
+
     
     // Función para el envío del formulario
     const handleSubmit = async (e: React.FormEvent) => {
@@ -354,7 +365,7 @@ export default function CrearProyectoPage() {
       const formData = {
       informacionGeneral: {
         nombre: projectName, 
-        descripcion: _projectDescription, 
+        descripcion: "", // Description field currently not used in UI 
         tipoEdificacion: buildingType,
         edificioSeleccionado: selectedBuilding,
         nombreEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.nombre,
@@ -377,6 +388,7 @@ export default function CrearProyectoPage() {
       };
 
       try {
+      setIsSaving(true);
       const response = await fetch("/api/priorizacion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -387,13 +399,29 @@ export default function CrearProyectoPage() {
         throw new Error("Error al guardar el proyecto");
       }
 
-      alert("Proyecto guardado exitosamente!");
-      window.location.href = "/priorizacion";
+      const result = await response.json() as { status: string; insertedId?: string; message?: string };
+      
+      if (result.status === "success" && result.insertedId) {
+        // If there are PDFs to upload, upload them with the project ID
+        if (stagedFiles.length > 0) {
+          await handleUploadPDFs(result.insertedId);
+        } else {
+          setIsSaving(false);
+        }
+        
+        alert("Proyecto guardado exitosamente!");
+        window.location.href = "/priorizacion";
+      } else {
+        throw new Error(result.message ?? "Error al guardar el proyecto");
+      }
       } catch (error) {
       alert("Ocurrió un error al guardar el proyecto.");
       console.error(error);
+      setIsSaving(false);
       }
     };
+
+    
 
     
     // Componente para renderizar una tabla de eje
@@ -404,7 +432,7 @@ export default function CrearProyectoPage() {
       const criteriosDeEje = criterios.filter(c => c.ejeId === ejeId);
       
       return (
-        <div className="mt-6 border-t pt-6">
+        <div key={`eje_${ejeId}`} className="mt-6 border-t pt-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             {eje.eje} ({eje.peso}%)
           </h3>
@@ -586,7 +614,7 @@ export default function CrearProyectoPage() {
                             </SelectItem>
                           ))
                          : 
-                          <SelectItem disabled value="">No hay sedes disponibles</SelectItem>
+                          <SelectItem key="no-sedes" disabled value="">No hay sedes disponibles</SelectItem>
                         }
                       </SelectContent>
                     </Select>
@@ -655,7 +683,7 @@ export default function CrearProyectoPage() {
                           ) : null
                         )
                       ) : (
-                        <SelectItem disabled value={""}>No hay edificios disponibles</SelectItem>
+                        <SelectItem key="no-edificios" disabled value={""}>No hay edificios disponibles</SelectItem>
                       )}
                       </SelectContent>
                     </Select>
@@ -741,7 +769,8 @@ export default function CrearProyectoPage() {
                         </tr>
                         <tr className="bg-gray-50">
                           <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
+                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>
+                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
                             {puntajeEdificacionExistente.toFixed(2)}
                           </td>
                         </tr>
@@ -773,7 +802,8 @@ export default function CrearProyectoPage() {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje Obtenido</th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">                          {/* Filas para los ejes */}
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {/* Filas para los ejes */}
                           {ejes.map(eje => (
                             <tr key={`total_${eje.id}`}>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
@@ -836,13 +866,72 @@ export default function CrearProyectoPage() {
                       </table>
                     </div>
                   </div>
+                  <div className="mt-6 border-t pt-6">
+                    <h2 className="mb-4 text-xl font-semibold">
+                      Documentos del Proyecto (PDFs)
+                    </h2>
+          
+                    <div {...getRootProps()} className={`mb-4 border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}>
+                      <input {...getInputProps()} />
+                      <div className="flex flex-col items-center">
+                        <Upload className="h-12 w-12 text-gray-400 mb-2" />
+                        {isDragActive ? (
+                          <p>Suelta los archivos PDF aquí ...</p>
+                        ) : (
+                          <p>Arrastra y suelta archivos PDF aquí, o haz clic para seleccionar</p>
+                        )}
+                      </div>
+                    </div>
+          
+                    {/* Staged PDFs */}
+                    {stagedFiles.length > 0 && (
+                      <div className="mt-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="text-lg font-medium">
+                            PDFs seleccionados ({stagedFiles.length})
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Los PDFs se subirán cuando guardes el proyecto
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                          {stagedFiles.map((file) => (
+                            <div key={file.id} className="group relative overflow-hidden rounded-md border p-4">
+                              <div className="flex items-center space-x-3">
+                                <div className="flex-shrink-0">
+                                  <Upload className="h-8 w-8 text-red-500" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {file.file.name}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    {(file.file.size / 1024 / 1024).toFixed(2)} MB
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveStaged(file.id)}
+                                className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
               <div className="flex justify-end space-x-3 pt-4">
                 <Link href="/priorizacion">
-                  <Button variant="outline" className="px-6">Cancelar</Button>
+                  <Button variant="outline" className="px-6" disabled={isSaving}>Cancelar</Button>
                 </Link>
-                <Button type="submit" className="px-6">Guardar Proyecto</Button>
+                <Button type="submit" className="px-6" disabled={isSaving}>
+                  {isSaving ? "Guardando..." : "Guardar Proyecto"}
+                </Button>
               </div>
             </div>
           )}

@@ -19,7 +19,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
 
     const [totalGeneral, setTotalGeneral] = useState("");
     const [projectName, setProjectName] = useState("");
-    const [_projectDescription, setProjectDescription] = useState("");
+    // const [_projectDescription, setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
     
     // Cargar datos del proyecto
@@ -37,7 +37,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
           
           // Actualizar estados con la información del proyecto
           setProjectName(proyecto.data.informacionGeneral.nombre);
-          setProjectDescription(proyecto.data.informacionGeneral.descripcion);
+          // setProjectDescription(proyecto.data.informacionGeneral.descripcion);
           setBuildingType(proyecto.data.informacionGeneral.tipoEdificacion);
           setSelectedBuilding(proyecto.data.informacionGeneral.edificioSeleccionado ?? "");
           setSelectedSede(proyecto.data.informacionGeneral.sede ?? "");
@@ -602,7 +602,8 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                       </tr>
                       <tr className="bg-gray-50">
                         <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
                           {puntajeEdificacionExistente.toFixed(2)}
                         </td>
                       </tr>
@@ -639,39 +640,45 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje Obtenido</th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">{ejes.map(eje => (
-                        <tr key={`total_${eje.id}`}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{eje.eje}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">{eje.peso}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">{calcularTotalEje(eje.id)}</td>
-                        </tr>
-                      ))}{buildingType === "existing" ? (
-                        <tr key="existing-building">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-50">Edificación Existente</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">35%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">{puntajeEdificacionExistente.toFixed(2)}</td>
-                        </tr>
-                      ) : (
-                        <tr key="new-building">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-blue-50">Edificación Nueva</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0.00</td>
-                        </tr>
-                      )}<tr key="total-general">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">TOTAL GENERAL</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center font-medium">{ejes.reduce((sum, eje) => sum + eje.peso, 0) + (buildingType === "existing" ? 35 : 0)}%</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center font-medium text-blue-600">{(() => {
-                          const total = ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) +
-                            (buildingType === "existing" ? puntajeEdificacionExistente : 0);
-                          if (totalGeneral !== total.toFixed(2)) setTotalGeneral(total.toFixed(2));
-                          return total.toFixed(2);
-                        })()}</td>
-                      </tr></tbody></table>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {ejes.map(eje => (
+                            <tr key={`total_${eje.id}`}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{eje.eje}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center">{eje.peso}%</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center">{calcularTotalEje(eje.id)}</td>
+                            </tr>
+                          ))}
+                          {buildingType === "existing" ? (
+                            <tr key="existing-building">
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-50">Edificación Existente</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">35%</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">{puntajeEdificacionExistente.toFixed(2)}</td>
+                            </tr>
+                          ) : (
+                            <tr key="new-building">
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-blue-50">Edificación Nueva</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0%</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0.00</td>
+                            </tr>
+                          )}
+                          <tr key="total-general">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">TOTAL GENERAL</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium">{ejes.reduce((sum, eje) => sum + eje.peso, 0) + (buildingType === "existing" ? 35 : 0)}%</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium text-blue-600">{(() => {
+                              const total = ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) +
+                                (buildingType === "existing" ? puntajeEdificacionExistente : 0);
+                              if (totalGeneral !== total.toFixed(2)) setTotalGeneral(total.toFixed(2));
+                              return total.toFixed(2);
+                            })()}</td>
+                          </tr>
+                        </tbody></table>
                     </div>
                   </div>
                 </>
               )}
+              
             </div>
+            
           )}
         
       </div>
