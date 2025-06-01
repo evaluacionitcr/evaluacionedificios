@@ -10,17 +10,35 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { getEjes, getCriterios, getParametros } from "../crearProyecto/actions";
+import { Download, FileText, ExternalLink } from "lucide-react";
 
 // Interfaces para los tipos de datos
-import { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, EjeTotal, Sedes } from "../types";
+import type { Eje, Criterio, Parametro, FormularioProyecto, ApiResponse, Evaluacion, Sedes } from "../types";
+
+interface DocumentoProyecto {
+  _id: string;
+  name: string;
+  url: string;
+  description: string;
+  projectId: string;
+  userId: string;
+  type: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function VerProyectoPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
 
     const [totalGeneral, setTotalGeneral] = useState("");
     const [projectName, setProjectName] = useState("");
-    const [projectDescription, setProjectDescription] = useState("");
+    // const [_projectDescription, setProjectDescription] = useState("");
     const [buildingType, setBuildingType] = useState("new"); // "new" or "existing"
+    
+    // PDF state management
+    const [documentos, setDocumentos] = useState<DocumentoProyecto[]>([]);
+    const [loadingDocumentos, setLoadingDocumentos] = useState(false);
+    const [documentosError, setDocumentosError] = useState<string | null>(null);
     
     // Cargar datos del proyecto
     useEffect(() => {
@@ -33,26 +51,26 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
             throw new Error("Error al obtener el proyecto");
           }
 
-          const proyecto = await response.json();
+          const proyecto = await response.json() as { data: FormularioProyecto };
           
           // Actualizar estados con la información del proyecto
           setProjectName(proyecto.data.informacionGeneral.nombre);
-          setProjectDescription(proyecto.data.informacionGeneral.descripcion);
+          // setProjectDescription(proyecto.data.informacionGeneral.descripcion);
           setBuildingType(proyecto.data.informacionGeneral.tipoEdificacion);
-          setSelectedBuilding(proyecto.data.informacionGeneral.edificioSeleccionado || "");
-          setSelectedSede(proyecto.data.informacionGeneral.sede || "");
-          setTotalGeneral(proyecto.data.totalGeneral);
+          setSelectedBuilding(proyecto.data.informacionGeneral.edificioSeleccionado ?? "");
+          setSelectedSede(proyecto.data.informacionGeneral.sede ?? "");
+          setTotalGeneral(proyecto.data.totalGeneral.toString());
           
           // Si es edificación existente, establecer los valores
           if (proyecto.data.edificacionExistente) {
-            setDepreciacion(proyecto.data.edificacionExistente.depreciacion.toString());
-            setEstadoComponentes(proyecto.data.edificacionExistente.estadoComponentes.toString());
-            setCondicionFuncionalidad(proyecto.data.edificacionExistente.condicionFuncionalidad.toString());
+            setDepreciacion(proyecto.data.edificacionExistente.depreciacion?.toString() ?? "0");
+            setEstadoComponentes(proyecto.data.edificacionExistente.estadoComponentes?.toString() ?? "0");
+            setCondicionFuncionalidad(proyecto.data.edificacionExistente.condicionFuncionalidad?.toString() ?? "0");
           }
 
-          // Establecer los parámetros seleccionados
+          // Establecer los parámetros seleccionados 
+          const parametrosSeleccionados: Record<string, string> = {};
           if (proyecto.data.evaluacion) {
-            const parametrosSeleccionados: Record<string, string> = {};
             Object.entries(proyecto.data.evaluacion).forEach(([_eje, datos]) => {
               if (datos && typeof datos === 'object') {
                 Object.entries(datos).forEach(([criterioKey, valor]) => {
@@ -62,9 +80,8 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                 });
               }
             });
-            setSelectedParametros(parametrosSeleccionados);
-            setIsInitialized(true);
           }
+          setSelectedParametros(parametrosSeleccionados);
           
         } catch (error) {
           console.error("Error al cargar el proyecto:", error);
@@ -75,6 +92,65 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
       };
 
       void fetchProyecto();
+    }, [id]);
+
+    // Fetch PDFs from API
+    const fetchDocumentos = async () => {
+      try {
+        setLoadingDocumentos(true);
+        setDocumentosError(null);
+        
+        const response = await fetch(`/api/priorizacion/${id}/documentos`);
+        
+        if (!response.ok) {
+          throw new Error("Error al cargar los documentos");
+        }
+        
+        const result = await response.json() as { status: string; data: DocumentoProyecto[]; message?: string };
+        
+        if (result.status === "success") {
+          setDocumentos(result.data);
+        } else {
+          throw new Error(result.message ?? "Error al cargar los documentos");
+        }
+      } catch (error) {
+        console.error("Error al cargar documentos:", error);
+        setDocumentosError(error instanceof Error ? error.message : "Error desconocido");
+        setDocumentos([]);
+      } finally {
+        setLoadingDocumentos(false);
+      }
+    };
+
+    // Handle PDF download
+    const handleDownload = async (documento: DocumentoProyecto) => {
+      try {
+        const response = await fetch(documento.url);
+        const blob = await response.blob();
+        
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = documento.name;
+        document.body.appendChild(link);
+        link.click();
+        
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error("Error al descargar el archivo:", error);
+      }
+    };
+
+    // Handle PDF view in new tab
+    const handleView = (documento: DocumentoProyecto) => {
+      window.open(documento.url, '_blank');
+    };
+
+    // Fetch PDFs when component loads
+    useEffect(() => {
+      void fetchDocumentos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
     const [selectedBuilding, setSelectedBuilding] = useState("");
     const [depreciacion, setDepreciacion] = useState("");
@@ -101,19 +177,10 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
     const [loadError, setLoadError] = useState<string | null>(null);
 
     // Variables para manejar la evaluación reciente
-    const [evaluacionesPorCodigo, setEvaluacionesPorCodigo] = useState<Record<string, Evaluacion[]>>({});
     const [evaluacionRecientePorCodigo, setEvaluacionRecientePorCodigo] = useState<Record<string, Evaluacion | null>>({});
     const [sedes, setSedes] = useState<Sedes[]>([]);
     const [selectedSede, setSelectedSede] = useState("");
-    // Estados para el manejo de formularios de nuevos elementos
-    const [showAddEjeForm, setShowAddEjeForm] = useState(false);
-    const [showAddCriterioForm, setShowAddCriterioForm] = useState(false);
-    const [showAddParametroForm, setShowAddParametroForm] = useState(false);
-    
-    // Estados para los nuevos elementos a agregar
-    const [newEje, setNewEje] = useState({ eje: "", peso: 0 });
-    const [newCriterio, setNewCriterio] = useState({ ejeId: 0, criterio: "", peso: 0 });
-    const [newParametro, setNewParametro] = useState({ criterioId: 0, parametro: "", peso: 0 });
+    // Estados para el manejo de formularios de nuevos elementos (no usados en vista de solo lectura)
     
     // Cargar datos desde el servidor
     useEffect(() => {
@@ -177,7 +244,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
         }
       };
       
-      fetchData();
+      void fetchData();
     }, []);
 
    
@@ -218,7 +285,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
             throw new Error("Error al obtener sedes");
           }
 
-          const data = await response.json();
+          const data = await response.json() as Sedes[];
           setSedes(data);
 
         } catch (error) {
@@ -229,9 +296,9 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
       void fetchSedes();
     }, []);
     
-    // Inicializar el estado de parámetros seleccionados solo si no hay datos
+    // Inicializar el estado de parámetros seleccionados
     useEffect(() => {
-      if (!loading && criterios.length > 0 && Object.keys(selectedParametros).length === 0) {
+      if (!loading && criterios.length > 0) {
         const initialSelectedParams: Record<string, string> = {};
         criterios.forEach(criterio => {
           initialSelectedParams[`criterio_${criterio.id}`] = "";
@@ -239,15 +306,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
         setSelectedParametros(initialSelectedParams);
         setIsInitialized(true);
       }
-    }, [criterios, loading, selectedParametros]);
-    
-    // Función para manejar cambios en los parámetros seleccionados
-    const handleParametroChange = (criterioId: number, value: string) => {
-      setSelectedParametros(prev => ({
-        ...prev,
-        [`criterio_${criterioId}`]: value
-      }));
-    };
+    }, [criterios, loading]);
     
     // Función para obtener el valor de un parámetro seleccionado
     const getParametroValor = (parametroId: string | undefined): number => {
@@ -279,19 +338,6 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
       
       return total.toFixed(2);
     };
-    
-    // Función para agregar un nuevo eje
-    const handleAddEje = () => {
-      if (newEje.eje.trim() === "" || newEje.peso <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...ejes.map(e => e.id), 0) + 1;
-      setEjes([...ejes, { id: newId, eje: newEje.eje, peso: newEje.peso }]);
-      setNewEje({ eje: "", peso: 0 });
-      setShowAddEjeForm(false);
-    };
 
     const actualizarValoresEdificio = (codigo: string) => {
         const evaluacion = evaluacionRecientePorCodigo[codigo];
@@ -310,142 +356,6 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
           setCondicionFuncionalidad(puntajeServiciabilidad.toString());
         }
     };
-    
-    // Función para agregar un nuevo criterio
-    const handleAddCriterio = () => {
-      if (newCriterio.ejeId === 0 || newCriterio.criterio.trim() === "" || newCriterio.peso <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...criterios.map(c => c.id), 0) + 1;
-      setCriterios([...criterios, { 
-        id: newId, 
-        ejeId: newCriterio.ejeId, 
-        criterio: newCriterio.criterio, 
-        peso: newCriterio.peso,
-        ejes_priorizacion_Id: newCriterio.ejeId
-      }]);
-      
-      // Actualizar el estado de parametros seleccionados para incluir el nuevo criterio
-      setSelectedParametros(prev => ({
-        ...prev,
-        [`criterio_${newId}`]: ""
-      }));
-      
-      setNewCriterio({ ejeId: 0, criterio: "", peso: 0 });
-      setShowAddCriterioForm(false);
-    };
-    
-    // Función para agregar un nuevo parámetro
-    const handleAddParametro = () => {
-      if (newParametro.criterioId === 0 || newParametro.parametro.trim() === "") {
-        alert("Por favor, complete todos los campos correctamente.");
-        return;
-      }
-      
-      const newId = Math.max(...parametros.map(p => p.id), 0) + 1;
-      setParametros([...parametros, { 
-        id: newId, 
-        parametro: newParametro.parametro, 
-        peso: newParametro.peso,
-        criterios_priorizacion_Id: newParametro.criterioId
-      }]);
-      
-      setNewParametro({ criterioId: 0, parametro: "", peso: 0 });
-      setShowAddParametroForm(false);
-    };
-    
-    // Función para el envío del formulario
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-
-      // Validate sede selection for new buildings
-      if (buildingType === "new" && !selectedSede) {
-        alert("Por favor, seleccione una sede para la nueva edificación.");
-        return;
-      }
-
-      // Construir el objeto para el envío
-      const parametrosData: Record<string, any> = {};
-      
-      ejes.forEach(eje => {
-      const criteriosDeEje = criterios.filter(c => c.ejeId === eje.id);
-      const ejePuntajes: Record<string, any> = {};
-      
-      criteriosDeEje.forEach(criterio => {
-        const criterioKey = `criterio_${criterio.id}`;
-        const parametroSeleccionado = selectedParametros[criterioKey];
-        
-        // Si se seleccionó un parámetro para este criterio
-        if (parametroSeleccionado) {
-        const parametro = parametros.find(p => p.id.toString() === parametroSeleccionado);
-        
-        ejePuntajes[criterioKey] = {
-          id: parametroSeleccionado,
-          valor: getParametroValor(parametroSeleccionado),
-          puntaje: calcularPuntaje(parametroSeleccionado, criterio.id),
-          parametroTexto: parametro?.parametro || ""
-        };
-        } else {
-        ejePuntajes[criterioKey] = {
-          id: "",
-          valor: 0,
-          puntaje: "0.00",
-          parametroTexto: ""
-        };
-        }
-      });
-      
-      ejePuntajes.totalPuntaje = calcularTotalEje(eje.id);
-      parametrosData[eje.eje.toLowerCase()] = ejePuntajes;
-      });
-      
-      // Construir el objeto completo de datos
-      const formData = {
-      informacionGeneral: {
-        nombre: projectName, 
-        descripcion: projectDescription, 
-        tipoEdificacion: buildingType,
-        edificioSeleccionado: selectedBuilding,
-        nombreEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.nombre,
-        campusEdificio: evaluacionRecientePorCodigo[selectedBuilding]?.edificio?.campus,
-        sede: buildingType === "new" ? selectedSede : undefined
-      },        
-      edificacionExistente: buildingType === "existing" ? {          
-        depreciacion: depreciacion ? parseFloat(depreciacion) : 0,
-        estadoComponentes: estadoComponentes ? parseFloat(estadoComponentes) : 0,
-        condicionFuncionalidad: condicionFuncionalidad ? parseFloat(condicionFuncionalidad) : 0,
-        totalPuntaje: puntajeEdificacionExistente.toFixed(2)
-      } : null,
-      configuracion: {
-        ejes: ejes,
-        criterios: criterios,
-        parametros: parametros
-      },
-      evaluacion: parametrosData,
-      totalGeneral: totalGeneral
-      };
-
-      try {
-      const response = await fetch("/api/priorizacion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al guardar el proyecto");
-      }
-
-      alert("Proyecto guardado exitosamente!");
-      window.location.href = "/priorizacion";
-      } catch (error) {
-      alert("Ocurrió un error al guardar el proyecto.");
-      console.error(error);
-      }
-    };
-
     
     // Componente para renderizar una tabla de eje
     const renderTablaEje = (ejeId: number) => {
@@ -473,7 +383,7 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
               <tbody className="bg-white divide-y divide-gray-200">
                 {criteriosDeEje.length > 0 ? (
                   criteriosDeEje.map((criterio) => (
-                    <tr key={criterio.id}>
+                    <tr key={`criterio-${criterio.id}`}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                         {criterio.criterio}
                       </td>
@@ -622,57 +532,48 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                       <SelectTrigger id="sede" className="w-full h-11">
                         <SelectValue placeholder="Seleccionar sede" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {sedes.length > 0 ? 
-                          sedes.map((sede) => (
-                            <SelectItem key={sede.idSede} value={sede.nombre}>
-                              {sede.nombre}
-                            </SelectItem>
-                          ))
-                         : 
-                          <SelectItem disabled value="">No hay sedes disponibles</SelectItem>
-                        }
-                      </SelectContent>
+                      <SelectContent>{sedes.length > 0 ? 
+                        sedes.map((sede) => (
+                          <SelectItem 
+                            key={`sede-${sede.idSede || sede.nombre}`} 
+                            value={sede.nombre || '_no_value_'}
+                          >{sede.nombre}</SelectItem>
+                        )) : 
+                        <SelectItem key="no-sedes" value="_no_sedes_">No hay sedes disponibles</SelectItem>
+                      }</SelectContent>
                     </Select>
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="min-w-full border rounded-md">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600 bg-red-100">No hay posibilidad de reacondicionar edificio existente</td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600 bg-red-100">Se cuenta con viabilidad ambiental</td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600 bg-red-100">Es requerido para mejorar el servicio</td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                          <td className="px-6 py-4 whitespace-nowrap"></td>
-                        </tr>
-                        <tr className="bg-gray-50">
-                          <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium">0%</td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium">0%</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <table className="min-w-full border rounded-md"><thead className="bg-gray-50"><tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
+                    </tr></thead><tbody className="bg-white divide-y divide-gray-200"><tr>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación del edificio</td>
+                      <td className="px-6 py-4">
+                        <input type="number" min="0.00" step="0.01" placeholder="0-1" readOnly 
+                          value={depreciacion}
+                          onChange={(e) => setDepreciacion(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{depreciacion ? parseFloat(depreciacion).toFixed(2) : "0.00"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">5%</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{depreciacion ? (parseFloat(depreciacion) * 5).toFixed(2) : "0.00"}</td>
+                    </tr><tr>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Estados de los componentes y sistemas</td>
+                      <td className="px-6 py-4">
+                        <input type="number" min="0.00" readOnly step="0.01" placeholder="0-1" 
+                          value={estadoComponentes}
+                          onChange={(e) => setEstadoComponentes(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{estadoComponentes ? parseFloat(estadoComponentes).toFixed(2) : "0.00"}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">10%</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">{estadoComponentes ? (parseFloat(estadoComponentes) * 10).toFixed(2) : "0.00"}</td>
+                    </tr></tbody></table>
                   </div>
                   </>
               )}
@@ -689,107 +590,101 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                       <SelectTrigger id="building" className="w-full h-11">
                         <SelectValue placeholder="Seleccionar edificio" />
                       </SelectTrigger>
-                      <SelectContent>
-                      {Object.keys(evaluacionRecientePorCodigo).length > 0 ? (
+                      <SelectContent>{Object.keys(evaluacionRecientePorCodigo).length > 0 ? 
                         Object.entries(evaluacionRecientePorCodigo).map(([codigo, evaluacion]) =>
                           evaluacion ? (
-                            <SelectItem key={evaluacion._id} value={codigo}>
+                            <SelectItem key={`building-${evaluacion._id}`} value={codigo || '_no_value_'}>
                               {evaluacion.edificio?.nombre || codigo}
                             </SelectItem>
                           ) : null
-                        )
-                      ) : (
-                        <SelectItem disabled value={""}>No hay edificios disponibles</SelectItem>
-                      )}
-                      </SelectContent>
+                        ) : 
+                        <SelectItem key="no-buildings" value="_no_buildings_">No hay edificios disponibles</SelectItem>
+                      }</SelectContent>
                     </Select>
                   </div>
                   
                   <div className="overflow-x-auto">
-                    <table className="min-w-full border rounded-md">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación del edificio</td>
-                          <td className="px-6 py-4">
-                            <input
-                              type="number"
-                              min="0.00"
-                              step="0.01"
-                              placeholder="0-1"
-                              readOnly
-                              value={depreciacion}
-                              onChange={(e) => setDepreciacion(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </td>                          
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {depreciacion ? parseFloat(depreciacion).toFixed(2) : "0.00"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">5%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {depreciacion ? (parseFloat(depreciacion) * 5).toFixed(2) : "0.00"}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Estados de los componentes y sistemas</td>
-                          <td className="px-6 py-4">
-                            <input
-                              type="number"
-                              min="0.00"
-                              readOnly
-                              step="0.01"
-                              placeholder="0-1"
-                              value={estadoComponentes}
-                              onChange={(e) => setEstadoComponentes(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </td>                          
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {estadoComponentes ? parseFloat(estadoComponentes).toFixed(2) : "0.00"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">10%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {estadoComponentes ? (parseFloat(estadoComponentes) * 10).toFixed(2) : "0.00"}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Condición de funcionalidad y normativa del edificio</td>
-                          <td className="px-6 py-4">
-                            <input
-                              type="number"
-                              min="0.00"
-                              readOnly
-                              step="0.01"
-                              placeholder="0-1"
-                              value={condicionFuncionalidad}
-                              onChange={(e) => setCondicionFuncionalidad(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </td>                          
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {condicionFuncionalidad ? parseFloat(condicionFuncionalidad).toFixed(2) : "0.00"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">20%</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            {condicionFuncionalidad ? (parseFloat(condicionFuncionalidad) * 20).toFixed(2) : "0.00"}
-                          </td>
-                        </tr>
-                        <tr className="bg-gray-50">
-                          <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>                          <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
-                            {puntajeEdificacionExistente.toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
+                    <table className="min-w-full border rounded-md"><thead className="bg-gray-50"><tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Criterio seleccionado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Valor obtenido</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Peso</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje</th>
+                    </tr></thead><tbody className="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Depreciación del edificio</td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="number"
+                            min="0.00"
+                            step="0.01"
+                            placeholder="0-1"
+                            readOnly
+                            value={depreciacion}
+                            onChange={(e) => setDepreciacion(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>                          
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {depreciacion ? parseFloat(depreciacion).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">5%</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {depreciacion ? (parseFloat(depreciacion) * 5).toFixed(2) : "0.00"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Estados de los componentes y sistemas</td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="number"
+                            min="0.00"
+                            readOnly
+                            step="0.01"
+                            placeholder="0-1"
+                            value={estadoComponentes}
+                            onChange={(e) => setEstadoComponentes(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>                          
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {estadoComponentes ? parseFloat(estadoComponentes).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">10%</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {estadoComponentes ? (parseFloat(estadoComponentes) * 10).toFixed(2) : "0.00"}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-100">Condición de funcionalidad y normativa del edificio</td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="number"
+                            min="0.00"
+                            readOnly
+                            step="0.01"
+                            placeholder="0-1"
+                            value={condicionFuncionalidad}
+                            onChange={(e) => setCondicionFuncionalidad(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>                          
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {condicionFuncionalidad ? parseFloat(condicionFuncionalidad).toFixed(2) : "0.00"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">20%</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          {condicionFuncionalidad ? (parseFloat(condicionFuncionalidad) * 20).toFixed(2) : "0.00"}
+                        </td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td colSpan={3} className="px-6 py-4 text-right font-medium">Total</td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-center">35%</td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-center">
+                          {puntajeEdificacionExistente.toFixed(2)}
+                        </td>
+                      </tr>
+                    </tbody>
                     </table>
                   </div>
                 </>
@@ -799,13 +694,14 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
               {isInitialized && (
                 <>
                   
-                  
-                  {/* Tablas de ejes */}
-                  {ejes.map(eje => (
-                    <div key={eje.id}>
-                      {renderTablaEje(eje.id)}
-                    </div>
-                  ))}
+                    {/* Tablas de ejes */}
+                  <div>
+                    {ejes.map(eje => (
+                      <div key={`eje-${eje.id}`}>
+                        {renderTablaEje(eje.id)}
+                      </div>
+                    ))}
+                  </div>
 
                   {/* Tabla de Total General */}
                   <div className="mt-8 border-t pt-6">
@@ -821,72 +717,108 @@ export default function VerProyectoPage({ params }: { params: Promise<{ id: stri
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-b">Puntaje Obtenido</th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">                          {/* Filas para los ejes */}
+                        <tbody className="bg-white divide-y divide-gray-200">
                           {ejes.map(eje => (
                             <tr key={`total_${eje.id}`}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                                {eje.eje}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center">
-                                {eje.peso}%
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center">
-                                {calcularTotalEje(eje.id)}
-                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{eje.eje}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center">{eje.peso}%</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center">{calcularTotalEje(eje.id)}</td>
                             </tr>
                           ))}
-                          
-                          {/* Fila para edificación existente o nueva */}
                           {buildingType === "existing" ? (
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-50">
-                                Edificación Existente
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">
-                                35%
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">
-                                {puntajeEdificacionExistente.toFixed(2)}
-                              </td>
+                            <tr key="existing-building">
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-yellow-50">Edificación Existente</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">35%</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-yellow-50">{puntajeEdificacionExistente.toFixed(2)}</td>
                             </tr>
                           ) : (
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-blue-50">
-                                Edificación Nueva
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">
-                                0%
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">
-                                0.00
-                              </td>
+                            <tr key="new-building">
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 bg-blue-50">Edificación Nueva</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0%</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center bg-blue-50">0.00</td>
                             </tr>
                           )}
-                          
-                          {/* Fila del total general */}
-                          <tr className="bg-blue-50">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                              TOTAL GENERAL
-                            </td>                            
-                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium">
-                              {ejes.reduce((sum, eje) => sum + eje.peso, 0) + (buildingType === "existing" ? 35 : 0)}%
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium text-blue-600">
-                              {(() => {
-                                const total = ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) +
-                                  (buildingType === "existing" ? puntajeEdificacionExistente : 0);
-                                if (totalGeneral !== total.toFixed(2)) setTotalGeneral(total.toFixed(2));
-                                return total.toFixed(2);
-                              })()}
-                            </td>
+                          <tr key="total-general">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">TOTAL GENERAL</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium">{ejes.reduce((sum, eje) => sum + eje.peso, 0) + (buildingType === "existing" ? 35 : 0)}%</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-center font-medium text-blue-600">{(() => {
+                              const total = ejes.reduce((sum, eje) => sum + parseFloat(calcularTotalEje(eje.id)), 0) +
+                                (buildingType === "existing" ? puntajeEdificacionExistente : 0);
+                              if (totalGeneral !== total.toFixed(2)) setTotalGeneral(total.toFixed(2));
+                              return total.toFixed(2);
+                            })()}</td>
                           </tr>
-                        </tbody>
-                      </table>
+                        </tbody></table>
                     </div>
                   </div>
                 </>
               )}
+              
+              {/* Sección de documentos PDF */}
+              <div className="mt-8 border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Documentos del Proyecto</h3>
+                
+                {loadingDocumentos ? (
+                  <div className="flex items-center justify-center p-6">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <span className="ml-2 text-gray-600">Cargando documentos...</span>
+                  </div>
+                ) : documentosError ? (
+                  <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
+                    <p>{documentosError}</p>
+                  </div>
+                ) : documentos.length === 0 ? (
+                  <div className="bg-gray-50 border border-gray-200 text-gray-600 p-6 rounded-md text-center">
+                    <FileText className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                    <p>No hay documentos disponibles para este proyecto.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {documentos.map((documento) => (
+                      <div
+                        key={documento._id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start space-x-3">
+                          <FileText className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-gray-900 truncate">
+                              {documento.name}
+                            </h4>
+                            {documento.description && (
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                {documento.description}
+                              </p>
+                            )}
+                            <div className="flex items-center space-x-2 mt-3">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleView(documento)}
+                                className="flex items-center space-x-1"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                <span>Ver</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleDownload(documento)}
+                                className="flex items-center space-x-1"
+                              >
+                                <Download className="h-3 w-3" />
+                                <span>Descargar</span>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
             </div>
+            
           )}
         
       </div>
