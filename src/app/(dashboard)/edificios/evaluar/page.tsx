@@ -344,7 +344,7 @@ export default function Page(): JSX.Element {
   }, [edadEdificioRemodelacion, vidaUtilRemodelacion, estadoSeleccionadoRemodelacion]);
 
   useEffect(() => {
-    if (escalaDepreciacion || escalaDepreciacionRemodelacion || porcentajeRemodelacion) {
+    if (escalaDepreciacion ?? escalaDepreciacionRemodelacion ?? porcentajeRemodelacion) {
       const puntajeTotal = ((escalaDepreciacion * (1 - porcentajeRemodelacion / 100)) + (escalaDepreciacionRemodelacion * escalaDepreciacion)).toFixed(2);
       setPuntajeDepreciacionTotal(parseFloat(puntajeTotal));
     }
