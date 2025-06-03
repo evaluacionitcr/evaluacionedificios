@@ -145,7 +145,7 @@ export default function RankingNewestEvaluations() {
                         {evaluacion.puntajeTotalEdificio ? `${evaluacion.puntajeTotalEdificio.toFixed(2)}` : "N/A"}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link href={`/evaluaciones/${evaluacion._id}/evaluacion`}>
+                      <Link href={`/evaluaciones/${evaluacion.edificio.codigo.toLowerCase()}/evaluacion?codigo=${encodeURIComponent(evaluacion._id)}`}>
                         <Button size="sm" variant="ghost">
                           <Eye className="h-4 w-4 mr-1" />
                           Ver
