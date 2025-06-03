@@ -115,26 +115,26 @@ export default function RankingNewestEvaluations() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
           </div>
         ) : ultimasEvaluaciones.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">No hay evaluaciones disponibles</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableCell className="font-medium">Código</TableCell>
-                  <TableCell className="font-medium">Edificio</TableCell>
-                  <TableCell className="font-medium">Campus</TableCell>
-                  <TableCell className="font-medium">Fecha</TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center">
-                      Puntaje
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium text-right">Acción</TableCell>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          <p className="text-center text-gray-500 py-4">No hay evaluaciones disponibles</p>        ) : (
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto max-h-96 overflow-y-auto">
+              <Table>
+                <TableHeader className="sticky top-0 bg-white shadow-sm z-10">
+                  <TableRow>
+                    <TableCell className="font-medium bg-white border-b">Código</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Edificio</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Campus</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Fecha</TableCell>
+                    <TableCell className="font-medium bg-white border-b">
+                      <div className="flex items-center">
+                        Puntaje
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium text-right bg-white border-b">Acción</TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                 {ultimasEvaluaciones.map((evaluacion) => (
                   <TableRow key={evaluacion._id}>
                     <TableCell className="font-medium">{evaluacion.edificio.codigo}</TableCell>
@@ -151,11 +151,11 @@ export default function RankingNewestEvaluations() {
                           Ver
                         </Button>
                       </Link>
-                    </TableCell>
-                  </TableRow>
+                    </TableCell>                  </TableRow>
                 ))}
               </TableBody>
-            </Table>
+              </Table>
+            </div>
           </div>
         )}
       </CardContent>

@@ -102,17 +102,21 @@ export default function RankingPriorizacion() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700" />
           </div>
         ) : proyectos.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">No hay proyectos disponibles</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table><TableHeader><TableRow>
-              <TableCell className="font-medium">Nombre Proyecto</TableCell>
-              <TableCell className="font-medium">Código Edificio</TableCell>
-              <TableCell className="font-medium">Nombre Edificio</TableCell>
-              <TableCell className="font-medium">Campus</TableCell>
-              <TableCell className="font-medium">Prioridad (Puntaje)</TableCell>
-              <TableCell className="font-medium">Acciones</TableCell>
-            </TableRow></TableHeader><TableBody>{proyectos.map(proyecto => (              <TableRow key={proyecto._id}>
+          <p className="text-center text-gray-500 py-4">No hay proyectos disponibles</p>        ) : (
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto max-h-96 overflow-y-auto">
+              <Table>
+                <TableHeader className="sticky top-0 bg-white shadow-sm z-10">
+                  <TableRow>
+                    <TableCell className="font-medium bg-white border-b">Nombre Proyecto</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Código Edificio</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Nombre Edificio</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Campus</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Prioridad (Puntaje)</TableCell>
+                    <TableCell className="font-medium bg-white border-b">Acciones</TableCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>{proyectos.map(proyecto => (<TableRow key={proyecto._id}>
                 <TableCell className="font-medium">{proyecto.nombre}</TableCell>
                 <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.edificioSeleccionado ?? "-" : "-"}</TableCell>
                 <TableCell>{proyecto.tipoEdificacion === "existing" ? proyecto.nombreEdificio ?? "Sin edificio asociado" : "Sin edificio asociado"}</TableCell>
@@ -126,9 +130,10 @@ export default function RankingPriorizacion() {
                   >
                     <Eye className="h-4 w-4 mr-1" />
                     Ver
-                  </Button>
-                </TableCell>
-              </TableRow>))}</TableBody></Table>
+                  </Button>                </TableCell>
+              </TableRow>))}</TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </CardContent>
