@@ -9,12 +9,6 @@ import Link from "next/link";
 import { Eye } from "lucide-react";
 import {
     ArrowLeft,
-    Building,
-    Calendar,
-    Trash2,
-    ChevronDown,
-    ChevronUp,
-    Pencil,
   } from "lucide-react";
 
 interface Evaluacion {
@@ -85,12 +79,9 @@ interface UserData {
   lastName: string;
 }
 
-interface PageParams {
-  id: string;
-}
-
 export default function EvaluacionesDeEdificio() {
   const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
+  const [loading, setLoading] = useState(true);
   const params = useParams();
   const codigo = typeof params?.id === 'string' ? params.id : "";
 
@@ -98,10 +89,12 @@ export default function EvaluacionesDeEdificio() {
     async function fetchEvaluaciones() {
       if (!codigo) {
         console.warn("Código no definido");
+        setLoading(false);
         return;
       }
 
       try {
+        setLoading(true);
         const response = await fetch("/api/evaluaciones");
         if (!response.ok) {
           throw new Error("Error al obtener evaluaciones");
@@ -132,6 +125,8 @@ export default function EvaluacionesDeEdificio() {
         setEvaluaciones(evaluacionesConEvaluadores);
       } catch (error) {
         console.error("Error al obtener evaluaciones:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -163,7 +158,16 @@ export default function EvaluacionesDeEdificio() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {evaluaciones.length > 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <p className="text-gray-600">Cargando evaluaciones...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : evaluaciones.length > 0 ? (
               evaluaciones.map((evaluacion) => (
                 <TableRow key={evaluacion._id}>
                   <TableCell>
@@ -195,7 +199,7 @@ export default function EvaluacionesDeEdificio() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
+                <TableCell colSpan={6} className="text-center">
                   No hay evaluaciones disponibles para este edificio.
                 </TableCell>
               </TableRow>

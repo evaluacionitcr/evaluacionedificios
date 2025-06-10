@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, Document } from "mongodb";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { MongoClient, type Document } from "mongodb";
 
 interface Evaluacion {
   edificio: {
@@ -51,14 +52,12 @@ interface Evaluacion {
   idEvaluador: string;
 }
 
-const uri = process.env.MONGODB_URI ??'';
-const client = new MongoClient(uri);
-const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
-const collectionName = process.env.COLLECTION_NAME ??"evaluaciones";
-const db = client.db(dbName);
-const collection = db.collection(collectionName);
+const uri = process.env.MONGODB_URI ?? '';
+const dbName = process.env.DB_NAME ?? "evaluacionedificiositcr";
+const collectionName = process.env.COLLECTION_NAME ?? "evaluaciones";
 
 export async function POST(request: NextRequest) {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const db = client.db(dbName);
@@ -93,25 +92,29 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-    try {
-        await client.connect();
-        
-        // Get all documents from the collection
-        const documents = await collection.find({}).toArray() as unknown as Evaluacion[];
-        await client.close();
-        
-        return NextResponse.json({ 
-            status: "success", 
-            message: "Documents retrieved successfully!",
-            data: documents
-        });
-    } catch (error) {
-        console.error("MongoDB error:", error);
-        return NextResponse.json({ 
-            status: "error", 
-            message: "Failed to retrieve documents",
-            error: error instanceof Error ? error.message : "Unknown error"
-        }, { status: 500 });
-    }
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+    
+    // Get all documents from the collection
+    const documents = await collection.find({}).toArray() as unknown as Evaluacion[];
+    
+    return NextResponse.json({ 
+      status: "success", 
+      message: "Documents retrieved successfully!",
+      data: documents
+    });
+  } catch (error) {
+    console.error("MongoDB error:", error);
+    return NextResponse.json({ 
+      status: "error", 
+      message: "Failed to retrieve documents",
+      error: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 });
+  } finally {
+    await client.close();
+  }
 }
 

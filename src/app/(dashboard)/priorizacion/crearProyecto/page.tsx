@@ -432,7 +432,7 @@ export default function CrearProyectoPage() {
       const criteriosDeEje = criterios.filter(c => c.ejeId === ejeId);
       
       return (
-        <div key={`eje_${ejeId}`} className="mt-6 border-t pt-6">
+        <div className="mt-6 border-t pt-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             {eje.eje} ({eje.peso}%)
           </h3>
@@ -614,7 +614,7 @@ export default function CrearProyectoPage() {
                             </SelectItem>
                           ))
                          : 
-                          <SelectItem key="no-sedes" disabled value="">No hay sedes disponibles</SelectItem>
+                          <SelectItem key="no-sedes" disabled value="no-sedes-disponibles">No hay sedes disponibles</SelectItem>
                         }
                       </SelectContent>
                     </Select>
@@ -683,7 +683,7 @@ export default function CrearProyectoPage() {
                           ) : null
                         )
                       ) : (
-                        <SelectItem key="no-edificios" disabled value={""}>No hay edificios disponibles</SelectItem>
+                        <SelectItem key="no-edificios" disabled value="no-edificios-disponibles">No hay edificios disponibles</SelectItem>
                       )}
                       </SelectContent>
                     </Select>
@@ -786,7 +786,11 @@ export default function CrearProyectoPage() {
                   
                   
                   {/* Tablas de ejes */}
-                  {ejes.map(eje => renderTablaEje(eje.id))}
+                  {ejes.map(eje => (
+                    <div key={eje.id}>
+                      {renderTablaEje(eje.id)}
+                    </div>
+                  ))}
 
                   {/* Tabla de Total General */}
                   <div className="mt-8 border-t pt-6">
