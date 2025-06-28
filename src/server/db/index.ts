@@ -17,7 +17,7 @@ const connectionConfig = {
   connection: {
     application_name: 'evaluacionedificios',
   },
-  onnotice: (notice: any) => {
+  onnotice: (notice: { severity?: string; [key: string]: unknown }) => {
     if (notice.severity === 'NOTICE') {
       console.log('PostgreSQL notice:', notice);
     }
