@@ -12,7 +12,19 @@ const globalForDb = globalThis as unknown as {
   conn: postgres.Sql | undefined;
 };
 
-const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
+const connectionConfig = {
+  max: 1,
+  connection: {
+    application_name: 'evaluacionedificios',
+  },
+  onnotice: (notice: any) => {
+    if (notice.severity === 'NOTICE') {
+      console.log('PostgreSQL notice:', notice);
+    }
+  },
+};
+
+const conn = globalForDb.conn ?? postgres(env.DATABASE_URL, connectionConfig);
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 export const db = drizzle(conn, { schema });

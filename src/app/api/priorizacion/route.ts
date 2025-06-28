@@ -1,17 +1,15 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
 import type { Document } from "mongodb";
 import type { FormularioProyecto } from "../../(dashboard)/priorizacion/types";
+import clientPromise from "~/lib/mongodb";
 
-const uri = process.env.MONGODB_URI ??'';
-const client = new MongoClient(uri);
-const dbName = process.env.DB_NAME ??"evaluacionedificiositcr";
+const dbName = process.env.DB_NAME ?? "evaluacionedificiositcr";
 const collectionName = "proyectos";
 
 export async function POST(request: NextRequest) {
   try {
-    await client.connect();
+    const client = await clientPromise;
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
@@ -43,14 +41,12 @@ export async function POST(request: NextRequest) {
       message: "Error al guardar el proyecto",
       error: error instanceof Error ? error.message : "Error desconocido"
     }, { status: 500 });
-  } finally {
-    await client.close();
   }
 }
 
 export async function GET() {
   try {
-    await client.connect();
+    const client = await clientPromise;
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
@@ -69,7 +65,5 @@ export async function GET() {
       message: "Error al obtener los proyectos",
       error: error instanceof Error ? error.message : "Error desconocido"
     }, { status: 500 });
-  } finally {
-    await client.close();
   }
 }

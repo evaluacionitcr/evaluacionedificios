@@ -10,9 +10,21 @@ export async function getEjes() {
     const ejes = await db.select().from(EjesPriorizacion);
     return { success: true, data: ejes };
   }
-  catch (error) {
+  catch (error: any) {
     console.error("Error al obtener los ejes:", error);
-    return { success: false, error: "No se pudieron cargar los ejes" };
+    
+    // Handle specific PostgreSQL errors
+    if (error?.code === 'XX000' && error?.message?.includes('Tenant or user not found')) {
+      return { 
+        success: false, 
+        error: "Error de conexión a la base de datos: El servidor no está disponible. Verifica la configuración de Supabase." 
+      };
+    }
+    
+    return { 
+      success: false, 
+      error: error?.message || "No se pudieron cargar los ejes" 
+    };
   }
 }
 
