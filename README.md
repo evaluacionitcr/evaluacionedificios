@@ -21,7 +21,7 @@ The system replaces manual processes (based on scattered spreadsheets), improvin
 
 - **Frontend**: [Next.js 14](https://nextjs.org/) + TailwindCSS  
 - **Backend**: Serverless API on Vercel  
-- **Database**: PostgreSQL on [Supabase](https://supabase.com/)  
+- **Database**: PostgreSQL on [Supabase](https://supabase.com/)  and MongoDB on [MongoAtlas](https://www.mongodb.com/products/platform)
 - **Authentication and roles**: [Clerk](https://clerk.com/)  
 - **File storage**: [UploadThing](https://uploadthing.com/)  
 - **Hosting**: [Vercel](https://vercel.com/)  
