@@ -35,7 +35,7 @@ flowchart TD
     U[👤 User] -->|Web| FE[Next.js Frontend]
     FE -->|API Calls| BE[Backend on Vercel]
     BE -->|Auth| Clerk[Clerk]
-    BE -->|Data| DB[(Supabase - PostgreSQL)]
+    BE -->|Data| DB[(Supabase - PostgreSQL / MongoAtlas - MongoDB)]
     BE -->|Files| UT[UploadThing]
     DB -->|Reports| EX[📊 Export PDF/Excel]
 ```
@@ -53,6 +53,7 @@ flowchart TD
   - Vercel account
   - Clerk API keys
   - UploadThing API keys
+  - MongoAtlas API keys
 
 ## ⚙️ Installation & Usage
     Clone the repository:
