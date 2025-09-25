@@ -1,29 +1,92 @@
-# Create T3 App
+# 🏗️ Building Evaluation and Project Prioritization System
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This project develops a web system to **automate the evaluation of buildings** at the Costa Rica Institute of Technology (TEC) and support the **prioritization of maintenance, remodeling, or construction projects**.  
 
-## What's next? How do I make an app with this?
+The system replaces manual processes (based on scattered spreadsheets), improving **efficiency, traceability, and strategic decision-making**.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+---
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## 🚀 Main Features
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- **Building evaluations**: structured records of technical conditions, depreciation, and serviceability.  
+- **Project prioritization**: automatic ranking based on urgency, impact, and estimated costs.  
+- **User and role management**: secure access control through institutional authentication.  
+- **Report generation**: export structured data and charts to PDF and Excel.  
+- **Evaluation history**: review previous evaluations for each building.  
+- **Intuitive interface**: accessible design, real-time validations, and compliance with WCAG 2.1 AA accessibility standards.  
 
-## Learn More
+---
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## 🛠️ Technologies Used
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+- **Frontend**: [Next.js 14](https://nextjs.org/) + TailwindCSS  
+- **Backend**: Serverless API on Vercel  
+- **Database**: PostgreSQL on [Supabase](https://supabase.com/)  
+- **Authentication and roles**: [Clerk](https://clerk.com/)  
+- **File storage**: [UploadThing](https://uploadthing.com/)  
+- **Hosting**: [Vercel](https://vercel.com/)  
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+---
 
-## How do I deploy this?
+## 📐 System Architecture
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+```mermaid
+flowchart TD
+    U[👤 User] -->|Web| FE[Next.js Frontend]
+    FE -->|API Calls| BE[Backend on Vercel]
+    BE -->|Auth| Clerk[Clerk]
+    BE -->|Data| DB[(Supabase - PostgreSQL)]
+    BE -->|Files| UT[UploadThing]
+    DB -->|Reports| EX[📊 Export PDF/Excel]
+```
+
+## 👥 User Roles
+
+    Administrator: manages users, assigns roles, and configures parameters.
+
+    Project Evaluator: records evaluations and prioritizes projects.
+
+
+## 📋 Requirements
+  - Node.js 20+
+  - Supabase account
+  - Vercel account
+  - Clerk API keys
+  - UploadThing API keys
+
+## ⚙️ Installation & Usage
+    Clone the repository:
+```sh
+    git clone https://github.com/yourusername/building-evaluation.git
+    cd building-evaluation
+```
+Install dependencies:
+```sh
+    npm/pnpm/bun install
+```
+Configure environment variables (.env.local):
+```
+    NEXT_PUBLIC_SUPABASE_URL=...
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+    CLERK_API_KEY=...
+    UPLOADTHING_API_KEY=...
+```
+Run in development mode:
+```sh
+    npm/pnpm/bun run dev
+```
+Open in your browser:
+```
+    http://localhost:3000
+```
+## 👨‍💻 Development Team
+
+| Member |
+|--------|
+| [![Javier Rojas Rojas](https://img.shields.io/badge/Javier%20Rojas%20Rojas-181717?style=flat-square&logo=github)](https://github.com/javialroro) |
+| [![Hytan Jara Matamoros](https://img.shields.io/badge/Hytan%20Jara%20Matamoros-181717?style=flat-square&logo=github)](https://github.com/HytanJara) |
+| [![Julián López Mata](https://img.shields.io/badge/Julián%20López%20Mata-181717?style=flat-square&logo=github)](https://github.com/Julianlopmm) |
+| [![Carlos Venegas Masís](https://img.shields.io/badge/Carlos%20Venegas%20Masís-181717?style=flat-square&logo=github)](https://github.com/ScarloVM) |
+
+
+Costa Rica Institute of Technology – 2025
