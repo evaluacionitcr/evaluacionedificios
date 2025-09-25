@@ -1,6 +1,6 @@
 # 🏗️ Building Evaluation and Project Prioritization System
 
-This project develops a web system to **automate the evaluation of buildings** at the Costa Rica Institute of Technology (TEC) and support the **prioritization of maintenance, remodeling, or construction projects**.  
+This project develops a web system to **automate the evaluation of buildings** for the Costa Rica Institute of Technology (TEC) Engineering Office and support the **prioritization of maintenance, remodeling, or construction projects**.  
 
 The system replaces manual processes (based on scattered spreadsheets), improving **efficiency, traceability, and strategic decision-making**.
 
